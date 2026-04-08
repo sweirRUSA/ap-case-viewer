@@ -177,17 +177,17 @@ function getVal(cols, id) {
 
 async function fetchBoard(boardId, colMap) {
   let all = [], cursor = null;
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 6);
+  const cutoffStr = cutoff.toISOString().split("T")[0];
+  const rules = `rules:[{column_id:"date4",compare_value:["${cutoffStr}"],operator:greater_than_or_equals}]`;
   for (let p = 0; p < 20; p++) {
-    const cutoff = new Date();
-    cutoff.setMonth(cutoff.getMonth() - 6);
-    const cutoffStr = cutoff.toISOString().split("T")[0];
-    const rules = `rules:[{column_id:"date4",compare_value:["${cutoffStr}"],operator:greater_than_or_equals}]`;
     const q = cursor
       ? `{next_items_page(limit:100,cursor:"${cursor}"){cursor items{id name column_values{id text value}}}}`
       : `{boards(ids:${boardId}){items_page(limit:100,query_params:{${rules}}){cursor items{id name column_values{id text value}}}}}`;
     const data = await gql(q);
     const pd = cursor ? data?.data?.next_items_page : data?.data?.boards?.[0]?.items_page;
-    if (!pd) break;
+    if (!pd || !pd.items || pd.items.length === 0) break;
     const mapped = pd.items.map(item => {
       const r = {id:item.id, name:item.name};
       Object.entries(colMap).forEach(([k,cid]) => { r[k] = getVal(item.column_values, cid); });
