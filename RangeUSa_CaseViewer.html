@@ -127,9 +127,22 @@ button:hover{background:#f5f5f5;}
 const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY0MzAzMzE5NiwiYWFpIjoxMSwidWlkIjo1OTA4NDY1LCJpYWQiOiIyMDI2LTA0LTA4VDEzOjM2OjQ2LjA4MloiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjoyNjYzMjIyLCJyZ24iOiJ1c2UxIn0.y2EeoxRh9al0cSui5AnYbRKOVDz2vdYII90esef1tuI";
 const IR_BOARD = "309348813";
 const VR_BOARD = "992178387";
+const DS_BOARD = "1053253179";
 const PROXY = "https://corsproxy.io/?";
 
-let irItems = [], vrItems = [], selectedId = null, currentVR = null;
+const DS_COLS = {
+  status:"status",branch:"dropdown0",district:"status1",
+  subjectName:"text61",subjectId:"dup__of_subject_id__",
+  transactionInfo:"text22",submittedBy:"primary_contributor",
+  date:"date4",dateSubmitted:"date0",narrative:"long_text",
+  supplement:"text_mkpxnqe3",incidentReport:"incident__",
+  leContact:"le_contact_name",leEmail:"le_email_address",
+  incidentType:"incident_type",location:"incident_category",
+  specificLocation:"text8",injuries:"dropdown58",
+  propertyDamage:"ems_transport2",phone:"phone_mkr6t0vm"
+};
+
+let irItems = [], vrItems = [], dsItems = [], selectedId = null, currentVR = null;
 
 const IR_COLS = {
   caseId:"formula_mkr4w8ec",date:"date4",incidentTime:"text19",
@@ -229,6 +242,13 @@ function getLinkedVR(ir) {
   );
 }
 
+function getLinkedDS(ir) {
+  return dsItems.filter(ds =>
+    (ds.incidentReport && ds.incidentReport === ir.id) ||
+    (ir.caseId && ds.incidentReport === ir.caseId)
+  );
+}
+
 function renderList() {
   const q = document.getElementById("search").value.toLowerCase();
   const sf = document.getElementById("status-filter").value;
@@ -242,7 +262,10 @@ function renderList() {
   const panel = document.getElementById("list-panel");
   if (!filtered.length) { panel.innerHTML = '<div class="empty">No cases match your search.</div>'; return; }
 
-  panel.innerHTML = filtered.map(r => `
+  panel.innerHTML = filtered.map(r => {
+    const ds = getLinkedDS(r);
+    const dsStatus = ds.length ? ds[0].status : null;
+    return `
     <div class="list-item ${selectedId === r.id ? 'active' : ''}" onclick="selectItem('${r.id}')">
       <div class="list-item-name">${displayName(r)}</div>
       <div class="list-item-caseid">${r.caseId || r.id}</div>
@@ -251,11 +274,13 @@ function renderList() {
         <span><span class="label">Date </span>${r.date||"—"}</span>
         <span><span class="label">Category </span>${r.category||"—"}</span>
         <span><span class="label">Type </span>${(r.incidentType||"—").substring(0,20)}</span>
-        <span><span class="label">DL </span>${r.district||"—"}</span>
-        <span><span class="label">Status </span>${r.apFollowUp||"—"}</span>
+        <span><span class="label">Ownership </span>${r.apFollowUp||"—"}</span>
+        <span><span class="label">HR Review </span>${r.hrRec||"—"}</span>
+        <span><span class="label">Retain Video </span>${r.retainVideo||"—"}</span>
+        <span><span class="label">Deny Service </span>${dsStatus||"None"}</span>
       </div>
     </div>
-  `).join("");
+  `}).join("");
 }
 
 function selectItem(id) {
@@ -276,6 +301,105 @@ function docThumb(url, label) {
   </a>`;
 }
 
+async function updateColumn(itemId, columnId, value, type) {
+  let colValue;
+  if (type === 'text') colValue = JSON.stringify(value);
+  else if (type === 'longtext') colValue = JSON.stringify({text: value});
+  else if (type === 'status') colValue = JSON.stringify({label: value});
+  
+  const mutation = `mutation {
+    change_column_value(
+      board_id: ${IR_BOARD},
+      item_id: ${itemId},
+      column_id: "${columnId}",
+      value: ${JSON.stringify(colValue)}
+    ) { id }
+  }`;
+  
+  try {
+    const result = await gql(mutation);
+    if (result?.data?.change_column_value?.id) return true;
+    console.error("Update failed:", result);
+    return false;
+  } catch(e) {
+    console.error("Update error:", e);
+    return false;
+  }
+}
+
+function showSaveStatus(el, success) {
+  const msg = document.createElement('span');
+  msg.textContent = success ? ' ✓ Saved' : ' ✗ Failed';
+  msg.style.cssText = `font-size:11px;margin-left:8px;color:${success?'#1a7a3f':'#c0392b'};`;
+  el.parentNode.appendChild(msg);
+  setTimeout(() => msg.remove(), 3000);
+}
+
+function makeEditable(r) {
+  // AP Findings - long text
+  const apEl = document.getElementById('edit-apFindings');
+  if (apEl) {
+    apEl.addEventListener('blur', async function() {
+      const btn = document.getElementById('save-apFindings');
+      btn.textContent = 'Saving…';
+      btn.disabled = true;
+      const success = await updateColumn(r.id, 'long_text__1', this.value, 'longtext');
+      btn.textContent = 'Save';
+      btn.disabled = false;
+      showSaveStatus(btn, success);
+      if (success) {
+        const item = irItems.find(x => x.id === r.id);
+        if (item) item.apFindings = this.value;
+      }
+    });
+    document.getElementById('save-apFindings').addEventListener('click', async function() {
+      const val = apEl.value;
+      this.textContent = 'Saving…';
+      this.disabled = true;
+      const success = await updateColumn(r.id, 'long_text__1', val, 'longtext');
+      this.textContent = 'Save';
+      this.disabled = false;
+      showSaveStatus(this, success);
+      if (success) {
+        const item = irItems.find(x => x.id === r.id);
+        if (item) item.apFindings = val;
+      }
+    });
+  }
+
+  // OneDrive Link - text
+  const odEl = document.getElementById('edit-oneDriveLink');
+  if (odEl) {
+    document.getElementById('save-oneDriveLink').addEventListener('click', async function() {
+      const val = odEl.value;
+      this.textContent = 'Saving…';
+      this.disabled = true;
+      const success = await updateColumn(r.id, 'text_mkvd8262', val, 'text');
+      this.textContent = 'Save';
+      this.disabled = false;
+      showSaveStatus(this, success);
+      if (success) {
+        const item = irItems.find(x => x.id === r.id);
+        if (item) item.oneDriveLink = val;
+      }
+    });
+  }
+
+  // Retain Video - status dropdown
+  const rvEl = document.getElementById('edit-retainVideo');
+  if (rvEl) {
+    rvEl.addEventListener('change', async function() {
+      const success = await updateColumn(r.id, 'deny_service__', this.value, 'status');
+      showSaveStatus(this, success);
+      if (success) {
+        const item = irItems.find(x => x.id === r.id);
+        if (item) item.retainVideo = this.value;
+        renderList();
+      }
+    });
+  }
+}
+
 function renderDetail(r) {
   const vrs = getLinkedVR(r);
   const sections = [
@@ -290,7 +414,7 @@ function renderDetail(r) {
     ]},
     {title:"Narrative", fields:[{key:"narrative1",label:"Original narrative",long:true}]},
     {title:"Findings", fields:[
-      {key:"apFindings",label:"AP findings",long:true},
+      {key:"apFindings",label:"AP findings",long:true,editable:"longtext",editId:"apFindings",colId:"long_text__1"},
       {key:"hrRec",label:"HR recommendation & findings",long:true},
       {key:"interviewNarrative",label:"Interview narrative",long:true}
     ]},
@@ -302,24 +426,49 @@ function renderDetail(r) {
   ];
 
   const sectionsHTML = sections.map(s => {
-    const fieldsHTML = s.fields.map(f => `
-      <div class="field ${f.long?'full':''}">
+    const fieldsHTML = s.fields.map(f => {
+      const val = getIRValue(r, f.key);
+      if (f.editable === 'longtext') {
+        return `<div class="field ${f.long?'full':''}">
+          <div class="field-label">${f.label}</div>
+          <textarea id="edit-${f.editId}" style="width:100%;min-height:80px;font-size:13px;padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-family:inherit;resize:vertical;">${val === '—' ? '' : val}</textarea>
+          <button id="save-${f.editId}" style="margin-top:4px;font-size:11px;padding:3px 10px;background:#2d3a4a;color:#fff;border:none;border-radius:4px;cursor:pointer;">Save to Monday</button>
+        </div>`;
+      }
+      return `<div class="field ${f.long?'full':''}">
         <div class="field-label">${f.label}</div>
-        <div class="field-value">${getIRValue(r, f.key)}</div>
-      </div>
-    `).join("");
+        <div class="field-value">${val}</div>
+      </div>`;
+    }).join("");
     return `<div class="section"><div class="section-title">${s.title}</div><div class="field-grid">${fieldsHTML}</div></div>`;
   }).join("");
 
-  const docsHTML = (r.oneDriveLink || r.documents || r.pictures) ? `
+  const docsHTML = `
     <div class="section">
       <div class="section-title">Documents & media</div>
-      <div class="doc-thumbs">
-        ${docThumb(r.oneDriveLink,"Video")}
-        ${docThumb(r.documents,"Document")}
-        ${docThumb(r.pictures,"Picture")}
+      <div class="field-grid">
+        <div class="field full">
+          <div class="field-label">OneDrive video link</div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="edit-oneDriveLink" type="text" value="${r.oneDriveLink||''}" placeholder="Paste OneDrive link…" style="flex:1;min-width:200px;font-size:12px;"/>
+            <button id="save-oneDriveLink" style="font-size:11px;padding:3px 10px;background:#2d3a4a;color:#fff;border:none;border-radius:4px;cursor:pointer;">Save to Monday</button>
+            ${r.oneDriveLink ? `<a href="${r.oneDriveLink}" target="_blank" style="font-size:11px;color:#3a7bd5;">Open ↗</a>` : ''}
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Retain video</div>
+          <select id="edit-retainVideo" style="font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;">
+            <option value="Yes - Retain Video" ${(r.retainVideo||'').includes('Yes') ? 'selected' : ''}>Yes - Retain Video</option>
+            <option value="No" ${r.retainVideo === 'No' ? 'selected' : ''}>No</option>
+          </select>
+          <span style="font-size:11px;color:#888;margin-left:6px;">Auto-saves on change</span>
+        </div>
+        <div class="field" style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;">
+          ${docThumb(r.documents,"Document")}
+          ${docThumb(r.pictures,"Picture")}
+        </div>
       </div>
-    </div>` : "";
+    </div>`;
 
   const vrFields = [
     {key:"agency",label:"Agency"},{key:"status",label:"Status"},
@@ -351,6 +500,29 @@ function renderDetail(r) {
     </div>
   `).join("");
 
+  const dsRecords = getLinkedDS(r);
+  const dsHTML = `
+    <div class="section">
+      <div class="section-title">Deny service records (${dsRecords.length})</div>
+      ${dsRecords.length === 0 ? '<div style="font-size:13px;color:#999;padding:8px 0">No deny service records linked.</div>' :
+        dsRecords.map(ds => `
+          <div style="background:#fdecea;border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid #f5c6c6;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-size:13px;font-weight:600;color:#c0392b;">${ds.subjectName||"Unknown Subject"}</div>
+              <span class="badge badge-red">${ds.status||"—"}</span>
+            </div>
+            <div class="field-grid">
+              <div class="field"><div class="field-label">Branch</div><div class="field-value">${ds.branch||"—"}</div></div>
+              <div class="field"><div class="field-label">District leader</div><div class="field-value">${ds.district||"—"}</div></div>
+              <div class="field"><div class="field-label">Date</div><div class="field-value">${ds.date||"—"}</div></div>
+              <div class="field"><div class="field-label">Subject ID</div><div class="field-value">${ds.subjectId||"—"}</div></div>
+              <div class="field"><div class="field-label">Submitted by</div><div class="field-value">${ds.submittedBy||"—"}</div></div>
+              <div class="field"><div class="field-label">Phone</div><div class="field-value">${ds.phone||"—"}</div></div>
+              <div class="field full"><div class="field-label">Narrative</div><div class="field-value">${ds.narrative||"—"}</div></div>
+            </div>
+          </div>`).join("")}
+    </div>`;
+
   document.getElementById("detail-panel").innerHTML = `
     <div class="detail-card">
       <div class="detail-header">
@@ -370,12 +542,14 @@ function renderDetail(r) {
       </div>
       ${sectionsHTML}
       ${docsHTML}
+      ${dsHTML}
       <div class="section">
         <div class="section-title">Video requests (${vrs.length})</div>
         ${vrs.length ? vrsHTML : '<div style="font-size:13px;color:#999;padding:8px 0">No linked video requests.</div>'}
       </div>
     </div>
   `;
+  makeEditable(r);
 }
 
 function openModal(vrIndex, irId) {
@@ -460,12 +634,14 @@ function printCase(id) {
 
 async function init() {
   try {
-    const [ir, vr] = await Promise.all([
+    const [ir, vr, ds] = await Promise.all([
       fetchBoard(IR_BOARD, IR_COLS),
-      fetchBoard(VR_BOARD, VR_COLS)
+      fetchBoard(VR_BOARD, VR_COLS),
+      fetchBoard(DS_BOARD, DS_COLS)
     ]);
     irItems = ir;
     vrItems = vr;
+    dsItems = ds;
     document.getElementById("live-badge").textContent = `● Live — ${irItems.length} cases`;
     renderList();
   } catch(e) {
