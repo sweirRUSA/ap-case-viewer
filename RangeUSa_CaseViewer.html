@@ -7,78 +7,90 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f2f5;color:#1a1a1a;font-size:14px;}
-.header{background:#2d3a4a;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;}
+.header{background:#2d3a4a;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;}
 .logo{display:flex;align-items:center;gap:4px;}
 .logo-text{font-size:17px;font-weight:800;color:#fff;letter-spacing:3px;font-family:Georgia,serif;}
-.logo svg{margin:0 4px;}
 .header-right{display:flex;align-items:center;gap:16px;}
 .live-badge{font-size:11px;color:#4caf50;letter-spacing:1px;}
 .ap-text{font-size:11px;color:#8fa8c0;letter-spacing:2px;text-transform:uppercase;}
-.toolbar{display:flex;gap:8px;padding:14px 16px;align-items:center;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e0e0e0;}
-input[type=text],select{padding:7px 10px;border:1px solid #ccc;border-radius:6px;font-size:13px;outline:none;font-family:inherit;}
-input[type=text]{flex:1;min-width:200px;}
+.toolbar{display:flex;gap:6px;padding:10px 12px;align-items:center;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e0e0e0;}
+input[type=text],select{padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:12px;outline:none;font-family:inherit;background:#fff;color:#1a1a1a;}
 input[type=text]:focus,select:focus{border-color:#3a7bd5;}
-button{padding:6px 14px;border:1px solid #ccc;border-radius:6px;background:#fff;font-size:12px;cursor:pointer;font-family:inherit;color:#333;}
+input[type=date]{padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px;outline:none;font-family:inherit;}
+button{padding:5px 12px;border:1px solid #ccc;border-radius:6px;background:#fff;font-size:12px;cursor:pointer;font-family:inherit;color:#333;}
 button:hover{background:#f5f5f5;}
-.main{display:flex;height:calc(100vh - 100px);}
-.list{width:300px;min-width:300px;overflow-y:auto;border-right:1px solid #e0e0e0;background:#fff;}
-.list-item{padding:12px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.15s;}
+.btn-primary{background:#2d3a4a;color:#fff;border-color:#2d3a4a;}
+.btn-primary:hover{background:#3a4d63;}
+.btn-small{font-size:11px;padding:3px 10px;}
+.main{display:flex;height:calc(100vh - 108px);}
+.list{width:310px;min-width:310px;overflow-y:auto;border-right:1px solid #e0e0e0;background:#fff;}
+.list-item{padding:10px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
 .list-item:hover{background:#f5f8ff;}
 .list-item.active{background:#e8f0fb;border-left:3px solid #3a7bd5;}
-.list-item-name{font-size:13px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.list-item-caseid{font-size:11px;color:#3a7bd5;font-weight:500;margin-bottom:6px;}
-.list-item-meta{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;}
-.list-item-meta span{font-size:11px;color:#666;}
-.list-item-meta .label{color:#aaa;}
-.detail{flex:1;overflow-y:auto;padding:16px;}
-.detail-card{background:#fff;border-radius:10px;border:1px solid #e0e0e0;padding:18px 20px;max-width:1000px;}
-.detail-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
-.detail-name{font-size:16px;font-weight:600;}
-.detail-caseid{font-size:11px;color:#999;margin-top:2px;}
-.detail-actions{display:flex;gap:6px;}
-.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
-.badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;display:inline-block;}
-.badge-green{background:#e6f4ec;color:#1a7a3f;}
-.badge-orange{background:#fff8e6;color:#b07800;}
-.badge-red{background:#fdecea;color:#c0392b;}
-.badge-gray{background:#f0f0f0;color:#444;}
-.section{margin-bottom:18px;}
-.section-title{font-size:10px;font-weight:700;color:#2d3a4a;text-transform:uppercase;letter-spacing:0.09em;padding-bottom:5px;border-bottom:2px solid #2d3a4a;margin-bottom:10px;}
-.field-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 18px;}
-.field{margin-bottom:4px;}
-.field.full{grid-column:1/-1;}
-.field-label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;}
-.field-value{font-size:13px;line-height:1.7;word-break:break-word;white-space:pre-wrap;}
-.vr-card{background:#2d3a4a;border-radius:8px;padding:12px 14px;margin-bottom:10px;color:#fff;}
-.vr-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.item-name{font-size:12px;font-weight:500;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.item-caseid{font-size:11px;color:#3a7bd5;font-weight:500;margin-bottom:5px;}
+.item-meta{display:grid;grid-template-columns:1fr 1fr;gap:2px 6px;}
+.item-meta span{font-size:10px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.item-meta .lbl{color:#aaa;}
+.detail{flex:1;overflow-y:auto;padding:14px;}
+.card{background:#fff;border-radius:10px;border:1px solid #e0e0e0;padding:16px 18px;max-width:1100px;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.card-name{font-size:15px;font-weight:600;}
+.card-caseid{font-size:11px;color:#999;margin-top:2px;}
+.card-actions{display:flex;gap:6px;flex-shrink:0;}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.badge{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;}
+.bg-green{background:#e6f4ec;color:#1a7a3f;}
+.bg-orange{background:#fff8e6;color:#b07800;}
+.bg-red{background:#fdecea;color:#c0392b;}
+.bg-gray{background:#f0f0f0;color:#555;}
+.bg-blue{background:#e6f0fb;color:#1a5fa8;}
+.sec{margin-bottom:16px;}
+.sec-title{font-size:10px;font-weight:700;color:#2d3a4a;text-transform:uppercase;letter-spacing:.09em;padding-bottom:4px;border-bottom:2px solid #2d3a4a;margin-bottom:8px;}
+.fgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 16px;}
+.f{margin-bottom:2px;}
+.f.full{grid-column:1/-1;}
+.f.half{grid-column:span 2;}
+.flabel{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;}
+.fval{font-size:13px;line-height:1.7;word-break:break-word;white-space:pre-wrap;}
+.fedit textarea{width:100%;min-height:80px;font-size:13px;padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-family:inherit;resize:vertical;line-height:1.6;}
+.fedit input[type=text]{width:100%;font-size:12px;}
+.fedit-actions{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap;}
+.save-msg{font-size:11px;}
+.save-msg.ok{color:#1a7a3f;}
+.save-msg.err{color:#c0392b;}
+.vr-card{background:#2d3a4a;border-radius:8px;padding:11px 13px;margin-bottom:8px;}
+.vr-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .vr-agency{font-size:13px;font-weight:600;color:#fff;}
-.vr-sub{font-size:11px;color:#8fa8c0;margin-top:2px;}
-.vr-actions{display:flex;gap:6px;align-items:center;}
-.vr-status{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.15);color:#fff;}
-.vr-expand{font-size:11px;padding:3px 10px;background:transparent;border:1px solid #c0392b;color:#fff;border-radius:4px;cursor:pointer;}
-.vr-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;}
-.vr-field-label{font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;}
-.vr-field-value{font-size:12px;color:#e8eef4;line-height:1.6;white-space:pre-wrap;}
-.vr-field.full{grid-column:1/-1;}
-.doc-thumbs{display:flex;flex-wrap:wrap;gap:10px;padding-top:6px;}
-.doc-thumb{display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;}
-.doc-thumb-icon{width:60px;height:60px;border-radius:8px;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:24px;}
-.doc-thumb-label{font-size:10px;color:#666;max-width:60px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:999;}
-.modal{background:#fff;border-radius:12px;padding:20px 24px;max-width:640px;width:92%;max-height:82vh;overflow-y:auto;}
-.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.vr-sub{font-size:11px;color:#8fa8c0;margin-top:1px;}
+.vr-right{display:flex;gap:5px;align-items:center;}
+.vr-status{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;}
+.vr-expand{font-size:11px;padding:3px 9px;background:transparent;border:1px solid #c0392b;color:#fff;border-radius:4px;cursor:pointer;}
+.vr-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;}
+.vrf-label{font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;}
+.vrf-val{font-size:12px;color:#e8eef4;line-height:1.5;white-space:pre-wrap;}
+.vrf.full{grid-column:1/-1;}
+.ds-card{background:#fdecea;border-radius:8px;padding:11px 13px;margin-bottom:8px;border:1px solid #f5c6c6;}
+.ds-name{font-size:13px;font-weight:600;color:#c0392b;margin-bottom:8px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal{background:#fff;border-radius:12px;padding:18px 22px;max-width:640px;width:92%;max-height:82vh;overflow-y:auto;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .modal-title{font-size:14px;font-weight:600;}
-.modal-sub{font-size:11px;color:#888;margin-top:2px;}
-.modal-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;}
-.modal-field{margin-bottom:2px;}
-.modal-field.full{grid-column:1/-1;}
-.modal-field-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;}
-.modal-field-value{font-size:13px;line-height:1.7;white-space:pre-wrap;}
-.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:#888;gap:12px;}
-.loading-spinner{width:36px;height:36px;border:3px solid #e0e0e0;border-top-color:#3a7bd5;border-radius:50%;animation:spin 0.8s linear infinite;}
+.modal-sub{font-size:11px;color:#888;margin-top:1px;}
+.mfields{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;}
+.mf{margin-bottom:2px;}
+.mf.full{grid-column:1/-1;}
+.mf-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;}
+.mf-val{font-size:13px;line-height:1.7;white-space:pre-wrap;}
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;color:#888;gap:10px;}
+.spinner{width:32px;height:32px;border:3px solid #e0e0e0;border-top-color:#3a7bd5;border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .empty{padding:40px;text-align:center;color:#aaa;font-size:13px;}
-.error{padding:20px;color:#c0392b;font-size:13px;}
+.err-msg{padding:16px;color:#c0392b;font-size:13px;}
+.doc-link{display:inline-flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;margin-right:8px;}
+.doc-icon{width:52px;height:52px;border-radius:6px;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.doc-lbl{font-size:10px;color:#666;max-width:52px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:#f8f8f8;border-bottom:1px solid #e8e8e8;}
 </style>
 </head>
 <body>
@@ -86,12 +98,7 @@ button:hover{background:#f5f5f5;}
 <div class="header">
   <div class="logo">
     <span class="logo-text">RANGE</span>
-    <svg width="26" height="26" viewBox="0 0 32 32">
-      <circle cx="16" cy="16" r="12" fill="none" stroke="#c0392b" stroke-width="2.5"/>
-      <line x1="16" y1="4" x2="16" y2="28" stroke="#c0392b" stroke-width="2.5"/>
-      <line x1="4" y1="16" x2="28" y2="16" stroke="#c0392b" stroke-width="2.5"/>
-      <circle cx="16" cy="16" r="2.5" fill="#c0392b"/>
-    </svg>
+    <svg width="24" height="24" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="none" stroke="#c0392b" stroke-width="2.5"/><line x1="16" y1="4" x2="16" y2="28" stroke="#c0392b" stroke-width="2.5"/><line x1="4" y1="16" x2="28" y2="16" stroke="#c0392b" stroke-width="2.5"/><circle cx="16" cy="16" r="2.5" fill="#c0392b"/></svg>
     <span class="logo-text">USA</span>
   </div>
   <div class="header-right">
@@ -101,18 +108,43 @@ button:hover{background:#f5f5f5;}
 </div>
 
 <div class="toolbar">
-  <input type="text" id="search" placeholder="Search case ID, subject, branch…" oninput="renderList()"/>
-  <select id="status-filter" onchange="renderList()">
-    <option value="all">All statuses</option>
-    <option value="completed">Completed</option>
-    <option value="in progress">In Progress</option>
-    <option value="action needed">Action needed</option>
+  <input type="text" id="search" placeholder="Search case ID, name, branch…" oninput="renderList()" style="flex:1;min-width:160px;"/>
+</div>
+
+<div class="filter-row">
+  <select id="f-branch" onchange="renderList()"><option value="">All branches</option></select>
+  <select id="f-category" onchange="renderList()"><option value="">All categories</option></select>
+  <select id="f-type" onchange="renderList()"><option value="">All types</option></select>
+  <select id="f-ap" onchange="renderList()">
+    <option value="">All AP actions</option>
+    <option value="YES - AP ACTION NEEDED">AP Action Needed</option>
+    <option value="AP Review Completed">AP Review Completed</option>
+    <option value="No - AP Action is not needed">No AP Action Needed</option>
   </select>
+  <select id="f-hr" onchange="renderList()">
+    <option value="">All HR</option>
+    <option value="Termination">Termination</option>
+    <option value="Final Written">Final Written</option>
+    <option value="Written Warning">Written Warning</option>
+  </select>
+  <select id="f-retain" onchange="renderList()">
+    <option value="">All retain video</option>
+    <option value="yes">Yes - Retain</option>
+    <option value="no">No</option>
+  </select>
+  <select id="f-deny" onchange="renderList()">
+    <option value="">All deny service</option>
+    <option value="has">Has DNS record</option>
+    <option value="none">No DNS record</option>
+  </select>
+  <input type="date" id="f-date-from" onchange="renderList()" title="Date from"/>
+  <input type="date" id="f-date-to" onchange="renderList()" title="Date to"/>
+  <button onclick="clearFilters()" class="btn-small">Clear filters</button>
 </div>
 
 <div class="main">
   <div class="list" id="list-panel">
-    <div class="loading"><div class="loading-spinner"></div><span>Loading cases…</span></div>
+    <div class="loading"><div class="spinner"></div><span>Loading cases…</span></div>
   </div>
   <div class="detail" id="detail-panel">
     <div class="empty">Select a case from the list</div>
@@ -130,45 +162,64 @@ const VR_BOARD = "992178387";
 const DS_BOARD = "1053253179";
 const PROXY = "https://corsproxy.io/?";
 
-const DS_COLS = {
-  status:"status",branch:"dropdown0",district:"status1",
-  subjectName:"text61",subjectId:"dup__of_subject_id__",
-  transactionInfo:"text22",submittedBy:"primary_contributor",
-  date:"date4",dateSubmitted:"date0",narrative:"long_text",
-  supplement:"text_mkpxnqe3",incidentReport:"incident__",
-  leContact:"le_contact_name",leEmail:"le_email_address",
-  incidentType:"incident_type",location:"incident_category",
-  specificLocation:"text8",injuries:"dropdown58",
-  propertyDamage:"ems_transport2",phone:"phone_mkr6t0vm"
-};
-
-let irItems = [], vrItems = [], dsItems = [], selectedId = null, currentVR = null;
+let irItems=[], vrItems=[], dsItems=[], selectedId=null;
 
 const IR_COLS = {
-  caseId:"formula_mkr4w8ec",date:"date4",incidentTime:"text19",
-  branch:"dropdown0",district:"status1",submittedBy:"primary_contributor",
-  submittedByEmail:"dup__of_submitted_by",location:"incident_category",
-  specificLocation:"text8",category:"color_mknf4hd3",incidentType:"dropdown_mkqakpqf",
-  apFollowUp:"dup__of_hr_decision____1",denyService:"district_leader",
-  retainVideo:"deny_service__",hrRec:"status_1__1",
-  hrFindings:"long_text_mm0f4cbg",narrative1:"long_text",narrative2:"long_text5",
-  narrative3:"narrative_3",narrative4:"long_text6",apFindings:"long_text__1",
-  interviewNarrative:"long_text3__1",subjectName:"text61",subjectType:"text22",
-  injuries:"dropdown58",propertyDamage:"ems_transport2",policeReport:"text95",
-  oneDriveLink:"text_mkvd8262",documents:"text39",pictures:"text4"
+  caseId:"formula_mkr4w8ec", pushableCaseId:"text_mkr4w8ec",
+  date:"date4", incidentTime:"text19",
+  branch:"dropdown0", district:"status1",
+  submittedBy:"primary_contributor", submittedByEmail:"dup__of_submitted_by",
+  location:"incident_category", specificLocation:"text8",
+  category:"color_mknf4hd3",
+  incidentType1:"dropdown_mkqakpqf", incidentType2:"dropdown_mkq4h3my",
+  incidentType3:"dropdown_mkq4d5sf", incidentType4:"dropdown_mkq4w1hv",
+  apFollowUp:"dup__of_hr_decision____1",
+  denyService:"district_leader", retainVideo:"deny_service__",
+  hrRec:"status_1__1", hrFindings:"long_text_mm0f4cbg",
+  narrative1:"long_text", narrative2:"long_text5",
+  narrative3:"narrative_3", narrative4:"long_text6",
+  apFindings:"long_text__1", interviewNarrative:"long_text3__1",
+  subjectName:"text61", subjectType:"text22",
+  injuries:"dropdown58", propertyDamage:"ems_transport2",
+  policeReport:"text95", oneDriveLink:"text_mkvd8262",
+  documents:"text39", pictures:"text4"
 };
 
 const VR_COLS = {
-  agency:"status_14",status:"status",assigned:"person",priority:"status_15",
-  branch:"location",incidentDate:"date4",submittedBy:"text0",
-  requestNarrative:"long_text",supplement:"long_text_1",oneDriveLink:"link",
-  leContact:"text_1",leEmail:"email",lePhone:"phone",reviewDecision:"status_16",
-  dateCompleted:"date0",caseIdLinked:"board_relation"
+  agency:"status6", status:"status", assigned:"person",
+  priority:"agency", branch:"dropdown0",
+  incidentDate:"date4", incidentTime:"text19",
+  submittedDate:"date0", submittedBy:"primary_contributor",
+  requestNarrative:"long_text", supplement:"main_office_supplement",
+  oneDriveLink:"text_mm032dsj",
+  leContact:"submitted_by", leEmail:"le_contact_name", lePhone:"le_email_address",
+  reviewDecision:"status_1__1", requestFollowUp:"request_for_follow_up__1",
+  incidentCategory:"incident_category", location:"text8",
+  injuries:"dropdown58", propertyDamage:"ems_transport2",
+  dateCompleted:"date__1",
+  linkToIR:"link_to_incident_reporting",
+  caseIdMirror:"lookup_mkvnvgf9"
+};
+
+const DS_COLS = {
+  status:"status", branch:"dropdown0", district:"status1",
+  subjectFirstName:"text61", subjectLastName:"short_text1__1",
+  subjectId:"dup__of_subject_id__", transactionInfo:"text22",
+  nicsNumber:"short_text0__1", requestType:"single_select1__1",
+  submittedBy:"primary_contributor", date:"date4",
+  dateSubmitted:"date0", lastActionDate:"date_mkvgpk7p",
+  narrative:"long_text", apNarrative:"text_mkpxnqe3",
+  apNotes:"text95", oneDriveLink:"main_office_supplement",
+  incidentReport:"incident__", leContact:"submitted_by",
+  leEmail:"le_contact_name", lePhone:"le_email_address",
+  incidentType:"incident_type", location:"incident_category",
+  specificLocation:"text8", injuries:"dropdown58",
+  propertyDamage:"ems_transport2", phone:"phone_mkr6t0vm",
+  subjectType:"dropdown6", audit:"color_mkq4smae"
 };
 
 async function gql(query) {
-  const url = PROXY + encodeURIComponent("https://api.monday.com/v2");
-  const r = await fetch(url, {
+  const r = await fetch(PROXY + encodeURIComponent("https://api.monday.com/v2"), {
     method:"POST",
     headers:{"Content-Type":"application/json","Authorization":TOKEN},
     body:JSON.stringify({query})
@@ -185,61 +236,62 @@ function getVal(cols, id) {
     if (typeof v === "string") return v;
     if (v.text) return v.text;
     if (v.name) return v.name;
-    if (Array.isArray(v)) return v.map(x => x.name || x).join(", ");
+    if (Array.isArray(v)) return v.map(x => x.name||x).join(", ");
     return c.text || "";
   } catch { return c.text || ""; }
 }
 
 async function fetchBoard(boardId, colMap) {
-  let all = [], cursor = null;
-  for (let p = 0; p < 20; p++) {
+  let all=[], cursor=null;
+  for (let p=0; p<30; p++) {
     const q = cursor
       ? `{next_items_page(limit:100,cursor:"${cursor}"){cursor items{id name column_values{id text value}}}}`
       : `{boards(ids:${boardId}){items_page(limit:100){cursor items{id name column_values{id text value}}}}}`;
     const data = await gql(q);
     const pd = cursor ? data?.data?.next_items_page : data?.data?.boards?.[0]?.items_page;
-    if (!pd || !pd.items || pd.items.length === 0) break;
-    const mapped = pd.items.map(item => {
-      const r = {id:item.id, name:item.name};
-      Object.entries(colMap).forEach(([k,cid]) => { r[k] = getVal(item.column_values, cid); });
+    if (!pd||!pd.items||!pd.items.length) break;
+    all = [...all, ...pd.items.map(item => {
+      const r={id:item.id, name:item.name};
+      Object.entries(colMap).forEach(([k,cid])=>{ r[k]=getVal(item.column_values,cid); });
       return r;
-    });
-    all = [...all, ...mapped];
+    })];
     if (!pd.cursor) break;
     cursor = pd.cursor;
   }
   return all;
 }
 
+function cleanNarrative(parts) {
+  return parts
+    .filter(Boolean)
+    .map(p => p.replace(/^\*?\s*cont\.?\s*\*?\s*/gi,'').replace(/\(cont in narrative \d+.*?\)/gi,'').trim())
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function getIncidentTypes(r) {
+  return [r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4]
+    .filter(Boolean).join(", ") || "—";
+}
+
 function getIRValue(r, key) {
-  if (key === "narrative1") return [r.narrative1,r.narrative2,r.narrative3,r.narrative4].filter(Boolean).join("\n\n");
-  if (key === "hrRec") {
-    const rec = r.hrRec && r.hrRec !== "—" ? "Recommendation: " + r.hrRec : "";
-    const find = r.hrFindings && r.hrFindings !== "—" ? "Findings: " + r.hrFindings : "";
-    return [rec,find].filter(Boolean).join("\n\n") || "—";
+  if (key==="narrative") return cleanNarrative([r.narrative1,r.narrative2,r.narrative3,r.narrative4]);
+  if (key==="hrRec") {
+    const rec = r.hrRec&&r.hrRec!=="—" ? "Recommendation: "+r.hrRec : "";
+    const find = r.hrFindings&&r.hrFindings!=="—" ? "Findings: "+r.hrFindings : "";
+    return [rec,find].filter(Boolean).join("\n\n")||"—";
   }
-  return r[key] || "—";
-}
-
-function badgeClass(s) {
-  if (!s) return "badge-gray";
-  const l = s.toLowerCase();
-  if (l.includes("completed")) return "badge-green";
-  if (l.includes("progress")) return "badge-orange";
-  if (l.includes("action needed")||l.includes("termination")) return "badge-red";
-  return "badge-gray";
-}
-
-function displayName(r) {
-  const parts = [r.branch, r.incidentType].filter(Boolean);
-  return parts.length ? parts.join(" · ") : r.name;
+  if (key==="incidentType") return getIncidentTypes(r);
+  return r[key]||"—";
 }
 
 function getLinkedVR(ir) {
-  return vrItems.filter(vr =>
-    (vr.caseIdLinked && vr.caseIdLinked.includes(ir.id)) ||
-    (ir.caseId && vr.caseId === ir.caseId)
-  );
+  return vrItems.filter(vr => {
+    if (vr.linkToIR && vr.linkToIR.includes(ir.id)) return true;
+    if (ir.id && vr.linkToIR && vr.linkToIR.includes(ir.id)) return true;
+    if (ir.caseId && vr.caseIdMirror && vr.caseIdMirror.includes(ir.caseId)) return true;
+    return false;
+  });
 }
 
 function getLinkedDS(ir) {
@@ -249,404 +301,416 @@ function getLinkedDS(ir) {
   );
 }
 
+function badgeCls(s) {
+  if (!s) return "bg-gray";
+  const l=s.toLowerCase();
+  if (l.includes("completed")) return "bg-green";
+  if (l.includes("progress")) return "bg-orange";
+  if (l.includes("action needed")||l.includes("termination")) return "bg-red";
+  return "bg-gray";
+}
+
+function displayName(r) {
+  const t = getIncidentTypes(r);
+  const parts = [r.branch, t!=="—"?t:null].filter(Boolean);
+  return parts.length ? parts.join(" · ") : r.name;
+}
+
+function docLink(url, label) {
+  if (!url||url==="N/A"||url==="—") return "";
+  const isPdf=/\.pdf/i.test(url), isImg=/\.(png|jpg|jpeg|gif|webp)/i.test(url);
+  const icon=isPdf?"📄":isImg?"🖼":"📁";
+  const bg=isPdf?"#fdecea":isImg?"#e6f0fa":"#f5f5f5";
+  return `<a class="doc-link" href="${url}" target="_blank">
+    <div class="doc-icon" style="background:${bg}">${icon}</div>
+    <span class="doc-lbl">${label}</span></a>`;
+}
+
+function populateFilters() {
+  const branches = [...new Set(irItems.map(r=>r.branch).filter(Boolean))].sort();
+  const categories = [...new Set(irItems.map(r=>r.category).filter(Boolean))].sort();
+  const types = [...new Set(irItems.flatMap(r=>[r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4]).filter(Boolean))].sort();
+
+  const bEl=document.getElementById("f-branch");
+  branches.forEach(b=>{ const o=document.createElement("option"); o.value=b; o.textContent=b; bEl.appendChild(o); });
+
+  const cEl=document.getElementById("f-category");
+  categories.forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=c; cEl.appendChild(o); });
+
+  const tEl=document.getElementById("f-type");
+  types.forEach(t=>{ const o=document.createElement("option"); o.value=t; o.textContent=t; tEl.appendChild(o); });
+}
+
+function clearFilters() {
+  ["f-branch","f-category","f-type","f-ap","f-hr","f-retain","f-deny","f-date-from","f-date-to","search"]
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  renderList();
+}
+
 function renderList() {
-  const q = document.getElementById("search").value.toLowerCase();
-  const sf = document.getElementById("status-filter").value;
+  const q=(document.getElementById("search").value||"").toLowerCase();
+  const fb=document.getElementById("f-branch").value;
+  const fc=document.getElementById("f-category").value;
+  const ft=document.getElementById("f-type").value;
+  const fap=document.getElementById("f-ap").value;
+  const fhr=document.getElementById("f-hr").value;
+  const fret=document.getElementById("f-retain").value;
+  const fdeny=document.getElementById("f-deny").value;
+  const fdfrom=document.getElementById("f-date-from").value;
+  const fdto=document.getElementById("f-date-to").value;
+
   const filtered = irItems.filter(r => {
-    const mQ = !q || (r.caseId||"").toLowerCase().includes(q) || (r.branch||"").toLowerCase().includes(q) || (r.subjectName||"").toLowerCase().includes(q) || displayName(r).toLowerCase().includes(q);
-    const mS = sf === "all" || (r.apFollowUp||"").toLowerCase().includes(sf);
-    const isBackground = (r.category||"").toLowerCase() === "background check denial";
-    return mQ && mS && !isBackground;
+    if ((r.category||"").toLowerCase()==="background check denial") return false;
+    if (q && ![(r.caseId||""),(r.branch||""),(r.subjectName||""),displayName(r)].some(s=>s.toLowerCase().includes(q))) return false;
+    if (fb && r.branch!==fb) return false;
+    if (fc && r.category!==fc) return false;
+    if (ft && ![r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4].includes(ft)) return false;
+    if (fap && r.apFollowUp!==fap) return false;
+    if (fhr && r.hrRec!==fhr) return false;
+    if (fret==="yes" && !(r.retainVideo||"").toLowerCase().includes("yes")) return false;
+    if (fret==="no" && (r.retainVideo||"").toLowerCase().includes("yes")) return false;
+    if (fdeny==="has" && !getLinkedDS(r).length) return false;
+    if (fdeny==="none" && getLinkedDS(r).length) return false;
+    if (fdfrom && r.date && r.date < fdfrom) return false;
+    if (fdto && r.date && r.date > fdto) return false;
+    return true;
   });
 
   const panel = document.getElementById("list-panel");
-  if (!filtered.length) { panel.innerHTML = '<div class="empty">No cases match your search.</div>'; return; }
+  if (!filtered.length) { panel.innerHTML='<div class="empty">No cases match your filters.</div>'; return; }
 
   panel.innerHTML = filtered.map(r => {
-    const ds = getLinkedDS(r);
-    const dsStatus = ds.length ? ds[0].status : null;
-    return `
-    <div class="list-item ${selectedId === r.id ? 'active' : ''}" onclick="selectItem('${r.id}')">
-      <div class="list-item-name">${displayName(r)}</div>
-      <div class="list-item-caseid">${r.caseId || r.id}</div>
-      <div class="list-item-meta">
-        <span><span class="label">Branch </span>${r.branch||"—"}</span>
-        <span><span class="label">Date </span>${r.date||"—"}</span>
-        <span><span class="label">Category </span>${r.category||"—"}</span>
-        <span><span class="label">Type </span>${(r.incidentType||"—").substring(0,20)}</span>
-        <span><span class="label">Ownership </span>${r.apFollowUp||"—"}</span>
-        <span><span class="label">HR Review </span>${r.hrRec||"—"}</span>
-        <span><span class="label">Retain Video </span>${r.retainVideo||"—"}</span>
-        <span><span class="label">Deny Service </span>${dsStatus||"None"}</span>
+    const ds=getLinkedDS(r);
+    return `<div class="list-item ${selectedId===r.id?'active':''}" onclick="selectItem('${r.id}')">
+      <div class="item-name">${displayName(r)}</div>
+      <div class="item-caseid">${r.caseId||r.pushableCaseId||r.id}</div>
+      <div class="item-meta">
+        <span><span class="lbl">Branch </span>${r.branch||"—"}</span>
+        <span><span class="lbl">Date </span>${r.date||"—"}</span>
+        <span><span class="lbl">Category </span>${r.category||"—"}</span>
+        <span><span class="lbl">Type </span>${getIncidentTypes(r).substring(0,22)}</span>
+        <span><span class="lbl">Ownership </span>${r.apFollowUp||"—"}</span>
+        <span><span class="lbl">HR </span>${r.hrRec||"—"}</span>
+        <span><span class="lbl">Video </span>${r.retainVideo||"—"}</span>
+        <span><span class="lbl">DNS </span>${ds.length?ds[0].status||"Yes":"None"}</span>
       </div>
-    </div>
-  `}).join("");
+    </div>`;
+  }).join("");
 }
 
 function selectItem(id) {
-  selectedId = id;
-  const r = irItems.find(x => x.id === id);
+  selectedId=id;
+  const r=irItems.find(x=>x.id===id);
   renderList();
   if (r) renderDetail(r);
 }
 
-function docThumb(url, label) {
-  if (!url || url === "N/A" || url === "—") return "";
-  const isPdf = /\.pdf/i.test(url), isImg = /\.(png|jpg|jpeg|gif|webp)/i.test(url);
-  const icon = isPdf ? "📄" : isImg ? "🖼" : "📁";
-  const bg = isPdf ? "#fdecea" : isImg ? "#e6f0fa" : "#f5f5f5";
-  return `<a class="doc-thumb" href="${url}" target="_blank">
-    <div class="doc-thumb-icon" style="background:${bg}">${icon}</div>
-    <span class="doc-thumb-label">${label}</span>
-  </a>`;
-}
-
-async function updateColumn(itemId, columnId, value, type) {
+async function updateColumn(itemId, boardId, columnId, value, type) {
   let colValue;
-  if (type === 'text') colValue = JSON.stringify(value);
-  else if (type === 'longtext') colValue = JSON.stringify({text: value});
-  else if (type === 'status') colValue = JSON.stringify({label: value});
-  
-  const mutation = `mutation {
-    change_column_value(
-      board_id: ${IR_BOARD},
-      item_id: ${itemId},
-      column_id: "${columnId}",
-      value: ${JSON.stringify(colValue)}
-    ) { id }
-  }`;
-  
+  if (type==="text") colValue=JSON.stringify(value);
+  else if (type==="longtext") colValue=JSON.stringify({text:value});
+  else if (type==="status") colValue=JSON.stringify({label:value});
+  const mutation=`mutation{change_column_value(board_id:${boardId},item_id:${itemId},column_id:"${columnId}",value:${JSON.stringify(colValue)}){id}}`;
   try {
-    const result = await gql(mutation);
-    if (result?.data?.change_column_value?.id) return true;
-    console.error("Update failed:", result);
-    return false;
-  } catch(e) {
-    console.error("Update error:", e);
-    return false;
-  }
+    const result=await gql(mutation);
+    return !!result?.data?.change_column_value?.id;
+  } catch(e) { return false; }
 }
 
-function showSaveStatus(el, success) {
-  const msg = document.createElement('span');
-  msg.textContent = success ? ' ✓ Saved' : ' ✗ Failed';
-  msg.style.cssText = `font-size:11px;margin-left:8px;color:${success?'#1a7a3f':'#c0392b'};`;
-  el.parentNode.appendChild(msg);
-  setTimeout(() => msg.remove(), 3000);
-}
-
-function makeEditable(r) {
-  // AP Findings - long text
-  const apEl = document.getElementById('edit-apFindings');
-  if (apEl) {
-    apEl.addEventListener('blur', async function() {
-      const btn = document.getElementById('save-apFindings');
-      btn.textContent = 'Saving…';
-      btn.disabled = true;
-      const success = await updateColumn(r.id, 'long_text__1', this.value, 'longtext');
-      btn.textContent = 'Save';
-      btn.disabled = false;
-      showSaveStatus(btn, success);
-      if (success) {
-        const item = irItems.find(x => x.id === r.id);
-        if (item) item.apFindings = this.value;
-      }
-    });
-    document.getElementById('save-apFindings').addEventListener('click', async function() {
-      const val = apEl.value;
-      this.textContent = 'Saving…';
-      this.disabled = true;
-      const success = await updateColumn(r.id, 'long_text__1', val, 'longtext');
-      this.textContent = 'Save';
-      this.disabled = false;
-      showSaveStatus(this, success);
-      if (success) {
-        const item = irItems.find(x => x.id === r.id);
-        if (item) item.apFindings = val;
-      }
-    });
-  }
-
-  // OneDrive Link - text
-  const odEl = document.getElementById('edit-oneDriveLink');
-  if (odEl) {
-    document.getElementById('save-oneDriveLink').addEventListener('click', async function() {
-      const val = odEl.value;
-      this.textContent = 'Saving…';
-      this.disabled = true;
-      const success = await updateColumn(r.id, 'text_mkvd8262', val, 'text');
-      this.textContent = 'Save';
-      this.disabled = false;
-      showSaveStatus(this, success);
-      if (success) {
-        const item = irItems.find(x => x.id === r.id);
-        if (item) item.oneDriveLink = val;
-      }
-    });
-  }
-
-  // Retain Video - status dropdown
-  const rvEl = document.getElementById('edit-retainVideo');
-  if (rvEl) {
-    rvEl.addEventListener('change', async function() {
-      const success = await updateColumn(r.id, 'deny_service__', this.value, 'status');
-      showSaveStatus(this, success);
-      if (success) {
-        const item = irItems.find(x => x.id === r.id);
-        if (item) item.retainVideo = this.value;
-        renderList();
-      }
-    });
-  }
+function showMsg(elId, success) {
+  const el=document.getElementById(elId);
+  if (!el) return;
+  el.textContent=success?"✓ Saved to Monday":"✗ Save failed";
+  el.className="save-msg "+(success?"ok":"err");
+  setTimeout(()=>{ el.textContent=""; },3000);
 }
 
 function renderDetail(r) {
-  const vrs = getLinkedVR(r);
-  const sections = [
-    {title:"Overview", fields:[
-      {key:"caseId",label:"Case ID"},{key:"date",label:"Incident date"},{key:"incidentTime",label:"Incident time"},
-      {key:"branch",label:"Branch"},{key:"district",label:"District leader"},{key:"submittedBy",label:"Submitted by"},
-      {key:"location",label:"Location"},{key:"specificLocation",label:"Specific location"}
-    ]},
-    {title:"Details", fields:[
-      {key:"category",label:"Category"},{key:"incidentType",label:"Incident type"},{key:"apFollowUp",label:"AP follow-up"},
-      {key:"denyService",label:"Deny service"},{key:"retainVideo",label:"Retain video"}
-    ]},
-    {title:"Narrative", fields:[{key:"narrative1",label:"Original narrative",long:true}]},
-    {title:"Findings", fields:[
-      {key:"apFindings",label:"AP findings",long:true,editable:"longtext",editId:"apFindings",colId:"long_text__1"},
-      {key:"hrRec",label:"HR recommendation & findings",long:true},
-      {key:"interviewNarrative",label:"Interview narrative",long:true}
-    ]},
-    {title:"Subject", fields:[
-      {key:"subjectName",label:"Subject name"},{key:"subjectType",label:"Subject type"},
-      {key:"injuries",label:"Injuries"},{key:"propertyDamage",label:"Property damage"},
-      {key:"policeReport",label:"Police report #"}
-    ]}
-  ];
+  const vrs=getLinkedVR(r);
+  const ds=getLinkedDS(r);
+  const caseIdDisplay = r.caseId||r.pushableCaseId||r.id;
 
-  const sectionsHTML = sections.map(s => {
-    const fieldsHTML = s.fields.map(f => {
-      const val = getIRValue(r, f.key);
-      if (f.editable === 'longtext') {
-        return `<div class="field ${f.long?'full':''}">
-          <div class="field-label">${f.label}</div>
-          <textarea id="edit-${f.editId}" style="width:100%;min-height:80px;font-size:13px;padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-family:inherit;resize:vertical;">${val === '—' ? '' : val}</textarea>
-          <button id="save-${f.editId}" style="margin-top:4px;font-size:11px;padding:3px 10px;background:#2d3a4a;color:#fff;border:none;border-radius:4px;cursor:pointer;">Save to Monday</button>
-        </div>`;
-      }
-      return `<div class="field ${f.long?'full':''}">
-        <div class="field-label">${f.label}</div>
-        <div class="field-value">${val}</div>
-      </div>`;
-    }).join("");
-    return `<div class="section"><div class="section-title">${s.title}</div><div class="field-grid">${fieldsHTML}</div></div>`;
-  }).join("");
-
-  const docsHTML = `
-    <div class="section">
-      <div class="section-title">Documents & media</div>
-      <div class="field-grid">
-        <div class="field full">
-          <div class="field-label">OneDrive video link</div>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="edit-oneDriveLink" type="text" value="${r.oneDriveLink||''}" placeholder="Paste OneDrive link…" style="flex:1;min-width:200px;font-size:12px;"/>
-            <button id="save-oneDriveLink" style="font-size:11px;padding:3px 10px;background:#2d3a4a;color:#fff;border:none;border-radius:4px;cursor:pointer;">Save to Monday</button>
-            ${r.oneDriveLink ? `<a href="${r.oneDriveLink}" target="_blank" style="font-size:11px;color:#3a7bd5;">Open ↗</a>` : ''}
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">Retain video</div>
-          <select id="edit-retainVideo" style="font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:4px;">
-            <option value="Yes - Retain Video" ${(r.retainVideo||'').includes('Yes') ? 'selected' : ''}>Yes - Retain Video</option>
-            <option value="No" ${r.retainVideo === 'No' ? 'selected' : ''}>No</option>
-          </select>
-          <span style="font-size:11px;color:#888;margin-left:6px;">Auto-saves on change</span>
-        </div>
-        <div class="field" style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;">
-          ${docThumb(r.documents,"Document")}
-          ${docThumb(r.pictures,"Picture")}
-        </div>
-      </div>
-    </div>`;
-
-  const vrFields = [
-    {key:"agency",label:"Agency"},{key:"status",label:"Status"},
-    {key:"assigned",label:"Assigned to"},{key:"branch",label:"Branch"},
-    {key:"incidentDate",label:"Incident date"},{key:"submittedBy",label:"Submitted by"},
-    {key:"requestNarrative",label:"Request narrative",long:true},
-    {key:"supplement",label:"SSC supplement",long:true}
-  ];
-
-  const vrsHTML = vrs.map((v,i) => `
+  const vrHTML = vrs.length ? vrs.map((v,i)=>`
     <div class="vr-card">
-      <div class="vr-header">
-        <div>
-          <div class="vr-agency">${v.agency||"Video Request"}</div>
-          <div class="vr-sub">${v.caseId||r.caseId||""} · ${v.branch||""}</div>
-        </div>
-        <div class="vr-actions">
+      <div class="vr-top">
+        <div><div class="vr-agency">${v.agency||"Video Request"}</div>
+        <div class="vr-sub">${v.branch||""} · ${v.incidentDate||""}</div></div>
+        <div class="vr-right">
           <span class="vr-status">${v.status||""}</span>
-          <button class="vr-expand" onclick="openModal(${i}, '${r.id}')">Expand ↗</button>
+          <button class="vr-expand" onclick="openVRModal(${i},'${r.id}')">Expand ↗</button>
         </div>
       </div>
       <div class="vr-fields">
-        ${vrFields.map(f => `
-          <div class="vr-field ${f.long?'full':''}">
-            <div class="vr-field-label">${f.label}</div>
-            <div class="vr-field-value">${v[f.key]||"—"}</div>
-          </div>`).join("")}
+        <div class="vrf"><div class="vrf-label">Agency</div><div class="vrf-val">${v.agency||"—"}</div></div>
+        <div class="vrf"><div class="vrf-label">Assigned to</div><div class="vrf-val">${v.assigned||"—"}</div></div>
+        <div class="vrf full"><div class="vrf-label">Request narrative</div><div class="vrf-val">${v.requestNarrative||"—"}</div></div>
+        <div class="vrf full"><div class="vrf-label">SSC supplement</div><div class="vrf-val">${v.supplement||"—"}</div></div>
       </div>
-    </div>
-  `).join("");
+    </div>`).join("") : '<div style="font-size:13px;color:#999;padding:6px 0">No linked video requests.</div>';
 
-  const dsRecords = getLinkedDS(r);
-  const dsHTML = `
-    <div class="section">
-      <div class="section-title">Deny service records (${dsRecords.length})</div>
-      ${dsRecords.length === 0 ? '<div style="font-size:13px;color:#999;padding:8px 0">No deny service records linked.</div>' :
-        dsRecords.map(ds => `
-          <div style="background:#fdecea;border-radius:8px;padding:12px 14px;margin-bottom:10px;border:1px solid #f5c6c6;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-              <div style="font-size:13px;font-weight:600;color:#c0392b;">${ds.subjectName||"Unknown Subject"}</div>
-              <span class="badge badge-red">${ds.status||"—"}</span>
-            </div>
-            <div class="field-grid">
-              <div class="field"><div class="field-label">Branch</div><div class="field-value">${ds.branch||"—"}</div></div>
-              <div class="field"><div class="field-label">District leader</div><div class="field-value">${ds.district||"—"}</div></div>
-              <div class="field"><div class="field-label">Date</div><div class="field-value">${ds.date||"—"}</div></div>
-              <div class="field"><div class="field-label">Subject ID</div><div class="field-value">${ds.subjectId||"—"}</div></div>
-              <div class="field"><div class="field-label">Submitted by</div><div class="field-value">${ds.submittedBy||"—"}</div></div>
-              <div class="field"><div class="field-label">Phone</div><div class="field-value">${ds.phone||"—"}</div></div>
-              <div class="field full"><div class="field-label">Narrative</div><div class="field-value">${ds.narrative||"—"}</div></div>
-            </div>
-          </div>`).join("")}
+  const dsHTML = ds.length ? ds.map(d=>{
+    const subjectName = [d.subjectFirstName, d.subjectLastName].filter(Boolean).join(" ") || "Unknown";
+    const dsLink = d.oneDriveLink && d.oneDriveLink !== "—" ? d.oneDriveLink : "";
+    return `<div class="ds-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div class="ds-name">${subjectName}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          <span class="badge bg-red">${d.status||"—"}</span>
+          ${d.audit?`<span class="badge bg-orange">${d.audit}</span>`:""}
+          ${d.requestType?`<span class="badge bg-gray">${d.requestType}</span>`:""}
+        </div>
+      </div>
+      <div class="fgrid">
+        <div class="f"><div class="flabel">Branch</div><div class="fval">${d.branch||"—"}</div></div>
+        <div class="f"><div class="flabel">Incident date</div><div class="fval">${d.date||"—"}</div></div>
+        <div class="f"><div class="flabel">Last action date</div><div class="fval">${d.lastActionDate||"—"}</div></div>
+        <div class="f"><div class="flabel">Subject ID</div><div class="fval">${d.subjectId||"—"}</div></div>
+        <div class="f"><div class="flabel">NICS / Transaction #</div><div class="fval">${d.nicsNumber||"—"}</div></div>
+        <div class="f"><div class="flabel">Subject type</div><div class="fval">${d.subjectType||"—"}</div></div>
+        <div class="f"><div class="flabel">Phone</div><div class="fval">${d.phone||"—"}</div></div>
+        <div class="f"><div class="flabel">Submitted by</div><div class="fval">${d.submittedBy||"—"}</div></div>
+        <div class="f"><div class="flabel">District leader</div><div class="fval">${d.district||"—"}</div></div>
+        ${dsLink?`<div class="f full"><div class="flabel">OneDrive link</div><div class="fval"><a href="${dsLink}" target="_blank" style="color:#3a7bd5;font-size:12px;">Open video ↗</a></div></div>`:""}
+        <div class="f full"><div class="flabel">Request narrative</div><div class="fval">${d.narrative||"—"}</div></div>
+        ${d.apNarrative?`<div class="f full"><div class="flabel">AP narrative</div><div class="fval">${d.apNarrative}</div></div>`:""}
+        ${d.apNotes?`<div class="f full"><div class="flabel">AP notes</div><div class="fval">${d.apNotes}</div></div>`:""}
+      </div>
     </div>`;
+  }).join("") : '<div style="font-size:13px;color:#999;padding:6px 0">No deny service records linked.</div>';
+
+  const existingLink = r.oneDriveLink && r.oneDriveLink !== "—" ? r.oneDriveLink : "";
 
   document.getElementById("detail-panel").innerHTML = `
-    <div class="detail-card">
-      <div class="detail-header">
-        <div>
-          <div class="detail-name">${displayName(r)}</div>
-          <div class="detail-caseid">${r.caseId||r.id}</div>
-        </div>
-        <div class="detail-actions">
-          <button onclick="printCase('${r.id}')">🖨 Print</button>
-        </div>
-      </div>
-      <div class="badges">
-        ${r.apFollowUp?`<span class="badge ${badgeClass(r.apFollowUp)}">${r.apFollowUp}</span>`:""}
-        ${r.category?`<span class="badge badge-gray">${r.category}</span>`:""}
-        ${r.hrRec&&r.hrRec!=="—"?`<span class="badge badge-red">HR: ${r.hrRec}</span>`:""}
-        ${(r.retainVideo||"").includes("Yes")?`<span class="badge badge-gray">Video retained</span>`:""}
-      </div>
-      ${sectionsHTML}
-      ${docsHTML}
-      ${dsHTML}
-      <div class="section">
-        <div class="section-title">Video requests (${vrs.length})</div>
-        ${vrs.length ? vrsHTML : '<div style="font-size:13px;color:#999;padding:8px 0">No linked video requests.</div>'}
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-name">${displayName(r)}</div>
+      <div class="card-caseid">${caseIdDisplay}</div></div>
+      <div class="card-actions">
+        <button class="btn-small" onclick="printCase('${r.id}')">🖨 Print</button>
       </div>
     </div>
-  `;
-  makeEditable(r);
+    <div class="badges">
+      ${r.apFollowUp?`<span class="badge ${badgeCls(r.apFollowUp)}">${r.apFollowUp}</span>`:""}
+      ${r.category?`<span class="badge bg-gray">${r.category}</span>`:""}
+      ${r.hrRec&&r.hrRec!=="—"?`<span class="badge bg-red">HR: ${r.hrRec}</span>`:""}
+      ${(r.retainVideo||"").includes("Yes")?`<span class="badge bg-blue">Video retained</span>`:""}
+      ${ds.length?`<span class="badge bg-red">DNS: ${ds[0].status||"Yes"}</span>`:""}
+    </div>
+
+    <div class="sec"><div class="sec-title">Findings</div>
+      <div class="fgrid">
+        <div class="f full fedit">
+          <div class="flabel">AP findings</div>
+          <textarea id="edit-apFindings">${r.apFindings&&r.apFindings!=="—"?r.apFindings:""}</textarea>
+          <div class="fedit-actions">
+            <button class="btn-primary btn-small" onclick="saveApFindings('${r.id}')">Save to Monday</button>
+            <span id="msg-apFindings" class="save-msg"></span>
+          </div>
+        </div>
+        <div class="f full"><div class="flabel">HR recommendation & findings</div><div class="fval">${getIRValue(r,"hrRec")}</div></div>
+        <div class="f full"><div class="flabel">Interview narrative</div><div class="fval">${r.interviewNarrative||"—"}</div></div>
+      </div>
+    </div>
+
+    <div class="sec"><div class="sec-title">Overview</div>
+      <div class="fgrid">
+        <div class="f"><div class="flabel">Case ID</div><div class="fval">${caseIdDisplay}</div></div>
+        <div class="f"><div class="flabel">Incident date</div><div class="fval">${r.date||"—"}</div></div>
+        <div class="f"><div class="flabel">Incident time</div><div class="fval">${r.incidentTime||"—"}</div></div>
+        <div class="f"><div class="flabel">Branch</div><div class="fval">${r.branch||"—"}</div></div>
+        <div class="f"><div class="flabel">District leader</div><div class="fval">${r.district||"—"}</div></div>
+        <div class="f"><div class="flabel">Submitted by</div><div class="fval">${r.submittedBy||"—"}</div></div>
+        <div class="f"><div class="flabel">Location</div><div class="fval">${r.location||"—"}</div></div>
+        <div class="f"><div class="flabel">Specific location</div><div class="fval">${r.specificLocation||"—"}</div></div>
+      </div>
+    </div>
+
+    <div class="sec"><div class="sec-title">Details</div>
+      <div class="fgrid">
+        <div class="f"><div class="flabel">Category</div><div class="fval">${r.category||"—"}</div></div>
+        <div class="f half"><div class="flabel">Incident type</div><div class="fval">${getIncidentTypes(r)}</div></div>
+        <div class="f"><div class="flabel">AP follow-up</div><div class="fval">${r.apFollowUp||"—"}</div></div>
+        <div class="f"><div class="flabel">Deny service</div><div class="fval">${r.denyService||"—"}</div></div>
+        <div class="f"><div class="flabel">Retain video</div>
+          <select id="edit-retainVideo" onchange="saveRetainVideo('${r.id}',this.value)" style="font-size:12px;margin-top:2px;">
+            <option value="Yes - Retain Video" ${(r.retainVideo||"").includes("Yes")?"selected":""}>Yes - Retain Video</option>
+            <option value="No" ${r.retainVideo==="No"?"selected":""}>No</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec"><div class="sec-title">Original narrative</div>
+      <div class="fval" style="background:#f9f9f9;padding:10px 12px;border-radius:6px;border:1px solid #eee;">${getIRValue(r,"narrative")}</div>
+    </div>
+
+    <div class="sec"><div class="sec-title">Subject</div>
+      <div class="fgrid">
+        <div class="f"><div class="flabel">Subject name</div><div class="fval">${r.subjectName||"—"}</div></div>
+        <div class="f"><div class="flabel">Subject type</div><div class="fval">${r.subjectType||"—"}</div></div>
+        <div class="f"><div class="flabel">Injuries</div><div class="fval">${r.injuries||"—"}</div></div>
+        <div class="f"><div class="flabel">Property damage</div><div class="fval">${r.propertyDamage||"—"}</div></div>
+        <div class="f"><div class="flabel">Police report #</div><div class="fval">${r.policeReport||"—"}</div></div>
+      </div>
+    </div>
+
+    <div class="sec"><div class="sec-title">Documents & media</div>
+      <div class="fgrid">
+        <div class="f full fedit">
+          <div class="flabel">OneDrive video link</div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+            <input type="text" id="edit-oneDriveLink" value="${existingLink}" placeholder="Paste OneDrive link…" style="flex:1;min-width:200px;"/>
+            ${existingLink?`<a href="${existingLink}" target="_blank" style="font-size:11px;color:#3a7bd5;white-space:nowrap;">Open ↗</a>`:""}
+          </div>
+          <div class="fedit-actions">
+            <button class="btn-primary btn-small" onclick="saveOneDriveLink('${r.id}')">Save to Monday</button>
+            <button class="btn-small" onclick="document.getElementById('edit-oneDriveLink').value=''">Clear</button>
+            <span id="msg-oneDriveLink" class="save-msg"></span>
+          </div>
+        </div>
+        <div class="f" style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${docLink(r.documents,"Document")}${docLink(r.pictures,"Picture")}
+        </div>
+      </div>
+    </div>
+
+    <div class="sec"><div class="sec-title">Deny service records (${ds.length})</div>${dsHTML}</div>
+    <div class="sec"><div class="sec-title">Video requests (${vrs.length})</div>${vrHTML}</div>
+  </div>`;
 }
 
-function openModal(vrIndex, irId) {
-  const ir = irItems.find(x => x.id === irId);
-  const vrs = getLinkedVR(ir);
-  const v = vrs[vrIndex];
-  currentVR = v;
+async function saveApFindings(itemId) {
+  const val = document.getElementById("edit-apFindings").value;
+  const ok = await updateColumn(itemId, IR_BOARD, "long_text__1", val, "longtext");
+  showMsg("msg-apFindings", ok);
+  if (ok) { const item=irItems.find(x=>x.id===itemId); if(item) item.apFindings=val; }
+}
 
-  const allFields = [
-    {key:"agency",label:"Agency"},{key:"status",label:"Status"},
-    {key:"assigned",label:"Assigned to"},{key:"priority",label:"Priority"},
-    {key:"branch",label:"Branch"},{key:"incidentDate",label:"Incident date"},
-    {key:"submittedBy",label:"Submitted by"},
-    {key:"requestNarrative",label:"Request narrative",long:true},
-    {key:"supplement",label:"SSC supplement",long:true},
-    {key:"leContact",label:"LE contact"},{key:"leEmail",label:"LE email"},
-    {key:"lePhone",label:"LE phone"},{key:"reviewDecision",label:"Review decision"},
-    {key:"dateCompleted",label:"Date completed"}
+async function saveOneDriveLink(itemId) {
+  const val = document.getElementById("edit-oneDriveLink").value;
+  const ok = await updateColumn(itemId, IR_BOARD, "text_mkvd8262", val, "text");
+  showMsg("msg-oneDriveLink", ok);
+  if (ok) {
+    const item=irItems.find(x=>x.id===itemId);
+    if(item) item.oneDriveLink=val;
+    const openLink = document.querySelector('#edit-oneDriveLink + a');
+    if (openLink && val) { openLink.href=val; openLink.style.display="inline"; }
+  }
+}
+
+async function saveRetainVideo(itemId, val) {
+  const ok = await updateColumn(itemId, IR_BOARD, "deny_service__", val, "status");
+  if (ok) {
+    const item=irItems.find(x=>x.id===itemId);
+    if(item) { item.retainVideo=val; renderList(); }
+  }
+  const msg=document.createElement("span");
+  msg.textContent=ok?"✓ Saved":"✗ Failed";
+  msg.style.cssText=`font-size:11px;margin-left:8px;color:${ok?"#1a7a3f":"#c0392b"}`;
+  const sel=document.getElementById("edit-retainVideo");
+  if (sel) { sel.parentNode.appendChild(msg); setTimeout(()=>msg.remove(),2500); }
+}
+
+function openVRModal(idx, irId) {
+  const ir=irItems.find(x=>x.id===irId);
+  const vrs=getLinkedVR(ir);
+  const v=vrs[idx];
+  if (!v) return;
+  const fields=[
+    {k:"agency",l:"Agency"},{k:"status",l:"Status"},{k:"assigned",l:"Assigned to"},
+    {k:"priority",l:"Priority"},{k:"branch",l:"Branch"},{k:"incidentDate",l:"Incident date"},
+    {k:"incidentTime",l:"Incident time"},{k:"submittedDate",l:"Submitted date"},
+    {k:"submittedBy",l:"Submitted by"},
+    {k:"requestNarrative",l:"Request narrative",long:true},
+    {k:"supplement",l:"SSC supplement",long:true},
+    {k:"leContact",l:"LE contact"},{k:"leEmail",l:"LE email"},{k:"lePhone",l:"LE phone"},
+    {k:"reviewDecision",l:"Review decision"},{k:"dateCompleted",l:"Date completed"},
+    {k:"incidentCategory",l:"Incident category"},{k:"location",l:"Location"}
   ];
-
-  document.getElementById("vr-modal-content").innerHTML = `
-    <div class="modal-header">
-      <div>
-        <div class="modal-title">${v.agency||"Video Request"}</div>
-        <div class="modal-sub">${v.caseId||""} · ${v.branch||""}</div>
-      </div>
-      <button onclick="document.getElementById('vr-modal').style.display='none'">✕ Close</button>
+  document.getElementById("vr-modal-content").innerHTML=`
+    <div class="modal-hdr">
+      <div><div class="modal-title">${v.agency||"Video Request"}</div>
+      <div class="modal-sub">${v.branch||""} · ${v.incidentDate||""}</div></div>
+      <button onclick="document.getElementById('vr-modal').style.display='none'">✕</button>
     </div>
-    <div class="badges" style="margin-bottom:14px;">
-      <span class="badge ${badgeClass(v.status)}">${v.status||""}</span>
+    <div class="badges" style="margin-bottom:12px;"><span class="badge ${badgeCls(v.status)}">${v.status||""}</span></div>
+    <div class="mfields">
+      ${fields.map(f=>`<div class="mf ${f.long?'full':''}">
+        <div class="mf-label">${f.label||f.l}</div>
+        <div class="mf-val">${v[f.k]||"—"}</div>
+      </div>`).join("")}
     </div>
-    <div class="modal-fields">
-      ${allFields.map(f => `
-        <div class="modal-field ${f.long?'full':''}">
-          <div class="modal-field-label">${f.label}</div>
-          <div class="modal-field-value">${v[f.key]||"—"}</div>
-        </div>`).join("")}
-    </div>
-    ${v.oneDriveLink && v.oneDriveLink !== "—" ? `
-      <div style="margin-top:14px;">
-        <div class="modal-field-label">Video link</div>
-        ${docThumb(v.oneDriveLink,"Video")}
-      </div>` : ""}
-  `;
-  document.getElementById("vr-modal").style.display = "flex";
+    ${v.oneDriveLink&&v.oneDriveLink!=="—"?`<div style="margin-top:12px;">${docLink(v.oneDriveLink,"Video")}</div>`:""}`;
+  document.getElementById("vr-modal").style.display="flex";
 }
 
 function closeModal(e) {
-  if (e.target.id === "vr-modal") document.getElementById("vr-modal").style.display = "none";
+  if (e.target.id==="vr-modal") document.getElementById("vr-modal").style.display="none";
 }
 
 function printCase(id) {
-  const r = irItems.find(x => x.id === id);
-  const vrs = getLinkedVR(r);
-  const win = window.open("","_blank");
+  const r=irItems.find(x=>x.id===id);
+  const vrs=getLinkedVR(r);
+  const ds=getLinkedDS(r);
+  const win=window.open("","_blank");
   win.document.write(`<!DOCTYPE html><html><head><title>${r.caseId||r.name}</title>
   <style>body{font-family:Georgia,serif;margin:40px;color:#222;font-size:13px;}
   h1{font-size:18px;color:#2d3a4a;margin-bottom:4px;}
-  h2{font-size:10px;color:#2d3a4a;border-bottom:1px solid #2d3a4a;padding-bottom:3px;margin:16px 0 8px;text-transform:uppercase;letter-spacing:1px;}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 20px;margin-bottom:10px;}
-  .f label{font-size:9px;color:#888;text-transform:uppercase;display:block;margin-bottom:2px;}
+  h2{font-size:10px;color:#2d3a4a;border-bottom:1px solid #2d3a4a;padding-bottom:3px;margin:14px 0 7px;text-transform:uppercase;letter-spacing:1px;}
+  .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 18px;}
+  .f label{font-size:9px;color:#888;text-transform:uppercase;display:block;margin-bottom:1px;}
   .full{grid-column:1/-1;}.logo{font-size:20px;font-weight:800;color:#2d3a4a;letter-spacing:3px;}
-  .sub{font-size:11px;color:#c0392b;letter-spacing:2px;margin-bottom:16px;}
+  .sub{font-size:11px;color:#c0392b;letter-spacing:2px;margin-bottom:14px;}
+  .narr{background:#f9f9f9;padding:10px;border-radius:4px;white-space:pre-wrap;font-size:12px;line-height:1.6;}
   @media print{body{margin:20px;}}</style></head><body>
   <div class="logo">RANGE ✛ USA</div><div class="sub">ASSET PROTECTION</div>
   <h1>${displayName(r)}</h1>
-  <p style="color:#888;font-size:11px;margin-bottom:12px;">${r.caseId||r.id}</p>
-  <h2>Overview</h2><div class="grid">
-  ${["caseId","date","incidentTime","branch","district","submittedBy","location","specificLocation"].map(k=>`<div class="f"><label>${k}</label><p>${getIRValue(r,k)}</p></div>`).join("")}
+  <p style="color:#888;font-size:11px;margin-bottom:10px;">${r.caseId||r.id}</p>
+  <h2>Findings</h2><div class="g">
+  <div class="f full"><label>AP findings</label><p>${(r.apFindings||"—").replace(/\n/g,"<br/>")}</p></div>
+  <div class="f full"><label>HR recommendation & findings</label><p>${getIRValue(r,"hrRec").replace(/\n/g,"<br/>")}</p></div>
+  <div class="f full"><label>Interview narrative</label><p>${(r.interviewNarrative||"—").replace(/\n/g,"<br/>")}</p></div>
   </div>
-  <h2>Narrative</h2><div class="grid"><div class="f full"><label>Original narrative</label><p>${getIRValue(r,"narrative1").replace(/\n/g,"<br/>")}</p></div></div>
-  <h2>Findings</h2><div class="grid">
-  ${["apFindings","hrRec","interviewNarrative"].map(k=>`<div class="f full"><label>${k}</label><p>${getIRValue(r,k).replace(/\n/g,"<br/>")}</p></div>`).join("")}
+  <h2>Overview</h2><div class="g">
+  <div class="f"><label>Case ID</label><p>${r.caseId||r.id}</p></div>
+  <div class="f"><label>Date</label><p>${r.date||"—"}</p></div>
+  <div class="f"><label>Branch</label><p>${r.branch||"—"}</p></div>
+  <div class="f"><label>District leader</label><p>${r.district||"—"}</p></div>
+  <div class="f"><label>Submitted by</label><p>${r.submittedBy||"—"}</p></div>
+  <div class="f"><label>Location</label><p>${r.location||"—"} ${r.specificLocation||""}</p></div>
   </div>
-  <h2>Subject</h2><div class="grid">
-  ${["subjectName","subjectType","injuries","propertyDamage"].map(k=>`<div class="f"><label>${k}</label><p>${getIRValue(r,k)}</p></div>`).join("")}
+  <h2>Details</h2><div class="g">
+  <div class="f"><label>Category</label><p>${r.category||"—"}</p></div>
+  <div class="f"><label>Incident type</label><p>${getIncidentTypes(r)}</p></div>
+  <div class="f"><label>Retain video</label><p>${r.retainVideo||"—"}</p></div>
   </div>
-  ${vrs.length?`<h2>Video Requests</h2>${vrs.map(v=>`<div style="border:1px solid #ddd;padding:10px;border-radius:4px;margin-bottom:8px;"><div class="grid">${["agency","status","assigned","requestNarrative","supplement"].map(k=>`<div class="f ${["requestNarrative","supplement"].includes(k)?"full":""}"><label>${k}</label><p>${(v[k]||"—").replace(/\n/g,"<br/>")}</p></div>`).join("")}</div></div>`).join("")}`:""}
+  <h2>Original narrative</h2><div class="narr">${getIRValue(r,"narrative").replace(/\n/g,"<br/>")}</div>
+  <h2>Subject</h2><div class="g">
+  <div class="f"><label>Name</label><p>${r.subjectName||"—"}</p></div>
+  <div class="f"><label>Injuries</label><p>${r.injuries||"—"}</p></div>
+  <div class="f"><label>Property damage</label><p>${r.propertyDamage||"—"}</p></div>
+  </div>
+  ${ds.length?`<h2>Deny Service</h2>${ds.map(d=>`<p><b>${d.subjectName||"Unknown"}</b> — ${d.status||""} — ${d.date||""}<br/>${d.narrative||""}</p>`).join("")}`:""}
+  ${vrs.length?`<h2>Video Requests</h2>${vrs.map(v=>`<div style="border:1px solid #ddd;padding:8px;border-radius:4px;margin-bottom:8px;"><b>${v.agency||""}</b> · ${v.status||""} · ${v.branch||""}<br/><i>${v.requestNarrative||""}</i></div>`).join("")}`:""}
   <script>window.print();<\/script></body></html>`);
   win.document.close();
 }
 
 async function init() {
   try {
-    const [ir, vr, ds] = await Promise.all([
+    document.getElementById("live-badge").textContent="● Loading…";
+    const [ir,vr,ds] = await Promise.all([
       fetchBoard(IR_BOARD, IR_COLS),
       fetchBoard(VR_BOARD, VR_COLS),
       fetchBoard(DS_BOARD, DS_COLS)
     ]);
-    irItems = ir;
-    vrItems = vr;
-    dsItems = ds;
-    document.getElementById("live-badge").textContent = `● Live — ${irItems.length} cases`;
+    irItems=ir; vrItems=vr; dsItems=ds;
+    document.getElementById("live-badge").textContent=`● Live — ${irItems.length} cases`;
+    populateFilters();
     renderList();
   } catch(e) {
-    document.getElementById("list-panel").innerHTML = `<div class="error">Error loading data: ${e.message}</div>`;
-    document.getElementById("live-badge").textContent = "● Error";
+    document.getElementById("list-panel").innerHTML=`<div class="err-msg">Error: ${e.message}</div>`;
+    document.getElementById("live-badge").textContent="● Error";
   }
 }
 
