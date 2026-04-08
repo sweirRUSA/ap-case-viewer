@@ -26,12 +26,12 @@ const { useState, useEffect, useRef } = React;
 
 const NAVY = "#2d3a4a";
 const RED = "#c0392b";
-const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY0MzAyMjIxNCwiYWFpIjoxMSwidWlkIjo1OTA4NDY1LCJpYWQiOiIyMDI2LTA0LTA4VDEzOjE5OjU4LjI1MloiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjoyNjYzMjIyLCJyZ24iOiJ1c2UxIn0.PIs3Pf9rRy2ruo2G4kLWM5GG-PfoDCS4XmcuJpclNhw";
+const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY0MzAzMzE5NiwiYWFpIjoxMSwidWlkIjo1OTA4NDY1LCJpYWQiOiIyMDI2LTA0LTA4VDEzOjM2OjQ2LjA4MloiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjoyNjYzMjIyLCJyZ24iOiJ1c2UxIn0.y2EeoxRh9al0cSui5AnYbRKOVDz2vdYII90esef1tuI";
 const IR_BOARD = "309348813";
 const VR_BOARD = "992178387";
 
 const gql = async (query) => {
-  const r = await fetch("https://api.monday.com/v2", {
+  const r = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://api.monday.com/v2"), {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: TOKEN },
     body: JSON.stringify({ query }),
