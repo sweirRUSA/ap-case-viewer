@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Range USA — Asset Protection Case Viewer</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f4f5f7; color: #1a1a1a; }
+  #root { max-width: 1400px; margin: 0 auto; padding: 16px; }
+  input[type=text], select { padding: 7px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; outline: none; background: #fff; color: #1a1a1a; }
+  input[type=text]:focus, select:focus { border-color: #3a7bd5; box-shadow: 0 0 0 2px rgba(58,123,213,0.15); }
+  button { padding: 6px 12px; border: 1px solid #ccc; border-radius: 6px; background: #fff; font-size: 12px; cursor: pointer; color: #333; font-family: inherit; }
+  button:hover { background: #f0f0f0; }
+  input[type=checkbox] { cursor: pointer; accent-color: #3a7bd5; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #f1f1f1; } ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const NAVY = "#2d3a4a";
+const RED = "#c0392b";
+const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY0MjcwNDAyMiwiYWFpIjoxMSwidWlkIjo1OTA4NDY1LCJpYWQiOiIyMDI2LTA0LTA3VDE5OjM5OjA3LjAwMFoiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjoyNjYzMjIyLCJyZ24iOiJ1c2UxIn0.3CRHwat5cNMTMoPWqBm2OmvqVNqRcQk2SGpsCRW0mOw";
+const IR_BOARD = "309348813";
+const VR_BOARD = "992178387";
+
+const gql = async (query) => {
+  const r = await fetch("https://api.monday.com/v2", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: TOKEN },
+    body: JSON.stringify({ query }),
+  });
+  return r.json();
+};
+
+const getColVal = (cols, id) => {
+  const c = cols.find(x => x.id === id);
+  if (!c) return "";
+  try {
+    const v = JSON.parse(c.value);
+    if (v === null) return "";
+    if (typeof v === "string") return v;
+    if (v.text) return v.text;
+    if (v.name) return v.name;
+    if (Array.isArray(v)) return v.map(x => x.name || x).join(", ");
+    return c.text || "";
+  } catch { return c.text || ""; }
+};
+
+const IR_COL_IDS = {
+  caseId: "formula_mkr4w8ec", date: "date4", incidentTime: "hour",
+  branch: "location", district: "person", submittedBy: "text0",
+  submittedByEmail: "email", location: "dropdown", specificLocation: "text",
+  category: "status_1", incidentType: "dropdown0", apFollowUp: "status",
+  denyService: "status_13", retainVideo: "status_17", hrRec: "status_18",
+  hrFindings: "long_text_mkr0zd6h", narrative1: "long_text", narrative2: "long_text_1",
+  narrative3: "long_text_2", narrative4: "long_text_3", apFindings: "long_text_4",
+  interviewNarrative: "long_text_5", subjectName: "text_mkr13ght",
+  subjectType: "dropdown_mkr1b30k", injuries: "status_14", firstAid: "status_15",
+  emsResponse: "status_16", emsTransport: "status_19", propertyDamage: "status_110",
+  businessLoss: "status_111", policeResponse: "status_112", policeReport: "text_mkr2",
+  oneDriveLink: "link", documents: "file", pictures: "file0",
+  wasFirearmInvolved: "status_120", wasCodeRedCalled: "status_121",
+  wasRentalFirearm: "status_122", wasAmmoFromRUSA: "status_123",
+};
+
+const VR_COL_IDS = {
+  agency: "status_14", status: "status", assigned: "person", priority: "status_15",
+  branch: "location", incidentDate: "date4", incidentTime: "hour",
+  submittedDate: "date", submittedBy: "text0", requestNarrative: "long_text",
+  supplement: "long_text_1", oneDriveLink: "link", leContact: "text_1",
+  leEmail: "email", lePhone: "phone", reviewDecision: "status_16",
+  requestFollowUp: "status_17", incidentCategory: "dropdown", incidentType: "dropdown0",
+  location: "dropdown1", specificLocation: "text", injuries: "status_18",
+  propertyDamage: "status_19", dateCompleted: "date0", tenDayDate: "date1",
+  caseIdLinked: "board_relation",
+};
+
+const ALL_IR_FIELDS = [
+  {key:"caseId",label:"Case ID",section:"Overview"},
+  {key:"date",label:"Incident date",section:"Overview"},
+  {key:"incidentTime",label:"Incident time",section:"Overview"},
+  {key:"branch",label:"Branch",section:"Overview"},
+  {key:"district",label:"District leader",section:"Overview"},
+  {key:"submittedBy",label:"Submitted by",section:"Overview"},
+  {key:"submittedByEmail",label:"Submitted by email",section:"Overview"},
+  {key:"location",label:"Location",section:"Overview"},
+  {key:"specificLocation",label:"Specific location",section:"Overview"},
+  {key:"category",label:"Category",section:"Details"},
+  {key:"incidentType",label:"Incident type",section:"Details"},
+  {key:"apFollowUp",label:"AP follow-up",section:"Details"},
+  {key:"denyService",label:"Deny service",section:"Details"},
+  {key:"retainVideo",label:"Retain video",section:"Details"},
+  {key:"wasFirearmInvolved",label:"Firearm involved",section:"Details"},
+  {key:"wasCodeRedCalled",label:"Code red called",section:"Details"},
+  {key:"wasRentalFirearm",label:"Rental firearm",section:"Details"},
+  {key:"wasAmmoFromRUSA",label:"RUSA ammo",section:"Details"},
+  {key:"narrative1",label:"Original narrative",section:"Narrative",long:true},
+  {key:"apFindings",label:"AP findings",section:"Findings",long:true},
+  {key:"hrRec",label:"HR recommendation & findings",section:"Findings",long:true},
+  {key:"interviewNarrative",label:"Interview narrative",section:"Findings",long:true},
+  {key:"subjectName",label:"Subject name",section:"Subject"},
+  {key:"subjectType",label:"Subject type",section:"Subject"},
+  {key:"injuries",label:"Injuries",section:"Subject"},
+  {key:"firstAid",label:"First aid",section:"Subject"},
+  {key:"emsResponse",label:"EMS response",section:"Subject"},
+  {key:"emsTransport",label:"EMS transport",section:"Subject"},
+  {key:"propertyDamage",label:"Property damage",section:"Subject"},
+  {key:"businessLoss",label:"Business loss",section:"Subject"},
+  {key:"policeResponse",label:"Police response",section:"Subject"},
+  {key:"policeReport",label:"Police report #",section:"Subject"},
+];
+
+const ALL_VR_FIELDS = [
+  {key:"caseId",label:"Case ID"},{key:"agency",label:"Agency"},
+  {key:"status",label:"Status"},{key:"assigned",label:"Assigned to"},
+  {key:"priority",label:"Priority"},{key:"branch",label:"Branch"},
+  {key:"incidentDate",label:"Incident date"},{key:"incidentTime",label:"Incident time"},
+  {key:"submittedDate",label:"Submitted date"},{key:"submittedBy",label:"Submitted by"},
+  {key:"requestNarrative",label:"Request narrative",long:true},
+  {key:"supplement",label:"SSC supplement",long:true},
+  {key:"oneDriveLink",label:"OneDrive link"},{key:"leContact",label:"LE contact"},
+  {key:"leEmail",label:"LE email"},{key:"lePhone",label:"LE phone"},
+  {key:"reviewDecision",label:"Review decision"},{key:"requestFollowUp",label:"Request follow-up"},
+  {key:"incidentCategory",label:"Incident category"},{key:"incidentType",label:"Incident type"},
+  {key:"location",label:"Location"},{key:"specificLocation",label:"Specific location"},
+  {key:"injuries",label:"Injuries"},{key:"propertyDamage",label:"Property damage"},
+  {key:"dateCompleted",label:"Date completed"},{key:"tenDayDate",label:"10-day date"},
+];
+
+const IR_SECTIONS = [...new Set(ALL_IR_FIELDS.map(f => f.section))];
+const DEFAULT_SEC_ORDER = [...IR_SECTIONS, "Documents", "Video Requests"];
+const DEFAULT_IR_VIS = Object.fromEntries(ALL_IR_FIELDS.map(f => [f.key, !["submittedByEmail","wasFirearmInvolved","wasCodeRedCalled","wasRentalFirearm","wasAmmoFromRUSA","firstAid","emsResponse","emsTransport","businessLoss","policeResponse","policeReport"].includes(f.key)]));
+const DEFAULT_VR_PREVIEW_VIS = Object.fromEntries(ALL_VR_FIELDS.map(f => [f.key, ["agency","status","assigned","requestNarrative","supplement"].includes(f.key)]));
+const DEFAULT_VR_MODAL_VIS = Object.fromEntries(ALL_VR_FIELDS.map(f => [f.key, true]));
+
+const statusColors = s => {
+  if (!s) return ["#eee","#555"];
+  const l = s.toLowerCase();
+  if (l.includes("completed")) return ["#e6f4ec","#1a7a3f"];
+  if (l.includes("progress")) return ["#fff8e6","#b07800"];
+  if (l.includes("action needed")||l.includes("termination")) return ["#fdecea",RED];
+  return ["#f0f0f0","#444"];
+};
+
+const Badge = ({text}) => {
+  if (!text||text==="—") return null;
+  const [bg,color] = statusColors(text);
+  return <span style={{fontSize:11,padding:"2px 8px",borderRadius:4,background:bg,color,fontWeight:500,display:"inline-block",marginRight:4}}>{text}</span>;
+};
+
+const Field = ({label,value,full}) => (
+  <div style={{gridColumn:full?"1 / -1":"auto",marginBottom:8}}>
+    <div style={{fontSize:10,color:"#999",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:3}}>{label}</div>
+    <div style={{fontSize:13,color:"#1a1a1a",lineHeight:1.7,wordBreak:"break-word",whiteSpace:"pre-wrap"}}>{value||"—"}</div>
+  </div>
+);
+
+const DocThumb = ({url,label}) => {
+  if (!url||url==="N/A"||url==="—") return null;
+  const isPdf = /\.pdf/i.test(url), isImg = /\.(png|jpg|jpeg|gif|webp)/i.test(url);
+  return (
+    <a href={url} target="_blank" rel="noreferrer" style={{display:"inline-flex",flexDirection:"column",alignItems:"center",gap:4,textDecoration:"none",marginRight:10,marginBottom:8}}>
+      <div style={{width:64,height:64,borderRadius:8,border:"1px solid #ddd",background:isPdf?"#fdecea":isImg?"#e6f0fa":"#f5f5f5",display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}}>
+        {isPdf?"📄":isImg?"🖼":"📁"}
+      </div>
+      <span style={{fontSize:10,color:"#666",maxWidth:64,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{label}</span>
+    </a>
+  );
+};
+
+const DragHandle = () => <span style={{cursor:"grab",color:"#bbb",fontSize:14,padding:"0 6px",userSelect:"none"}}>⠿</span>;
+const SecTitle = ({children}) => (
+  <div style={{fontSize:10,fontWeight:700,color:NAVY,textTransform:"uppercase",letterSpacing:"0.09em",paddingBottom:5,borderBottom:`2px solid ${NAVY}`,marginBottom:10}}>{children}</div>
+);
+
+const LOGO_SRC = "https://www.rangeusa.com/Content/images/logo-white.png";
+const Logo = () => (
+  <img src={LOGO_SRC} alt="Range USA"
+    style={{height:34,objectFit:"contain"}}
+    onError={e=>{
+      e.target.style.display="none";
+      document.getElementById("fallback-logo").style.display="flex";
+    }}
+  />
+);
+const FallbackLogo = () => (
+  <div id="fallback-logo" style={{display:"none",alignItems:"center",gap:0}}>
+    <span style={{fontSize:17,fontWeight:800,color:"#fff",letterSpacing:3,fontFamily:"Georgia,serif"}}>RANGE</span>
+    <svg width={26} height={26} viewBox="0 0 32 32" style={{margin:"0 4px"}}>
+      <circle cx="16" cy="16" r="12" fill="none" stroke={RED} strokeWidth="2.5"/>
+      <line x1="16" y1="4" x2="16" y2="28" stroke={RED} strokeWidth="2.5"/>
+      <line x1="4" y1="16" x2="28" y2="16" stroke={RED} strokeWidth="2.5"/>
+      <circle cx="16" cy="16" r="2.5" fill={RED}/>
+    </svg>
+    <span style={{fontSize:17,fontWeight:800,color:"#fff",letterSpacing:3,fontFamily:"Georgia,serif"}}>USA</span>
+  </div>
+);
+
+function App() {
+  const [irItems, setIrItems] = useState([]);
+  const [vrItems, setVrItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selected, setSelected] = useState(null);
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsTab, setSettingsTab] = useState("layout");
+  const [layout, setLayout] = useState("list + detail");
+  const [vrModal, setVrModal] = useState(null);
+  const [irVis, setIrVis] = useState(DEFAULT_IR_VIS);
+  const [vrPreviewVis, setVrPreviewVis] = useState(DEFAULT_VR_PREVIEW_VIS);
+  const [vrModalVis, setVrModalVis] = useState(DEFAULT_VR_MODAL_VIS);
+  const [secOrder, setSecOrder] = useState(DEFAULT_SEC_ORDER);
+  const [fieldOrder, setFieldOrder] = useState(() => Object.fromEntries(IR_SECTIONS.map(s => [s, ALL_IR_FIELDS.filter(f => f.section === s).map(f => f.key)])));
+
+  const dragSec = useRef(null), dragOverSec = useRef(null);
+  const dragField = useRef(null), dragOverField = useRef(null), dragFieldSec = useRef(null);
+
+  const fetchItems = async (boardId, colIds) => {
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - 6);
+    const cutoffStr = cutoff.toISOString().split("T")[0];
+    let all = [], cursor = null;
+    for (let page = 0; page < 20; page++) {
+      const rules = `rules: [{column_id: "date4", compare_value: ["${cutoffStr}"], operator: greater_than_or_equals}]`;
+      const q = cursor
+        ? `{ next_items_page(limit: 100, cursor: "${cursor}") { cursor items { id name column_values { id text value } } } }`
+        : `{ boards(ids: ${boardId}) { items_page(limit: 100, query_params: {${rules}}) { cursor items { id name column_values { id text value } } } } }`;
+      const data = await gql(q);
+      const pd = cursor ? data?.data?.next_items_page : data?.data?.boards?.[0]?.items_page;
+      if (!pd) break;
+      all = [...all, ...pd.items];
+      if (!pd.cursor) break;
+      cursor = pd.cursor;
+    }
+    return all.map(item => {
+      const r = {id: item.id, name: item.name};
+      Object.entries(colIds).forEach(([key, colId]) => { r[key] = getColVal(item.column_values, colId); });
+      return r;
+    });
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [ir, vr] = await Promise.all([fetchItems(IR_BOARD, IR_COL_IDS), fetchItems(VR_BOARD, VR_COL_IDS)]);
+        setIrItems(ir); setVrItems(vr);
+      } catch(e) { setError("Failed to load: " + e.message); }
+      finally { setLoading(false); }
+    })();
+  }, []);
+
+  const getIRValue = (r, key) => {
+    if (key === "narrative1") return [r.narrative1,r.narrative2,r.narrative3,r.narrative4].filter(Boolean).join("\n\n");
+    if (key === "hrRec") {
+      const rec = r.hrRec && r.hrRec !== "—" ? `Recommendation: ${r.hrRec}` : "";
+      const find = r.hrFindings && r.hrFindings !== "—" ? `Findings: ${r.hrFindings}` : "";
+      return [rec,find].filter(Boolean).join("\n\n") || "—";
+    }
+    return r[key];
+  };
+
+  const getLinkedVR = ir => vrItems.filter(vr =>
+    (vr.caseIdLinked && vr.caseIdLinked.includes(ir.id)) ||
+    (ir.caseId && vr.caseId === ir.caseId)
+  );
+
+  const filtered = irItems.filter(r => {
+    const q = search.toLowerCase();
+    const mQ = !q || (r.caseId||"").toLowerCase().includes(q) || r.name.toLowerCase().includes(q) || (r.branch||"").toLowerCase().includes(q) || (r.subjectName||"").toLowerCase().includes(q);
+    const mS = filterStatus === "all" || (r.apFollowUp||"").toLowerCase().includes(filterStatus);
+    const isBackgroundDenial = (r.category||"").toLowerCase() === "background check denial";
+    return mQ && mS && !isBackgroundDenial;
+  });
+
+  const onSecDS = i => { dragSec.current = i; };
+  const onSecDO = (e,i) => { e.preventDefault(); dragOverSec.current = i; };
+  const onSecDrop = () => {
+    const o=[...secOrder],from=dragSec.current,to=dragOverSec.current;
+    if(from===null||to===null||from===to) return;
+    const [it]=o.splice(from,1); o.splice(to,0,it); setSecOrder(o);
+    dragSec.current=null; dragOverSec.current=null;
+  };
+  const onFDS = (sec,i) => { dragField.current=i; dragFieldSec.current=sec; };
+  const onFDO = (e,i) => { e.preventDefault(); dragOverField.current=i; };
+  const onFDrop = sec => {
+    if(dragFieldSec.current!==sec) return;
+    const o=[...fieldOrder[sec]],from=dragField.current,to=dragOverField.current;
+    if(from===null||to===null||from===to) return;
+    const [it]=o.splice(from,1); o.splice(to,0,it);
+    setFieldOrder(p=>({...p,[sec]:o}));
+    dragField.current=null; dragOverField.current=null;
+  };
+
+  const printCase = r => {
+    const vrs = getLinkedVR(r);
+    const win = window.open("","_blank");
+    const rows = secOrder.filter(s=>IR_SECTIONS.includes(s)).map(s=>{
+      const keys=(fieldOrder[s]||[]).filter(k=>irVis[k]);
+      if(!keys.length) return "";
+      return `<h2>${s}</h2><div class="grid">${keys.map(k=>{const f=ALL_IR_FIELDS.find(x=>x.key===k);return`<div class="f ${f?.long?"full":""}"><label>${f?.label||k}</label><p>${(getIRValue(r,k)||"—").replace(/\n/g,"<br/>")}</p></div>`;}).join("")}</div>`;
+    }).join("");
+    win.document.write(`<!DOCTYPE html><html><head><title>${r.caseId||r.name}</title><style>
+    *{box-sizing:border-box;margin:0;padding:0;}body{font-family:Georgia,serif;margin:40px;color:#222;font-size:13px;}
+    .header{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;border-bottom:2px solid ${NAVY};padding-bottom:12px;}
+    .logo{font-size:22px;font-weight:800;color:${NAVY};letter-spacing:3px;}.sub{font-size:11px;color:${RED};letter-spacing:2px;text-transform:uppercase;}
+    h1{font-size:18px;color:${NAVY};margin-bottom:4px;}h2{font-size:10px;color:${NAVY};border-bottom:1px solid ${NAVY};padding-bottom:3px;margin:16px 0 8px;text-transform:uppercase;letter-spacing:1px;}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 20px;}.f label{font-size:9px;color:#888;text-transform:uppercase;display:block;margin-bottom:2px;}.full{grid-column:1/-1;}
+    .badge{background:#eee;border-radius:3px;padding:2px 6px;font-size:10px;margin-right:4px;display:inline-block;}
+    .vr{border:1px solid #ddd;padding:10px;border-radius:4px;margin-bottom:10px;}
+    @media print{body{margin:20px;}}</style></head><body>
+    <div class="header"><div class="logo">RANGE ✛ USA</div><div class="sub">Asset Protection</div></div>
+    <h1>${r.name}</h1><p style="color:#888;font-size:11px;margin-bottom:10px;">${r.caseId||r.id}</p>
+    <div style="margin-bottom:14px;">${[r.apFollowUp,r.category].filter(Boolean).map(t=>`<span class="badge">${t}</span>`).join("")}</div>
+    ${rows}
+    ${vrs.length?`<h2>Video Requests</h2>${vrs.map(v=>`<div class="vr"><div class="grid">${ALL_VR_FIELDS.filter(f=>vrModalVis[f.key]).map(f=>`<div class="f ${f.long?"full":""}"><label>${f.label}</label><p>${(v[f.key]||"—").replace(/\n/g,"<br/>")}</p></div>`).join("")}</div></div>`).join("")}`:""}
+    <script>window.print();<\/script></body></html>`);
+    win.document.close();
+  };
+
+  const renderSec = (r, sec) => {
+    if (sec==="Documents") {
+      if (!r.oneDriveLink&&!r.documents&&!r.pictures) return null;
+      return <div key="docs" style={{marginBottom:18}}><SecTitle>Documents & media</SecTitle><div style={{display:"flex",flexWrap:"wrap",paddingTop:6}}><DocThumb url={r.oneDriveLink} label="Video"/><DocThumb url={r.documents} label="Document"/><DocThumb url={r.pictures} label="Picture"/></div></div>;
+    }
+    if (sec==="Video Requests") {
+      const vrs=getLinkedVR(r);
+      return (
+        <div key="vr" style={{marginBottom:18}}>
+          <SecTitle>Video requests ({vrs.length})</SecTitle>
+          {vrs.length===0&&<p style={{fontSize:13,color:"#999",padding:"8px 0"}}>No linked video requests.</p>}
+          {vrs.map((v,i)=>(
+            <div key={i} style={{background:NAVY,borderRadius:8,padding:"12px 14px",marginBottom:10}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+                <div>
+                  <div style={{fontSize:13,fontWeight:600,color:"#fff"}}>{v.agency||"Video Request"}</div>
+                  <div style={{fontSize:11,color:"#8fa8c0",marginTop:2}}>{v.caseId||r.caseId} · {v.branch}</div>
+                </div>
+                <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                  <span style={{fontSize:11,padding:"2px 8px",borderRadius:4,background:"rgba(255,255,255,0.15)",color:"#fff"}}>{v.status}</span>
+                  <button onClick={()=>setVrModal(v)} style={{fontSize:11,padding:"3px 10px",background:"transparent",border:`1px solid ${RED}`,color:"#fff",borderRadius:4,cursor:"pointer"}}>Expand ↗</button>
+                </div>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:"8px 16px"}}>
+                {ALL_VR_FIELDS.filter(f=>vrPreviewVis[f.key]).map(f=>(
+                  <div key={f.key} style={{gridColumn:f.long?"1 / -1":"auto"}}>
+                    <div style={{fontSize:10,color:"#6a8aaa",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>{f.label}</div>
+                    <div style={{fontSize:12,color:"#e8eef4",lineHeight:1.6,whiteSpace:"pre-wrap"}}>{v[f.key]||"—"}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    const keys=(fieldOrder[sec]||[]).filter(k=>irVis[k]);
+    if(!keys.length) return null;
+    return (
+      <div key={sec} style={{marginBottom:18}}>
+        <SecTitle>{sec}</SecTitle>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:"10px 18px",paddingTop:6}}>
+          {keys.map(k=>{const f=ALL_IR_FIELDS.find(x=>x.key===k);return <Field key={k} label={f?.label||k} value={getIRValue(r,k)} full={!!f?.long}/>;  })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderDetail = r => (
+    <div style={{background:"#fff",border:"1px solid #e0e0e0",borderRadius:10,padding:"18px 20px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+        <div>
+          <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a"}}>{r.name}</div>
+          <div style={{fontSize:11,color:"#999",marginTop:2}}>{r.caseId||r.id}</div>
+        </div>
+        <div style={{display:"flex",gap:6}}>
+          <button onClick={()=>printCase(r)}>🖨 Print</button>
+          {layout!=="full width detail"&&<button onClick={()=>setSelected(null)}>✕</button>}
+        </div>
+      </div>
+      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:16}}>
+        <Badge text={r.apFollowUp}/><Badge text={r.category}/>
+        {r.hrRec&&r.hrRec!=="—"&&<Badge text={`HR: ${r.hrRec}`}/>}
+        {(r.retainVideo||"").includes("Yes")&&<Badge text="Video retained"/>}
+        {r.denyService==="Yes"&&<Badge text="Deny service"/>}
+      </div>
+      {secOrder.map(s=>renderSec(r,s))}
+    </div>
+  );
+
+  const displayName = r => {
+    const parts = [r.branch, r.incidentType, r.category].filter(Boolean);
+    return parts.length ? parts.join(" · ") : r.name;
+  };
+
+  const ListItem = ({r}) => (
+    <div onClick={()=>setSelected(selected?.id===r.id?null:r)}
+      style={{background:selected?.id===r.id?"#e8f0fb":"#fff",border:`1px solid ${selected?.id===r.id?"#3a7bd5":"#e0e0e0"}`,borderRadius:6,padding:"10px 14px",marginBottom:6,cursor:"pointer"}}>
+      <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"flex-start"}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:13,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{displayName(r)}</div>
+          <div style={{fontSize:11,color:"#3a7bd5",fontWeight:500,marginTop:2}}>{r.caseId||r.id}</div>
+        </div>
+        <Badge text={r.apFollowUp}/>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px 12px",marginTop:8}}>
+        {r.branch&&<div style={{fontSize:11,color:"#555"}}><span style={{color:"#aaa"}}>Branch </span>{r.branch}</div>}
+        {r.date&&<div style={{fontSize:11,color:"#555"}}><span style={{color:"#aaa"}}>Date </span>{r.date}</div>}
+        {r.category&&<div style={{fontSize:11,color:"#555"}}><span style={{color:"#aaa"}}>Category </span>{r.category}</div>}
+        {r.incidentType&&<div style={{fontSize:11,color:"#555",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}><span style={{color:"#aaa"}}>Type </span>{r.incidentType}</div>}
+        {r.district&&<div style={{fontSize:11,color:"#555"}}><span style={{color:"#aaa"}}>DL </span>{r.district}</div>}
+        {r.apFollowUp&&<div style={{fontSize:11,color:"#555",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}><span style={{color:"#aaa"}}>Ownership </span>{r.apFollowUp}</div>}
+      </div>
+    </div>
+  );
+
+  if (loading) return (
+    <div style={{fontFamily:"inherit"}}>
+      <div style={{background:NAVY,padding:"12px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:"10px 10px 0 0"}}>
+        <Logo/><span style={{fontSize:11,color:"#8fa8c0",letterSpacing:2,textTransform:"uppercase"}}>Asset Protection</span>
+      </div>
+      <div style={{padding:"80px 0",textAlign:"center",color:"#888",fontSize:14,background:"#fff",borderRadius:"0 0 10px 10px"}}>
+        <div style={{fontSize:32,marginBottom:16}}>⏳</div>Loading live data from Monday.com…
+      </div>
+    </div>
+  );
+
+  if (error) return <div style={{padding:20,color:RED,fontSize:13,background:"#fff",borderRadius:8}}><strong>Error:</strong> {error}</div>;
+
+  return (
+    <div style={{fontFamily:"inherit"}}>
+      <div style={{background:NAVY,padding:"12px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:"10px 10px 0 0",marginBottom:16}}>
+        <Logo/><FallbackLogo/>
+        <div style={{display:"flex",alignItems:"center",gap:16}}>
+          <span style={{fontSize:11,color:"#4a7",letterSpacing:1}}>● Live — {irItems.length} cases</span>
+          <span style={{fontSize:11,color:"#8fa8c0",letterSpacing:2,textTransform:"uppercase"}}>Asset Protection</span>
+        </div>
+      </div>
+
+      <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}>
+        <input type="text" placeholder="Search case ID, subject, branch…" value={search} onChange={e=>setSearch(e.target.value)} style={{flex:1,minWidth:200}}/>
+        <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
+          <option value="all">All statuses</option>
+          <option value="completed">Completed</option>
+          <option value="in progress">In Progress</option>
+          <option value="action needed">Action needed</option>
+        </select>
+        <button onClick={()=>setShowSettings(!showSettings)}>{showSettings?"Hide settings":"⚙ Settings"}</button>
+      </div>
+
+      {showSettings&&(
+        <div style={{background:"#f9f9f9",border:"1px solid #e0e0e0",borderRadius:8,padding:"14px 18px",marginBottom:14}}>
+          <div style={{display:"flex",gap:6,marginBottom:14,borderBottom:"1px solid #e0e0e0",paddingBottom:10}}>
+            {["layout","IR fields","VR fields"].map(t=>(
+              <button key={t} onClick={()=>setSettingsTab(t)} style={{fontSize:12,background:settingsTab===t?"#e8f0fb":undefined,color:settingsTab===t?"#1a5fa8":undefined,borderColor:settingsTab===t?"#1a5fa8":undefined}}>{t}</button>
+            ))}
+          </div>
+          {settingsTab==="layout"&&(
+            <div>
+              <div style={{fontSize:10,fontWeight:600,textTransform:"uppercase",color:"#888",marginBottom:8}}>Layout</div>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:16}}>
+                {["list + detail","card grid","full width detail"].map(l=>(
+                  <button key={l} onClick={()=>{setLayout(l);if(l==="full width detail"&&!selected)setSelected(filtered[0]||null);}} style={{fontSize:12,background:layout===l?"#e8f0fb":undefined,color:layout===l?"#1a5fa8":undefined,borderColor:layout===l?"#1a5fa8":undefined}}>{l}</button>
+                ))}
+              </div>
+              <div style={{fontSize:10,fontWeight:600,textTransform:"uppercase",color:"#888",marginBottom:8}}>Section order — drag to reorder</div>
+              {secOrder.map((s,i)=>(
+                <div key={s} draggable onDragStart={()=>onSecDS(i)} onDragOver={e=>onSecDO(e,i)} onDrop={onSecDrop}
+                  style={{display:"flex",alignItems:"center",gap:6,padding:"6px 10px",marginBottom:4,background:"#fff",border:"1px solid #e0e0e0",borderRadius:6,cursor:"grab"}}>
+                  <DragHandle/><span style={{fontSize:13}}>{s}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {settingsTab==="IR fields"&&(
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))",gap:"10px 24px"}}>
+              {IR_SECTIONS.map(sec=>(
+                <div key={sec}>
+                  <div style={{fontSize:11,fontWeight:700,color:NAVY,marginBottom:6,textTransform:"uppercase",letterSpacing:"0.06em"}}>{sec}</div>
+                  {(fieldOrder[sec]||[]).map((k,i)=>{
+                    const f=ALL_IR_FIELDS.find(x=>x.key===k);
+                    return(
+                      <div key={k} draggable onDragStart={()=>onFDS(sec,i)} onDragOver={e=>onFDO(e,i)} onDrop={()=>onFDrop(sec)}
+                        style={{display:"flex",alignItems:"center",gap:6,marginBottom:3,padding:"3px 6px",background:"#fff",border:"1px solid #e0e0e0",borderRadius:4,cursor:"grab"}}>
+                        <DragHandle/>
+                        <input type="checkbox" checked={!!irVis[k]} onChange={()=>setIrVis(p=>({...p,[k]:!p[k]}))} onClick={e=>e.stopPropagation()}/>
+                        <label style={{fontSize:11,color:"#555",cursor:"pointer"}}>{f?.label||k}</label>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          )}
+          {settingsTab==="VR fields"&&(
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+              <div>
+                <div style={{fontSize:11,fontWeight:700,color:NAVY,marginBottom:8,textTransform:"uppercase"}}>VR preview on IR card</div>
+                {ALL_VR_FIELDS.map(f=>(
+                  <div key={f.key} style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                    <input type="checkbox" checked={!!vrPreviewVis[f.key]} onChange={()=>setVrPreviewVis(p=>({...p,[f.key]:!p[f.key]}))}/>
+                    <label style={{fontSize:11,color:"#555"}}>{f.label}</label>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{fontSize:11,fontWeight:700,color:NAVY,marginBottom:8,textTransform:"uppercase"}}>VR expanded modal fields</div>
+                {ALL_VR_FIELDS.map(f=>(
+                  <div key={f.key} style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                    <input type="checkbox" checked={!!vrModalVis[f.key]} onChange={()=>setVrModalVis(p=>({...p,[f.key]:!p[f.key]}))}/>
+                    <label style={{fontSize:11,color:"#555"}}>{f.label}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {layout==="list + detail"&&(
+        <div style={{display:"grid",gridTemplateColumns:selected?"280px minmax(0,1fr)":"minmax(0,1fr)",gap:12}}>
+          <div>{filtered.map(r=><ListItem key={r.id} r={r}/>)}</div>
+          {selected&&<div style={{overflowY:"auto",maxHeight:"85vh"}}>{renderDetail(selected)}</div>}
+        </div>
+      )}
+      {layout==="card grid"&&(
+        <div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:12}}>
+            {filtered.map(r=>(
+              <div key={r.id} onClick={()=>setSelected(selected?.id===r.id?null:r)}
+                style={{background:"#fff",border:`1px solid ${selected?.id===r.id?"#3a7bd5":"#e0e0e0"}`,borderRadius:10,padding:"14px 16px",cursor:"pointer"}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+                  <div style={{fontSize:13,fontWeight:500,flex:1,marginRight:8}}>{r.name}</div>
+                  <Badge text={r.apFollowUp}/>
+                </div>
+                <div style={{fontSize:11,color:"#888",marginBottom:4}}>{r.caseId||r.id}</div>
+                <div style={{fontSize:12,color:"#555"}}>{r.branch} · {r.date}</div>
+              </div>
+            ))}
+          </div>
+          {selected&&<div style={{marginTop:12}}>{renderDetail(selected)}</div>}
+        </div>
+      )}
+      {layout==="full width detail"&&(
+        <div style={{display:"grid",gridTemplateColumns:"200px minmax(0,1fr)",gap:12}}>
+          <div>{filtered.map(r=>(
+            <div key={r.id} onClick={()=>setSelected(r)}
+              style={{background:selected?.id===r.id?"#e8f0fb":"transparent",borderRadius:6,padding:"8px 10px",marginBottom:2,cursor:"pointer",border:`1px solid ${selected?.id===r.id?"#3a7bd5":"transparent"}`}}>
+              <div style={{fontSize:12,fontWeight:500,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.name}</div>
+              <div style={{fontSize:11,color:"#999"}}>{r.date}</div>
+            </div>
+          ))}</div>
+          <div style={{overflowY:"auto",maxHeight:"85vh"}}>
+            {selected?renderDetail(selected):<div style={{padding:"60px 0",textAlign:"center",color:"#aaa",fontSize:13}}>Select a case from the list</div>}
+          </div>
+        </div>
+      )}
+
+      {vrModal&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:999}} onClick={()=>setVrModal(null)}>
+          <div style={{background:"#fff",borderRadius:12,padding:"20px 24px",maxWidth:640,width:"92%",maxHeight:"82vh",overflowY:"auto",boxSizing:"border-box"}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+              <div>
+                <div style={{fontSize:14,fontWeight:600}}>{vrModal.agency||"Video Request"}</div>
+                <div style={{fontSize:11,color:"#888",marginTop:2}}>{vrModal.caseId} · {vrModal.branch}</div>
+              </div>
+              <button onClick={()=>setVrModal(null)}>✕ Close</button>
+            </div>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}><Badge text={vrModal.status}/></div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(2,minmax(0,1fr))",gap:"10px 20px"}}>
+              {ALL_VR_FIELDS.filter(f=>vrModalVis[f.key]).map(f=>(
+                <div key={f.key} style={{gridColumn:f.long?"1 / -1":"auto"}}>
+                  <div style={{fontSize:10,color:"#aaa",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:2}}>{f.label}</div>
+                  <div style={{fontSize:13,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{vrModal[f.key]||"—"}</div>
+                </div>
+              ))}
+            </div>
+            {vrModal.oneDriveLink&&vrModal.oneDriveLink!=="—"&&(
+              <div style={{marginTop:14}}>
+                <div style={{fontSize:10,color:"#aaa",textTransform:"uppercase",letterSpacing:"0.05em",marginBottom:6}}>Video link</div>
+                <DocThumb url={vrModal.oneDriveLink} label="Video"/>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
