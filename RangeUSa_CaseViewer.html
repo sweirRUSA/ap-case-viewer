@@ -201,8 +201,9 @@ const VR_COLS = {
   priority:"agency", branch:"dropdown0",
   incidentDate:"date4", incidentTime:"text19",
   submittedDate:"date0", submittedBy:"primary_contributor",
-  requestNarrative:"long_text", supplement:"main_office_supplement",
-  oneDriveLink:"text_mm032dsj",
+  requestNarrative:"long_text",
+  oneDriveLink:"main_office_supplement",
+  sscSupplement:"text_mm032dsj",
   leContact:"submitted_by", leEmail:"le_contact_name", lePhone:"le_email_address",
   reviewDecision:"status_1__1", requestFollowUp:"request_for_follow_up__1",
   incidentCategory:"incident_category", location:"text8",
@@ -459,7 +460,8 @@ function renderDetail(r) {
         <div class="vrf"><div class="vrf-label">Agency</div><div class="vrf-val">${v.agency||"—"}</div></div>
         <div class="vrf"><div class="vrf-label">Assigned to</div><div class="vrf-val">${v.assigned||"—"}</div></div>
         <div class="vrf full"><div class="vrf-label">Request narrative</div><div class="vrf-val">${v.requestNarrative||"—"}</div></div>
-        <div class="vrf full"><div class="vrf-label">SSC supplement</div><div class="vrf-val">${v.supplement||"—"}</div></div>
+        <div class="vrf full"><div class="vrf-label">SSC supplement</div><div class="vrf-val">${v.sscSupplement||"—"}</div></div>
+        ${v.oneDriveLink?`<div class="vrf full"><div class="vrf-label">OneDrive / video link</div><div class="vrf-val"><a href="${v.oneDriveLink}" target="_blank" style="color:#7fb3d3;">Open video ↗</a></div></div>`:""}
       </div>
     </div>`).join("") : '<div style="font-size:13px;color:#999;padding:6px 0">No linked video requests.</div>';
 
@@ -632,7 +634,7 @@ function openVRModal(idx, irId) {
     {k:"incidentTime",l:"Incident time"},{k:"submittedDate",l:"Submitted date"},
     {k:"submittedBy",l:"Submitted by"},
     {k:"requestNarrative",l:"Request narrative",long:true},
-    {k:"supplement",l:"SSC supplement",long:true},
+    {k:"sscSupplement",l:"SSC supplement",long:true},
     {k:"leContact",l:"LE contact"},{k:"leEmail",l:"LE email"},{k:"lePhone",l:"LE phone"},
     {k:"reviewDecision",l:"Review decision"},{k:"dateCompleted",l:"Date completed"},
     {k:"incidentCategory",l:"Incident category"},{k:"location",l:"Location"}
