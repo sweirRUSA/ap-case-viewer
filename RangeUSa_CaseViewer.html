@@ -107,7 +107,10 @@ button:hover{background:#f5f5f5;}
 
 <div class="toolbar">
   <input type="text" id="search" placeholder="Search case ID, name, branch…" oninput="renderList()" style="flex:1;min-width:160px;"/>
+  <button onclick="showSettings=!showSettings;renderSettings();" style="font-size:12px;">⚙ Settings</button>
 </div>
+
+<div id="settings-panel" style="display:none;background:#f9f9f9;border-bottom:1px solid #e0e0e0;padding:14px 18px;"></div>
 
 <div class="filter-row">
   <select id="f-branch" onchange="renderList()"><option value="">All branches</option></select>
@@ -442,9 +445,44 @@ function showMsg(elId, success) {
 }
 
 function renderDetail(r) {
-  const vrs=getLinkedVR(r);
-  const ds=getLinkedDS(r);
   const caseIdDisplay = r.caseId||r.pushableCaseId||r.id;
+  const existingLink = r.oneDriveLink&&r.oneDriveLink!=="—" ? r.oneDriveLink : "";
+
+  document.getElementById("detail-panel").innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-name">${displayName(r)}</div>
+      <div class="card-caseid">${caseIdDisplay}</div></div>
+      <div class="card-actions">
+        <button class="btn-small" onclick="printCase('${r.id}')">🖨 Print</button>
+      </div>
+    </div>
+    <div class="badges">
+      ${r.apFollowUp?`<span class="badge ${badgeCls(r.apFollowUp)}">${r.apFollowUp}</span>`:""}
+      ${r.category?`<span class="badge bg-gray">${r.category}</span>`:""}
+      ${r.hrRec&&r.hrRec!=="—"?`<span class="badge bg-red">HR: ${r.hrRec}</span>`:""}
+      ${(r.retainVideo||"").includes("Yes")?`<span class="badge bg-blue">Video retained</span>`:""}
+      ${getLinkedDS(r).length?`<span class="badge bg-red">DNS: ${getLinkedDS(r)[0].status||"Yes"}</span>`:""}
+    </div>
+    <div class="sec"><div class="sec-title">Documents & media</div>
+      <div class="fgrid">
+        <div class="f full fedit">
+          <div class="flabel">OneDrive video link</div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+            <input type="text" id="edit-oneDriveLink" value="${existingLink}" placeholder="Paste OneDrive link…" style="flex:1;min-width:200px;font-size:12px;"/>
+            ${existingLink?`<a href="${existingLink}" target="_blank" style="font-size:11px;color:#3a7bd5;white-space:nowrap;">Open ↗</a>`:""}
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="btn-primary btn-small" onclick="saveOneDriveLink('${r.id}')">Save to Monday</button>
+            <button class="btn-small" onclick="document.getElementById('edit-oneDriveLink').value=''">Clear</button>
+            <span id="msg-oneDriveLink" class="save-msg"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    ${secOrder.map(s=>renderSection(r,s)).join("")}
+  </div>`;
+}
 
   const vrHTML = vrs.length ? vrs.map((v,i)=>`
     <div class="vr-card">
@@ -720,6 +758,7 @@ async function init() {
     document.getElementById("live-badge").textContent=`● Live — ${irItems.length} cases`;
     populateFilters();
     renderList();
+    renderSettings();
   } catch(e) {
     document.getElementById("list-panel").innerHTML=`<div class="err-msg">Error: ${e.message}</div>`;
     document.getElementById("live-badge").textContent="● Error";
