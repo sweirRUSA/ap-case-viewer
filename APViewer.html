@@ -596,14 +596,23 @@ async function renderPreview(r) {
       const q = "{assets(ids:["+assetIds.join(",")+"]){id public_url name}}";
       const data = await gql(q);
       const assets = data?.data?.assets || [];
-      assets.forEach(function(a){
+      // Fetch image blobs through proxy to get around CORS
+      await Promise.all(assets.map(async function(a){
         const f = files.find(function(x){return String(x.assetId)===String(a.id);});
-        if (f && a.public_url) {
-          // Use direct S3 URL for everything - works natively in browser
+        if (!f || !a.public_url) return;
+        f.directUrl = a.public_url;
+        if (f.isImage) {
+          try {
+            const resp = await fetch(PROXY + encodeURIComponent(a.public_url));
+            const blob = await resp.blob();
+            f.url = URL.createObjectURL(blob);
+          } catch(e) {
+            f.url = a.public_url; // fallback to direct
+          }
+        } else {
           f.url = a.public_url;
-          f.directUrl = a.public_url;
         }
-      });
+      }));
     } catch(e) {}
   }
 
