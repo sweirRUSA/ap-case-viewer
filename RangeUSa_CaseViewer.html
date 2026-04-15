@@ -3,23 +3,20 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Range USA — AP Case Viewer</title>
+<title>Range USA - AP Case Viewer</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f2f5;color:#1a1a1a;font-size:14px;}
 .header{background:#2d3a4a;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;}
-.logo{display:flex;align-items:center;}
 .header-right{display:flex;align-items:center;gap:16px;}
 .live-badge{font-size:11px;color:#4caf50;letter-spacing:1px;}
 .ap-text{font-size:11px;color:#8fa8c0;letter-spacing:2px;text-transform:uppercase;}
 .toolbar{display:flex;gap:6px;padding:10px 12px;align-items:center;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e0e0e0;}
 input[type=text],select{padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:12px;outline:none;font-family:inherit;background:#fff;color:#1a1a1a;}
-input[type=text]:focus,select:focus{border-color:#3a7bd5;}
 input[type=date]{padding:6px 8px;border:1px solid #ccc;border-radius:6px;font-size:12px;outline:none;font-family:inherit;}
 button{padding:5px 12px;border:1px solid #ccc;border-radius:6px;background:#fff;font-size:12px;cursor:pointer;font-family:inherit;color:#333;}
 button:hover{background:#f5f5f5;}
 .btn-primary{background:#2d3a4a;color:#fff;border-color:#2d3a4a;}
-.btn-primary:hover{background:#3a4d63;}
 .btn-small{font-size:11px;padding:3px 10px;}
 .main{display:flex;height:calc(100vh - 108px);}
 .list{width:310px;min-width:310px;overflow-y:auto;border-right:1px solid #e0e0e0;background:#fff;}
@@ -64,13 +61,12 @@ button:hover{background:#f5f5f5;}
 .vr-sub{font-size:11px;color:#8fa8c0;margin-top:1px;}
 .vr-right{display:flex;gap:5px;align-items:center;}
 .vr-status{font-size:11px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;}
-.vr-expand{font-size:11px;padding:3px 9px;background:transparent;border:1px solid #c0392b;color:#fff;border-radius:4px;cursor:pointer;}
+.vr-expand{font-size:11px;padding:3px 9px;background:transparent;border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:4px;cursor:pointer;}
 .vr-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;}
 .vrf-label{font-size:10px;color:#6a8aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;}
 .vrf-val{font-size:12px;color:#e8eef4;line-height:1.5;white-space:pre-wrap;}
 .vrf.full{grid-column:1/-1;}
 .ds-card{background:#fdecea;border-radius:8px;padding:11px 13px;margin-bottom:8px;border:1px solid #f5c6c6;}
-.ds-name{font-size:13px;font-weight:600;color:#c0392b;margin-bottom:8px;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;}
 .modal{background:#fff;border-radius:12px;padding:18px 22px;max-width:640px;width:92%;max-height:82vh;overflow-y:auto;}
 .modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -86,32 +82,22 @@ button:hover{background:#f5f5f5;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .empty{padding:40px;text-align:center;color:#aaa;font-size:13px;}
 .err-msg{padding:16px;color:#c0392b;font-size:13px;}
-.doc-link{display:inline-flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;margin-right:8px;}
-.doc-icon{width:52px;height:52px;border-radius:6px;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:20px;}
-.doc-lbl{font-size:10px;color:#666;max-width:52px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:#f8f8f8;border-bottom:1px solid #e8e8e8;}
 </style>
 </head>
 <body>
-
 <div class="header">
-  <div class="logo">
-    <img src="data:image/png;base64,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" 
-         alt="Range USA" style="height:34px;object-fit:contain;"/>
+  <div style="display:flex;align-items:center;">
+    <img src="data:image/png;base64,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" alt="Range USA" style="height:34px;object-fit:contain;"/>
   </div>
   <div class="header-right">
-    <span class="live-badge" id="live-badge">● Loading…</span>
+    <span class="live-badge" id="live-badge">Loading...</span>
     <span class="ap-text">Asset Protection</span>
   </div>
 </div>
-
 <div class="toolbar">
-  <input type="text" id="search" placeholder="Search case ID, name, branch…" oninput="renderList()" style="flex:1;min-width:160px;"/>
-  <button onclick="showSettings=!showSettings;renderSettings();" style="font-size:12px;">⚙ Settings</button>
+  <input type="text" id="search" placeholder="Search case ID, name, branch..." oninput="renderList()" style="flex:1;min-width:160px;"/>
 </div>
-
-<div id="settings-panel" style="display:none;background:#f9f9f9;border-bottom:1px solid #e0e0e0;padding:14px 18px;"></div>
-
 <div class="filter-row">
   <select id="f-branch" onchange="renderList()"><option value="">All branches</option></select>
   <select id="f-category" onchange="renderList()"><option value="">All categories</option></select>
@@ -142,95 +128,74 @@ button:hover{background:#f5f5f5;}
   <input type="date" id="f-date-to" onchange="renderList()" title="Date to"/>
   <button onclick="clearFilters()" class="btn-small">Clear filters</button>
 </div>
-
 <div class="main">
   <div class="list" id="list-panel">
-    <div class="loading"><div class="spinner"></div><span>Loading cases…</span></div>
+    <div class="loading"><div class="spinner"></div><span>Loading cases...</span></div>
   </div>
   <div class="detail" id="detail-panel">
     <div class="empty">Select a case from the list</div>
   </div>
 </div>
-
 <div class="modal-overlay" id="vr-modal" style="display:none" onclick="closeModal(event)">
   <div class="modal" id="vr-modal-content"></div>
 </div>
-
 <script>
 const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY0MzAzMzE5NiwiYWFpIjoxMSwidWlkIjo1OTA4NDY1LCJpYWQiOiIyMDI2LTA0LTA4VDEzOjM2OjQ2LjA4MloiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjoyNjYzMjIyLCJyZ24iOiJ1c2UxIn0.y2EeoxRh9al0cSui5AnYbRKOVDz2vdYII90esef1tuI";
 const IR_BOARD = "309348813";
 const VR_BOARD = "992178387";
 const DS_BOARD = "1053253179";
 const PROXY = "https://corsproxy.io/?";
-
 let irItems=[], vrItems=[], dsItems=[], selectedId=null;
 
 const IR_COLS = {
   caseId:"formula_mm0q4bmm", pushableCaseId:"text_mm0q5kyg",
   date:"date4", incidentTime:"text19",
   branch:"dropdown0", district:"status1",
-  submittedBy:"primary_contributor", submittedByEmail:"dup__of_submitted_by",
+  submittedBy:"primary_contributor",
   location:"incident_category", specificLocation:"text8",
-  primaryContributor:"secondary_contributor", secondaryContributor:"specific_location",
   category:"color_mknf4hd3",
   incidentType1:"dropdown_mkqakpqf", incidentType2:"dropdown_mkq4h3my",
   incidentType3:"dropdown_mkq4d5sf", incidentType4:"dropdown_mkq4w1hv",
-  apFollowUp:"dup__of_hr_decision____1", currentOwnership:"color_mm0q8n2x",
+  apFollowUp:"dup__of_hr_decision____1",
   denyService:"district_leader", retainVideo:"deny_service__",
   hrRec:"status_1__1", hrRecommendation:"color_mm0fehr4",
   hrFindings:"long_text_mm0f4cbg",
   narrative1:"long_text", narrative2:"long_text5",
   narrative3:"narrative_3", narrative4:"long_text6",
-  apFindings:"text95", interviewNarrative1:"long_text__1",
-  interviewNarrative2:"long_text3__1",
+  apFindings:"text95",
+  interviewNarrative1:"long_text__1", interviewNarrative2:"long_text3__1",
   subjectName:"text61", subjectType:"text22",
   injuries:"dropdown58", propertyDamage:"ems_transport2",
-  policeReport:"short_text_mkm825q2", policeNameBadge:"short_text_mkm8dpnn",
+  policeReport:"short_text_mkm825q2",
   oneDriveLink:"one_drive_link",
-  documents:"files", pictures:"files9",
-  wasFirearmInvolved:"dropdown_mkr4cv4a",
-  wasCodeRedCalled:"dropdown_mkr4v9w3",
-  wasRentalFirearm:"dropdown_mkr4apes",
-  wasAmmoFromRUSA:"dropdown_mm21ek66",
-  firstAid:"emergency_service", emsResponse:"dropdown8",
-  emsTransport:"dropdown14", businessLoss:"emergency_service2",
-  policeResponse:"first_aid",
-  backgroundDenial:"deny_service__4",
-  videoRequestStatus:"color_mm0qbcwa"
+  documents:"files", pictures:"files9"
 };
 
 const VR_COLS = {
   agency:"status6", status:"status", assigned:"person",
-  priority:"agency", branch:"dropdown0",
-  incidentDate:"date4", incidentTime:"text19",
+  branch:"dropdown0", incidentDate:"date4", incidentTime:"text19",
   submittedDate:"date0", submittedBy:"primary_contributor",
   requestNarrative:"long_text",
   oneDriveLink:"main_office_supplement",
   sscSupplement:"text_mm032dsj",
   leContact:"submitted_by", leEmail:"le_contact_name", lePhone:"le_email_address",
-  reviewDecision:"status_1__1", requestFollowUp:"request_for_follow_up__1",
+  reviewDecision:"status_1__1",
   incidentCategory:"incident_category", location:"text8",
-  injuries:"dropdown58", propertyDamage:"ems_transport2",
-  dateCompleted:"date__1", tenDayDate:"date_mm03g6vq",
-  linkedIRId:"text_mkwz2hhp",
-  linkedCaseId:"text_mm0q7wkt"
+  dateCompleted:"date__1",
+  linkedIRId:"text_mkwz2hhp", linkedCaseId:"text_mm0q7wkt"
 };
 
 const DS_COLS = {
   status:"status", branch:"dropdown0", district:"status1",
   subjectFirstName:"text61", subjectLastName:"short_text1__1",
-  subjectId:"dup__of_subject_id__", transactionInfo:"text22",
+  subjectId:"dup__of_subject_id__",
   nicsNumber:"short_text0__1", requestType:"single_select1__1",
   submittedBy:"primary_contributor", date:"date4",
-  dateSubmitted:"date0", lastActionDate:"date_mkvgpk7p",
+  lastActionDate:"date_mkvgpk7p",
   narrative:"long_text", apNarrative:"text_mkpxnqe3",
   apNotes:"text95", oneDriveLink:"main_office_supplement",
-  incidentReport:"incident__", leContact:"submitted_by",
-  leEmail:"le_contact_name", lePhone:"le_email_address",
-  incidentType:"incident_type", location:"incident_category",
-  specificLocation:"text8", injuries:"dropdown58",
-  propertyDamage:"ems_transport2", phone:"phone_mkr6t0vm",
-  subjectType:"dropdown6", audit:"color_mkq4smae"
+  incidentReport:"incident__",
+  phone:"phone_mkr6t0vm", subjectType:"dropdown6", audit:"color_mkq4smae"
 };
 
 async function gql(query) {
@@ -245,9 +210,6 @@ async function gql(query) {
 function getVal(cols, id) {
   const c = cols.find(x => x.id === id);
   if (!c) return "";
-  if (c.type === "board_relation" || id === "link_to_incident_reporting") {
-    return c.value || "";
-  }
   try {
     const v = JSON.parse(c.value);
     if (v === null) return "";
@@ -256,23 +218,26 @@ function getVal(cols, id) {
     if (v.name) return v.name;
     if (Array.isArray(v)) return v.map(x => x.name||x).join(", ");
     return c.text || "";
-  } catch { return c.text || ""; }
+  } catch(e) { return c.text || ""; }
 }
 
 async function fetchBoard(boardId, colMap) {
   let all=[], cursor=null;
   for (let p=0; p<30; p++) {
-    const q = cursor
-      ? `{next_items_page(limit:100,cursor:"${cursor}"){cursor items{id name column_values{id text value}}}}`
-      : `{boards(ids:${boardId}){items_page(limit:100){cursor items{id name column_values{id text value}}}}}`;
+    let q;
+    if (cursor) {
+      q = "{next_items_page(limit:100,cursor:\"" + cursor + "\"){cursor items{id name column_values{id text value}}}}";
+    } else {
+      q = "{boards(ids:" + boardId + "){items_page(limit:100){cursor items{id name column_values{id text value}}}}}";
+    }
     const data = await gql(q);
     const pd = cursor ? data?.data?.next_items_page : data?.data?.boards?.[0]?.items_page;
     if (!pd||!pd.items||!pd.items.length) break;
-    all = [...all, ...pd.items.map(item => {
+    all = all.concat(pd.items.map(item => {
       const r={id:item.id, name:item.name};
-      Object.entries(colMap).forEach(([k,cid])=>{ r[k]=getVal(item.column_values,cid); });
+      Object.entries(colMap).forEach(function(e){ r[e[0]]=getVal(item.column_values,e[1]); });
       return r;
-    })];
+    }));
     if (!pd.cursor) break;
     cursor = pd.cursor;
   }
@@ -282,31 +247,28 @@ async function fetchBoard(boardId, colMap) {
 function cleanNarrative(parts) {
   return parts
     .filter(Boolean)
-    .map(p => p.replace(/^\*?\s*cont\.?\s*\*?\s*/gi,'').replace(/\(cont in narrative \d+.*?\)/gi,'').trim())
+    .map(p => p.replace(/^\*?\s*cont\.?\s*\*?\s*/gi,"").replace(/\(cont in narrative \d+.*?\)/gi,"").trim())
     .filter(Boolean)
     .join("\n\n");
 }
 
 function getIncidentTypes(r) {
-  return [r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4]
-    .filter(Boolean).join(", ") || "—";
+  return [r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4].filter(Boolean).join(", ") || "—";
 }
 
 function getIRValue(r, key) {
-  if (key==="narrative") return cleanNarrative([r.narrative1,r.narrative2,r.narrative3,r.narrative4]);
+  if (key==="narrative") return cleanNarrative([r.narrative1,r.narrative2,r.narrative3,r.narrative4]) || "—";
   if (key==="hrRec") {
-    const rec = r.hrRecommendation&&r.hrRecommendation!=="—" ? "Recommendation: "+r.hrRecommendation : "";
-    const find = r.hrFindings&&r.hrFindings!=="—" ? "Findings: "+r.hrFindings : "";
-    return [rec,find].filter(Boolean).join("\n\n")||"—";
+    const rec = r.hrRecommendation && r.hrRecommendation!=="—" ? "Recommendation: "+r.hrRecommendation : "";
+    const find = r.hrFindings && r.hrFindings!=="—" ? "Findings: "+r.hrFindings : "";
+    return [rec,find].filter(Boolean).join("\n\n") || "—";
   }
-  if (key==="interviewNarrative") return [r.interviewNarrative1, r.interviewNarrative2].filter(Boolean).join("\n\n")||"—";
-  if (key==="incidentType") return getIncidentTypes(r);
-  if (key==="apFindings") return r.apFindings||"—";
+  if (key==="interviewNarrative") return cleanNarrative([r.interviewNarrative1,r.interviewNarrative2]) || "—";
   return r[key]||"—";
 }
 
 function getLinkedVR(ir) {
-  return vrItems.filter(vr => {
+  return vrItems.filter(function(vr) {
     if (vr.linkedIRId && String(vr.linkedIRId).trim() === String(ir.id).trim()) return true;
     if (vr.linkedCaseId && ir.caseId && String(vr.linkedCaseId).trim().toLowerCase() === String(ir.caseId).trim().toLowerCase()) return true;
     return false;
@@ -314,10 +276,10 @@ function getLinkedVR(ir) {
 }
 
 function getLinkedDS(ir) {
-  return dsItems.filter(ds =>
-    (ds.incidentReport && ds.incidentReport === ir.id) ||
-    (ir.caseId && ds.incidentReport === ir.caseId)
-  );
+  return dsItems.filter(function(ds) {
+    return (ds.incidentReport && ds.incidentReport === ir.id) ||
+           (ir.caseId && ds.incidentReport === ir.caseId);
+  });
 }
 
 function badgeCls(s) {
@@ -335,34 +297,20 @@ function displayName(r) {
   return parts.length ? parts.join(" · ") : r.name;
 }
 
-function docLink(url, label) {
-  if (!url||url==="N/A"||url==="—") return "";
-  const isPdf=/\.pdf/i.test(url), isImg=/\.(png|jpg|jpeg|gif|webp)/i.test(url);
-  const icon=isPdf?"📄":isImg?"🖼":"📁";
-  const bg=isPdf?"#fdecea":isImg?"#e6f0fa":"#f5f5f5";
-  return `<a class="doc-link" href="${url}" target="_blank">
-    <div class="doc-icon" style="background:${bg}">${icon}</div>
-    <span class="doc-lbl">${label}</span></a>`;
-}
-
 function populateFilters() {
-  const branches = [...new Set(irItems.map(r=>r.branch).filter(Boolean))].sort();
-  const categories = [...new Set(irItems.map(r=>r.category).filter(Boolean))].sort();
-  const types = [...new Set(irItems.flatMap(r=>[r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4]).filter(Boolean))].sort();
-
-  const bEl=document.getElementById("f-branch");
-  branches.forEach(b=>{ const o=document.createElement("option"); o.value=b; o.textContent=b; bEl.appendChild(o); });
-
-  const cEl=document.getElementById("f-category");
-  categories.forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=c; cEl.appendChild(o); });
-
-  const tEl=document.getElementById("f-type");
-  types.forEach(t=>{ const o=document.createElement("option"); o.value=t; o.textContent=t; tEl.appendChild(o); });
+  const branches = Array.from(new Set(irItems.map(r=>r.branch).filter(Boolean))).sort();
+  const categories = Array.from(new Set(irItems.map(r=>r.category).filter(Boolean))).sort();
+  const types = Array.from(new Set(irItems.reduce(function(a,r){return a.concat([r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4]);},[]).filter(Boolean))).sort();
+  function addOpts(elId, arr) {
+    const el=document.getElementById(elId);
+    arr.forEach(function(v){ const o=document.createElement("option"); o.value=v; o.textContent=v; el.appendChild(o); });
+  }
+  addOpts("f-branch",branches); addOpts("f-category",categories); addOpts("f-type",types);
 }
 
 function clearFilters() {
   ["f-branch","f-category","f-type","f-ap","f-hr","f-retain","f-deny","f-date-from","f-date-to","search"]
-    .forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    .forEach(function(id){ var el=document.getElementById(id); if(el) el.value=""; });
   renderList();
 }
 
@@ -377,13 +325,12 @@ function renderList() {
   const fdeny=document.getElementById("f-deny").value;
   const fdfrom=document.getElementById("f-date-from").value;
   const fdto=document.getElementById("f-date-to").value;
-
-  const filtered = irItems.filter(r => {
+  const filtered = irItems.filter(function(r) {
     if ((r.category||"").toLowerCase()==="background check denial") return false;
-    if (q && ![(r.caseId||""),(r.branch||""),(r.subjectName||""),displayName(r)].some(s=>s.toLowerCase().includes(q))) return false;
+    if (q && ![(r.caseId||""),(r.branch||""),(r.subjectName||""),displayName(r)].some(function(s){return s.toLowerCase().includes(q);})) return false;
     if (fb && r.branch!==fb) return false;
     if (fc && r.category!==fc) return false;
-    if (ft && ![r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4].includes(ft)) return false;
+    if (ft && [r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4].indexOf(ft)<0) return false;
     if (fap && r.apFollowUp!==fap) return false;
     if (fhr && r.hrRec!==fhr) return false;
     if (fret==="yes" && !(r.retainVideo||"").toLowerCase().includes("yes")) return false;
@@ -394,32 +341,29 @@ function renderList() {
     if (fdto && r.date && r.date > fdto) return false;
     return true;
   });
-
   const panel = document.getElementById("list-panel");
-  if (!filtered.length) { panel.innerHTML='<div class="empty">No cases match your filters.</div>'; return; }
-
-  panel.innerHTML = filtered.map(r => {
+  if (!filtered.length) { panel.innerHTML="<div class=\"empty\">No cases match your filters.</div>"; return; }
+  panel.innerHTML = filtered.map(function(r) {
     const ds=getLinkedDS(r);
-    return `<div class="list-item ${selectedId===r.id?'active':''}" onclick="selectItem('${r.id}')">
-      <div class="item-name">${displayName(r)}</div>
-      <div class="item-caseid">${r.caseId||r.pushableCaseId||r.id}</div>
-      <div class="item-meta">
-        <span><span class="lbl">Branch </span>${r.branch||"—"}</span>
-        <span><span class="lbl">Date </span>${r.date||"—"}</span>
-        <span><span class="lbl">Category </span>${r.category||"—"}</span>
-        <span><span class="lbl">Type </span>${getIncidentTypes(r).substring(0,22)}</span>
-        <span><span class="lbl">Ownership </span>${r.apFollowUp||"—"}</span>
-        <span><span class="lbl">HR </span>${r.hrRec||"—"}</span>
-        <span><span class="lbl">Video </span>${r.retainVideo||"—"}</span>
-        <span><span class="lbl">DNS </span>${ds.length?ds[0].status||"Yes":"None"}</span>
-      </div>
-    </div>`;
+    return "<div class=\"list-item " + (selectedId===r.id?"active":"") + "\" onclick=\"selectItem(\'"+r.id+"\')\">"+
+      "<div class=\"item-name\">"+displayName(r)+"</div>"+
+      "<div class=\"item-caseid\">"+(r.caseId||r.pushableCaseId||r.id)+"</div>"+
+      "<div class=\"item-meta\">"+
+        "<span><span class=\"lbl\">Branch </span>"+(r.branch||"—")+"</span>"+
+        "<span><span class=\"lbl\">Date </span>"+(r.date||"—")+"</span>"+
+        "<span><span class=\"lbl\">Category </span>"+(r.category||"—")+"</span>"+
+        "<span><span class=\"lbl\">Type </span>"+getIncidentTypes(r).substring(0,22)+"</span>"+
+        "<span><span class=\"lbl\">AP </span>"+(r.apFollowUp||"—")+"</span>"+
+        "<span><span class=\"lbl\">HR </span>"+(r.hrRec||"—")+"</span>"+
+        "<span><span class=\"lbl\">Video </span>"+(r.retainVideo||"—")+"</span>"+
+        "<span><span class=\"lbl\">DNS </span>"+(ds.length?ds[0].status||"Yes":"None")+"</span>"+
+      "</div></div>";
   }).join("");
 }
 
 function selectItem(id) {
   selectedId=id;
-  const r=irItems.find(x=>x.id===id);
+  const r=irItems.find(function(x){return x.id===id;});
   renderList();
   if (r) renderDetail(r);
 }
@@ -429,247 +373,183 @@ async function updateColumn(itemId, boardId, columnId, value, type) {
   if (type==="text") colValue=JSON.stringify(value);
   else if (type==="longtext") colValue=JSON.stringify({text:value});
   else if (type==="status") colValue=JSON.stringify({label:value});
-  const mutation=`mutation{change_column_value(board_id:${boardId},item_id:${itemId},column_id:"${columnId}",value:${JSON.stringify(colValue)}){id}}`;
-  try {
-    const result=await gql(mutation);
-    return !!result?.data?.change_column_value?.id;
-  } catch(e) { return false; }
+  const mut="mutation{change_column_value(board_id:"+boardId+",item_id:"+itemId+",column_id:\""+columnId+"\",value:"+JSON.stringify(colValue)+"){id}}";
+  try { const res=await gql(mut); return !!(res&&res.data&&res.data.change_column_value&&res.data.change_column_value.id); }
+  catch(e) { return false; }
 }
 
 function showMsg(elId, success) {
   const el=document.getElementById(elId);
   if (!el) return;
-  el.textContent=success?"✓ Saved to Monday":"✗ Save failed";
+  el.textContent=success?"Saved to Monday":"Save failed";
   el.className="save-msg "+(success?"ok":"err");
-  setTimeout(()=>{ el.textContent=""; },3000);
+  setTimeout(function(){ el.textContent=""; },3000);
 }
 
 function renderDetail(r) {
-  const caseIdDisplay = r.caseId||r.pushableCaseId||r.id;
-  const existingLink = r.oneDriveLink&&r.oneDriveLink!=="—" ? r.oneDriveLink : "";
+  const cid = r.caseId||r.pushableCaseId||r.id;
+  const vrs = getLinkedVR(r);
+  const ds = getLinkedDS(r);
+  const el = r.oneDriveLink&&r.oneDriveLink!=="—" ? r.oneDriveLink : "";
 
-  document.getElementById("detail-panel").innerHTML = `
-  <div class="card">
-    <div class="card-header">
-      <div><div class="card-name">${displayName(r)}</div>
-      <div class="card-caseid">${caseIdDisplay}</div></div>
-      <div class="card-actions">
-        <button class="btn-small" onclick="printCase('${r.id}')">🖨 Print</button>
-      </div>
-    </div>
-    <div class="badges">
-      ${r.apFollowUp?`<span class="badge ${badgeCls(r.apFollowUp)}">${r.apFollowUp}</span>`:""}
-      ${r.category?`<span class="badge bg-gray">${r.category}</span>`:""}
-      ${r.hrRec&&r.hrRec!=="—"?`<span class="badge bg-red">HR: ${r.hrRec}</span>`:""}
-      ${(r.retainVideo||"").includes("Yes")?`<span class="badge bg-blue">Video retained</span>`:""}
-      ${getLinkedDS(r).length?`<span class="badge bg-red">DNS: ${getLinkedDS(r)[0].status||"Yes"}</span>`:""}
-    </div>
-    <div class="sec"><div class="sec-title">Documents & media</div>
-      <div class="fgrid">
-        <div class="f full fedit">
-          <div class="flabel">OneDrive video link</div>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
-            <input type="text" id="edit-oneDriveLink" value="${existingLink}" placeholder="Paste OneDrive link…" style="flex:1;min-width:200px;font-size:12px;"/>
-            ${existingLink?`<a href="${existingLink}" target="_blank" style="font-size:11px;color:#3a7bd5;white-space:nowrap;">Open ↗</a>`:""}
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <button class="btn-primary btn-small" onclick="saveOneDriveLink('${r.id}')">Save to Monday</button>
-            <button class="btn-small" onclick="document.getElementById('edit-oneDriveLink').value=''">Clear</button>
-            <span id="msg-oneDriveLink" class="save-msg"></span>
-          </div>
-        </div>
-      </div>
-    </div>
-    ${secOrder.map(s=>renderSection(r,s)).join("")}
-  </div>`;
-}
+  let vrHTML = vrs.length ? vrs.map(function(v,i){
+    return "<div class=\"vr-card\">"+
+      "<div class=\"vr-top\">"+
+        "<div><div class=\"vr-agency\">"+(v.agency||"Video Request")+"</div>"+
+        "<div class=\"vr-sub\">"+(v.branch||"")+" · "+(v.incidentDate||"")+"</div></div>"+
+        "<div class=\"vr-right\">"+
+          "<span class=\"vr-status\">"+(v.status||"")+"</span>"+
+          "<button class=\"vr-expand\" onclick=\"openVRModal("+i+",\'"+r.id+"\')\">Expand</button>"+
+        "</div>"+
+      "</div>"+
+      "<div class=\"vr-fields\">"+
+        "<div class=\"vrf\"><div class=\"vrf-label\">Agency</div><div class=\"vrf-val\">"+(v.agency||"—")+"</div></div>"+
+        "<div class=\"vrf\"><div class=\"vrf-label\">Assigned</div><div class=\"vrf-val\">"+(v.assigned||"—")+"</div></div>"+
+        "<div class=\"vrf full\"><div class=\"vrf-label\">Request narrative</div><div class=\"vrf-val\">"+(v.requestNarrative||"—")+"</div></div>"+
+        "<div class=\"vrf full\"><div class=\"vrf-label\">SSC supplement</div><div class=\"vrf-val\">"+(v.sscSupplement||"—")+"</div></div>"+
+        (v.oneDriveLink?"<div class=\"vrf full\"><div class=\"vrf-label\">Video link</div><div class=\"vrf-val\"><a href=\""+v.oneDriveLink+"\" target=\"_blank\" style=\"color:#7fb3d3;\">Open video</a></div></div>":"")+
+      "</div></div>";
+  }).join("") : "<div style=\"font-size:13px;color:#999;padding:6px 0\">No linked video requests.</div>";
 
-  const vrHTML = vrs.length ? vrs.map((v,i)=>`
-    <div class="vr-card">
-      <div class="vr-top">
-        <div><div class="vr-agency">${v.agency||"Video Request"}</div>
-        <div class="vr-sub">${v.branch||""} · ${v.incidentDate||""}</div></div>
-        <div class="vr-right">
-          <span class="vr-status">${v.status||""}</span>
-          <button class="vr-expand" onclick="openVRModal(${i},'${r.id}')">Expand ↗</button>
-        </div>
-      </div>
-      <div class="vr-fields">
-        <div class="vrf"><div class="vrf-label">Agency</div><div class="vrf-val">${v.agency||"—"}</div></div>
-        <div class="vrf"><div class="vrf-label">Assigned to</div><div class="vrf-val">${v.assigned||"—"}</div></div>
-        <div class="vrf full"><div class="vrf-label">Request narrative</div><div class="vrf-val">${v.requestNarrative||"—"}</div></div>
-        <div class="vrf full"><div class="vrf-label">SSC supplement</div><div class="vrf-val">${v.sscSupplement||"—"}</div></div>
-        ${v.oneDriveLink?`<div class="vrf full"><div class="vrf-label">OneDrive / video link</div><div class="vrf-val"><a href="${v.oneDriveLink}" target="_blank" style="color:#7fb3d3;">Open video ↗</a></div></div>`:""}
-      </div>
-    </div>`).join("") : '<div style="font-size:13px;color:#999;padding:6px 0">No linked video requests.</div>';
+  let dsHTML = ds.length ? ds.map(function(d){
+    const sn=[d.subjectFirstName,d.subjectLastName].filter(Boolean).join(" ")||"Unknown";
+    const dl=d.oneDriveLink&&d.oneDriveLink!=="—"?d.oneDriveLink:"";
+    return "<div class=\"ds-card\">"+
+      "<div style=\"display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;\">"+
+        "<div style=\"font-size:13px;font-weight:600;color:#c0392b;\">"+sn+"</div>"+
+        "<div style=\"display:flex;gap:5px;flex-wrap:wrap;\">"+
+          "<span class=\"badge bg-red\">"+(d.status||"—")+"</span>"+
+          (d.audit?"<span class=\"badge bg-orange\">"+d.audit+"</span>":"")+
+          (d.requestType?"<span class=\"badge bg-gray\">"+d.requestType+"</span>":"")+
+        "</div>"+
+      "</div>"+
+      "<div class=\"fgrid\">"+
+        "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(d.branch||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(d.date||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Last action date</div><div class=\"fval\">"+(d.lastActionDate||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Subject ID</div><div class=\"fval\">"+(d.subjectId||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">NICS #</div><div class=\"fval\">"+(d.nicsNumber||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(d.submittedBy||"—")+"</div></div>"+
+        (dl?"<div class=\"f full\"><div class=\"flabel\">OneDrive link</div><div class=\"fval\"><a href=\""+dl+"\" target=\"_blank\" style=\"color:#3a7bd5;\">Open video</a></div></div>":"")+
+        "<div class=\"f full\"><div class=\"flabel\">Narrative</div><div class=\"fval\">"+(d.narrative||"—")+"</div></div>"+
+        (d.apNarrative?"<div class=\"f full\"><div class=\"flabel\">AP narrative</div><div class=\"fval\">"+d.apNarrative+"</div></div>":"")+
+        (d.apNotes?"<div class=\"f full\"><div class=\"flabel\">AP notes</div><div class=\"fval\">"+d.apNotes+"</div></div>":"")+
+      "</div></div>";
+  }).join("") : "<div style=\"font-size:13px;color:#999;padding:6px 0\">No deny service records linked.</div>";
 
-  const dsHTML = ds.length ? ds.map(d=>{
-    const subjectName = [d.subjectFirstName, d.subjectLastName].filter(Boolean).join(" ") || "Unknown";
-    const dsLink = d.oneDriveLink && d.oneDriveLink !== "—" ? d.oneDriveLink : "";
-    return `<div class="ds-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-        <div class="ds-name">${subjectName}</div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;">
-          <span class="badge bg-red">${d.status||"—"}</span>
-          ${d.audit?`<span class="badge bg-orange">${d.audit}</span>`:""}
-          ${d.requestType?`<span class="badge bg-gray">${d.requestType}</span>`:""}
-        </div>
-      </div>
-      <div class="fgrid">
-        <div class="f"><div class="flabel">Branch</div><div class="fval">${d.branch||"—"}</div></div>
-        <div class="f"><div class="flabel">Incident date</div><div class="fval">${d.date||"—"}</div></div>
-        <div class="f"><div class="flabel">Last action date</div><div class="fval">${d.lastActionDate||"—"}</div></div>
-        <div class="f"><div class="flabel">Subject ID</div><div class="fval">${d.subjectId||"—"}</div></div>
-        <div class="f"><div class="flabel">NICS / Transaction #</div><div class="fval">${d.nicsNumber||"—"}</div></div>
-        <div class="f"><div class="flabel">Subject type</div><div class="fval">${d.subjectType||"—"}</div></div>
-        <div class="f"><div class="flabel">Phone</div><div class="fval">${d.phone||"—"}</div></div>
-        <div class="f"><div class="flabel">Submitted by</div><div class="fval">${d.submittedBy||"—"}</div></div>
-        <div class="f"><div class="flabel">District leader</div><div class="fval">${d.district||"—"}</div></div>
-        ${dsLink?`<div class="f full"><div class="flabel">OneDrive link</div><div class="fval"><a href="${dsLink}" target="_blank" style="color:#3a7bd5;font-size:12px;">Open video ↗</a></div></div>`:""}
-        <div class="f full"><div class="flabel">Request narrative</div><div class="fval">${d.narrative||"—"}</div></div>
-        ${d.apNarrative?`<div class="f full"><div class="flabel">AP narrative</div><div class="fval">${d.apNarrative}</div></div>`:""}
-        ${d.apNotes?`<div class="f full"><div class="flabel">AP notes</div><div class="fval">${d.apNotes}</div></div>`:""}
-      </div>
-    </div>`;
-  }).join("") : '<div style="font-size:13px;color:#999;padding:6px 0">No deny service records linked.</div>';
+  document.getElementById("detail-panel").innerHTML =
+    "<div class=\"card\">"+
+    "<div class=\"card-header\">"+
+      "<div><div class=\"card-name\">"+displayName(r)+"</div>"+
+      "<div class=\"card-caseid\">"+cid+"</div></div>"+
+      "<div class=\"card-actions\"><button class=\"btn-small\" onclick=\"printCase(\'"+r.id+"\')\">Print</button></div>"+
+    "</div>"+
+    "<div class=\"badges\">"+
+      (r.apFollowUp?"<span class=\"badge "+badgeCls(r.apFollowUp)+"\">"+r.apFollowUp+"</span>":"")+
+      (r.category?"<span class=\"badge bg-gray\">"+r.category+"</span>":"")+
+      (r.hrRec&&r.hrRec!=="—"?"<span class=\"badge bg-red\">HR: "+r.hrRec+"</span>":"")+
+      ((r.retainVideo||"").includes("Yes")?"<span class=\"badge bg-blue\">Video retained</span>":"")+
+      (ds.length?"<span class=\"badge bg-red\">DNS: "+(ds[0].status||"Yes")+"</span>":"")+
+    "</div>"+
 
-  const existingLink = r.oneDriveLink && r.oneDriveLink !== "—" ? r.oneDriveLink : "";
+    "<div class=\"sec\"><div class=\"sec-title\">Findings</div><div class=\"fgrid\">"+
+      "<div class=\"f full fedit\"><div class=\"flabel\">AP findings</div>"+
+        "<textarea id=\"edit-apFindings\">"+(r.apFindings&&r.apFindings!=="—"?r.apFindings:"")+"</textarea>"+
+        "<div class=\"fedit-actions\">"+
+          "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings(\'"+r.id+"\')\">Save to Monday</button>"+
+          "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
+        "</div></div>"+
+      "<div class=\"f full\"><div class=\"flabel\">HR recommendation and findings</div><div class=\"fval\">"+getIRValue(r,"hrRec")+"</div></div>"+
+      "<div class=\"f full\"><div class=\"flabel\">Interview narrative</div><div class=\"fval\">"+getIRValue(r,"interviewNarrative")+"</div></div>"+
+    "</div></div>"+
 
-  document.getElementById("detail-panel").innerHTML = `
-  <div class="card">
-    <div class="card-header">
-      <div><div class="card-name">${displayName(r)}</div>
-      <div class="card-caseid">${caseIdDisplay}</div></div>
-      <div class="card-actions">
-        <button class="btn-small" onclick="printCase('${r.id}')">🖨 Print</button>
-      </div>
-    </div>
-    <div class="badges">
-      ${r.apFollowUp?`<span class="badge ${badgeCls(r.apFollowUp)}">${r.apFollowUp}</span>`:""}
-      ${r.category?`<span class="badge bg-gray">${r.category}</span>`:""}
-      ${r.hrRec&&r.hrRec!=="—"?`<span class="badge bg-red">HR: ${r.hrRec}</span>`:""}
-      ${(r.retainVideo||"").includes("Yes")?`<span class="badge bg-blue">Video retained</span>`:""}
-      ${ds.length?`<span class="badge bg-red">DNS: ${ds[0].status||"Yes"}</span>`:""}
-    </div>
+    "<div class=\"sec\"><div class=\"sec-title\">Overview</div><div class=\"fgrid\">"+
+      "<div class=\"f\"><div class=\"flabel\">Case ID</div><div class=\"fval\">"+cid+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(r.date||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Incident time</div><div class=\"fval\">"+(r.incidentTime||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(r.branch||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">District leader</div><div class=\"fval\">"+(r.district||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Location</div><div class=\"fval\">"+(r.location||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Specific location</div><div class=\"fval\">"+(r.specificLocation||"—")+"</div></div>"+
+    "</div></div>"+
 
-    <div class="sec"><div class="sec-title">Findings</div>
-      <div class="fgrid">
-        <div class="f full fedit">
-          <div class="flabel">AP findings</div>
-          <textarea id="edit-apFindings">${r.apFindings&&r.apFindings!=="—"?r.apFindings:""}</textarea>
-          <div class="fedit-actions">
-            <button class="btn-primary btn-small" onclick="saveApFindings('${r.id}')">Save to Monday</button>
-            <span id="msg-apFindings" class="save-msg"></span>
-          </div>
-        </div>
-        <div class="f full"><div class="flabel">HR recommendation & findings</div><div class="fval">${getIRValue(r,"hrRec")}</div></div>
-        <div class="f full"><div class="flabel">Interview narrative</div><div class="fval">${r.interviewNarrative||"—"}</div></div>
-      </div>
-    </div>
+    "<div class=\"sec\"><div class=\"sec-title\">Details</div><div class=\"fgrid\">"+
+      "<div class=\"f\"><div class=\"flabel\">Category</div><div class=\"fval\">"+(r.category||"—")+"</div></div>"+
+      "<div class=\"f half\"><div class=\"flabel\">Incident type</div><div class=\"fval\">"+getIncidentTypes(r)+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">AP follow-up</div><div class=\"fval\">"+(r.apFollowUp||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Deny service</div><div class=\"fval\">"+(r.denyService||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Retain video</div>"+
+        "<select id=\"edit-retainVideo\" onchange=\"saveRetainVideo(\'"+r.id+"\',this.value)\" style=\"font-size:12px;margin-top:2px;\">"+
+          "<option value=\"Yes - Retain Video\""+((r.retainVideo||"").includes("Yes")?" selected":"")+">Yes - Retain Video</option>"+
+          "<option value=\"No\""+((r.retainVideo||"")==="No"?" selected":"")+">No</option>"+
+        "</select>"+
+      "</div>"+
+    "</div></div>"+
 
-    <div class="sec"><div class="sec-title">Overview</div>
-      <div class="fgrid">
-        <div class="f"><div class="flabel">Case ID</div><div class="fval">${caseIdDisplay}</div></div>
-        <div class="f"><div class="flabel">Incident date</div><div class="fval">${r.date||"—"}</div></div>
-        <div class="f"><div class="flabel">Incident time</div><div class="fval">${r.incidentTime||"—"}</div></div>
-        <div class="f"><div class="flabel">Branch</div><div class="fval">${r.branch||"—"}</div></div>
-        <div class="f"><div class="flabel">District leader</div><div class="fval">${r.district||"—"}</div></div>
-        <div class="f"><div class="flabel">Submitted by</div><div class="fval">${r.submittedBy||"—"}</div></div>
-        <div class="f"><div class="flabel">Location</div><div class="fval">${r.location||"—"}</div></div>
-        <div class="f"><div class="flabel">Specific location</div><div class="fval">${r.specificLocation||"—"}</div></div>
-      </div>
-    </div>
+    "<div class=\"sec\"><div class=\"sec-title\">Original narrative</div>"+
+      "<div class=\"fval\" style=\"background:#f9f9f9;padding:10px 12px;border-radius:6px;border:1px solid #eee;\">"+getIRValue(r,"narrative")+"</div>"+
+    "</div>"+
 
-    <div class="sec"><div class="sec-title">Details</div>
-      <div class="fgrid">
-        <div class="f"><div class="flabel">Category</div><div class="fval">${r.category||"—"}</div></div>
-        <div class="f half"><div class="flabel">Incident type</div><div class="fval">${getIncidentTypes(r)}</div></div>
-        <div class="f"><div class="flabel">AP follow-up</div><div class="fval">${r.apFollowUp||"—"}</div></div>
-        <div class="f"><div class="flabel">Deny service</div><div class="fval">${r.denyService||"—"}</div></div>
-        <div class="f"><div class="flabel">Retain video</div>
-          <select id="edit-retainVideo" onchange="saveRetainVideo('${r.id}',this.value)" style="font-size:12px;margin-top:2px;">
-            <option value="Yes - Retain Video" ${(r.retainVideo||"").includes("Yes")?"selected":""}>Yes - Retain Video</option>
-            <option value="No" ${r.retainVideo==="No"?"selected":""}>No</option>
-          </select>
-        </div>
-      </div>
-    </div>
+    "<div class=\"sec\"><div class=\"sec-title\">Subject</div><div class=\"fgrid\">"+
+      "<div class=\"f\"><div class=\"flabel\">Subject name</div><div class=\"fval\">"+(r.subjectName||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Subject type</div><div class=\"fval\">"+(r.subjectType||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Injuries</div><div class=\"fval\">"+(r.injuries||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Property damage</div><div class=\"fval\">"+(r.propertyDamage||"—")+"</div></div>"+
+      "<div class=\"f\"><div class=\"flabel\">Police report #</div><div class=\"fval\">"+(r.policeReport||"—")+"</div></div>"+
+    "</div></div>"+
 
-    <div class="sec"><div class="sec-title">Original narrative</div>
-      <div class="fval" style="background:#f9f9f9;padding:10px 12px;border-radius:6px;border:1px solid #eee;">${getIRValue(r,"narrative")}</div>
-    </div>
+    "<div class=\"sec\"><div class=\"sec-title\">Documents and media</div><div class=\"fgrid\">"+
+      "<div class=\"f full fedit\"><div class=\"flabel\">OneDrive video link</div>"+
+        "<div style=\"display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;\">"+
+          "<input type=\"text\" id=\"edit-oneDriveLink\" value=\""+el+"\" placeholder=\"Paste OneDrive link...\" style=\"flex:1;min-width:200px;\"/>"+
+          (el?"<a href=\""+el+"\" target=\"_blank\" style=\"font-size:11px;color:#3a7bd5;\">Open</a>":"")+
+        "</div>"+
+        "<div class=\"fedit-actions\">"+
+          "<button class=\"btn-primary btn-small\" onclick=\"saveOneDriveLink(\'"+r.id+"\')\">Save to Monday</button>"+
+          "<button class=\"btn-small\" onclick=\"document.getElementById(\'edit-oneDriveLink\').value=\'\'\" >Clear</button>"+
+          "<span id=\"msg-oneDriveLink\" class=\"save-msg\"></span>"+
+        "</div>"+
+      "</div>"+
+    "</div></div>"+
 
-    <div class="sec"><div class="sec-title">Subject</div>
-      <div class="fgrid">
-        <div class="f"><div class="flabel">Subject name</div><div class="fval">${r.subjectName||"—"}</div></div>
-        <div class="f"><div class="flabel">Subject type</div><div class="fval">${r.subjectType||"—"}</div></div>
-        <div class="f"><div class="flabel">Injuries</div><div class="fval">${r.injuries||"—"}</div></div>
-        <div class="f"><div class="flabel">Property damage</div><div class="fval">${r.propertyDamage||"—"}</div></div>
-        <div class="f"><div class="flabel">Police report #</div><div class="fval">${r.policeReport||"—"}</div></div>
-      </div>
-    </div>
-
-    <div class="sec"><div class="sec-title">Documents & media</div>
-      <div class="fgrid">
-        <div class="f full fedit">
-          <div class="flabel">OneDrive video link</div>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
-            <input type="text" id="edit-oneDriveLink" value="${existingLink}" placeholder="Paste OneDrive link…" style="flex:1;min-width:200px;"/>
-            ${existingLink?`<a href="${existingLink}" target="_blank" style="font-size:11px;color:#3a7bd5;white-space:nowrap;">Open ↗</a>`:""}
-          </div>
-          <div class="fedit-actions">
-            <button class="btn-primary btn-small" onclick="saveOneDriveLink('${r.id}')">Save to Monday</button>
-            <button class="btn-small" onclick="document.getElementById('edit-oneDriveLink').value=''">Clear</button>
-            <span id="msg-oneDriveLink" class="save-msg"></span>
-          </div>
-        </div>
-        <div class="f" style="display:flex;gap:8px;flex-wrap:wrap;">
-          ${docLink(r.documents,"Document")}${docLink(r.pictures,"Picture")}
-        </div>
-      </div>
-    </div>
-
-    <div class="sec"><div class="sec-title">Deny service records (${ds.length})</div>${dsHTML}</div>
-    <div class="sec"><div class="sec-title">Video requests (${vrs.length})</div>${vrHTML}</div>
-  </div>`;
+    "<div class=\"sec\"><div class=\"sec-title\">Deny service records ("+ds.length+")</div>"+dsHTML+"</div>"+
+    "<div class=\"sec\"><div class=\"sec-title\">Video requests ("+vrs.length+")</div>"+vrHTML+"</div>"+
+    "</div>";
 }
 
 async function saveApFindings(itemId) {
   const val = document.getElementById("edit-apFindings").value;
   const ok = await updateColumn(itemId, IR_BOARD, "text95", val, "text");
   showMsg("msg-apFindings", ok);
-  if (ok) { const item=irItems.find(x=>x.id===itemId); if(item) item.apFindings=val; }
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.apFindings=val; }
 }
 
 async function saveOneDriveLink(itemId) {
   const val = document.getElementById("edit-oneDriveLink").value;
   const ok = await updateColumn(itemId, IR_BOARD, "one_drive_link", val, "text");
   showMsg("msg-oneDriveLink", ok);
-  if (ok) { const item=irItems.find(x=>x.id===itemId); if(item) item.oneDriveLink=val; }
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.oneDriveLink=val; }
 }
 
 async function saveRetainVideo(itemId, val) {
   const ok = await updateColumn(itemId, IR_BOARD, "deny_service__", val, "status");
-  if (ok) {
-    const item=irItems.find(x=>x.id===itemId);
-    if(item) { item.retainVideo=val; renderList(); }
-  }
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item){item.retainVideo=val;renderList();} }
   const msg=document.createElement("span");
-  msg.textContent=ok?"✓ Saved":"✗ Failed";
-  msg.style.cssText=`font-size:11px;margin-left:8px;color:${ok?"#1a7a3f":"#c0392b"}`;
+  msg.textContent=ok?"Saved":"Failed";
+  msg.style.cssText="font-size:11px;margin-left:8px;color:"+(ok?"#1a7a3f":"#c0392b");
   const sel=document.getElementById("edit-retainVideo");
-  if (sel) { sel.parentNode.appendChild(msg); setTimeout(()=>msg.remove(),2500); }
+  if(sel){sel.parentNode.appendChild(msg);setTimeout(function(){msg.remove();},2500);}
 }
 
 function openVRModal(idx, irId) {
-  const ir=irItems.find(x=>x.id===irId);
+  const ir=irItems.find(function(x){return x.id===irId;});
   const vrs=getLinkedVR(ir);
   const v=vrs[idx];
   if (!v) return;
   const fields=[
     {k:"agency",l:"Agency"},{k:"status",l:"Status"},{k:"assigned",l:"Assigned to"},
-    {k:"priority",l:"Priority"},{k:"branch",l:"Branch"},{k:"incidentDate",l:"Incident date"},
-    {k:"incidentTime",l:"Incident time"},{k:"submittedDate",l:"Submitted date"},
+    {k:"branch",l:"Branch"},{k:"incidentDate",l:"Incident date"},{k:"submittedDate",l:"Submitted date"},
     {k:"submittedBy",l:"Submitted by"},
     {k:"requestNarrative",l:"Request narrative",long:true},
     {k:"sscSupplement",l:"SSC supplement",long:true},
@@ -677,20 +557,19 @@ function openVRModal(idx, irId) {
     {k:"reviewDecision",l:"Review decision"},{k:"dateCompleted",l:"Date completed"},
     {k:"incidentCategory",l:"Incident category"},{k:"location",l:"Location"}
   ];
-  document.getElementById("vr-modal-content").innerHTML=`
-    <div class="modal-hdr">
-      <div><div class="modal-title">${v.agency||"Video Request"}</div>
-      <div class="modal-sub">${v.branch||""} · ${v.incidentDate||""}</div></div>
-      <button onclick="document.getElementById('vr-modal').style.display='none'">✕</button>
-    </div>
-    <div class="badges" style="margin-bottom:12px;"><span class="badge ${badgeCls(v.status)}">${v.status||""}</span></div>
-    <div class="mfields">
-      ${fields.map(f=>`<div class="mf ${f.long?'full':''}">
-        <div class="mf-label">${f.label||f.l}</div>
-        <div class="mf-val">${v[f.k]||"—"}</div>
-      </div>`).join("")}
-    </div>
-    ${v.oneDriveLink&&v.oneDriveLink!=="—"?`<div style="margin-top:12px;">${docLink(v.oneDriveLink,"Video")}</div>`:""}`;
+  document.getElementById("vr-modal-content").innerHTML=
+    "<div class=\"modal-hdr\">"+
+      "<div><div class=\"modal-title\">"+(v.agency||"Video Request")+"</div>"+
+      "<div class=\"modal-sub\">"+(v.branch||"")+" · "+(v.incidentDate||"")+"</div></div>"+
+      "<button onclick=\"document.getElementById(\'vr-modal\').style.display=\'none\';\" style=\"font-size:16px;background:none;border:none;cursor:pointer;\">X</button>"+
+    "</div>"+
+    "<div class=\"badges\" style=\"margin-bottom:12px;\"><span class=\"badge "+badgeCls(v.status)+"\">"+(v.status||"")+"</span></div>"+
+    "<div class=\"mfields\">"+
+      fields.map(function(f){
+        return "<div class=\"mf "+(f.long?"full":"")+"\"><div class=\"mf-label\">"+f.l+"</div><div class=\"mf-val\">"+(v[f.k]||"—")+"</div></div>";
+      }).join("")+
+    "</div>"+
+    (v.oneDriveLink&&v.oneDriveLink!=="—"?"<div style=\"margin-top:12px;\"><a href=\""+v.oneDriveLink+"\" target=\"_blank\" style=\"color:#3a7bd5;\">Open video</a></div>":"");
   document.getElementById("vr-modal").style.display="flex";
 }
 
@@ -699,69 +578,42 @@ function closeModal(e) {
 }
 
 function printCase(id) {
-  const r=irItems.find(x=>x.id===id);
+  const r=irItems.find(function(x){return x.id===id;});
   const vrs=getLinkedVR(r);
   const ds=getLinkedDS(r);
   const win=window.open("","_blank");
-  win.document.write(`<!DOCTYPE html><html><head><title>${r.caseId||r.name}</title>
-  <style>body{font-family:Georgia,serif;margin:40px;color:#222;font-size:13px;}
-  h1{font-size:18px;color:#2d3a4a;margin-bottom:4px;}
-  h2{font-size:10px;color:#2d3a4a;border-bottom:1px solid #2d3a4a;padding-bottom:3px;margin:14px 0 7px;text-transform:uppercase;letter-spacing:1px;}
-  .g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 18px;}
-  .f label{font-size:9px;color:#888;text-transform:uppercase;display:block;margin-bottom:1px;}
-  .full{grid-column:1/-1;}.logo{font-size:20px;font-weight:800;color:#2d3a4a;letter-spacing:3px;}
-  .sub{font-size:11px;color:#c0392b;letter-spacing:2px;margin-bottom:14px;}
-  .narr{background:#f9f9f9;padding:10px;border-radius:4px;white-space:pre-wrap;font-size:12px;line-height:1.6;}
-  @media print{body{margin:20px;}}</style></head><body>
-  <div class="logo">RANGE ✛ USA</div><div class="sub">ASSET PROTECTION</div>
-  <h1>${displayName(r)}</h1>
-  <p style="color:#888;font-size:11px;margin-bottom:10px;">${r.caseId||r.id}</p>
-  <h2>Findings</h2><div class="g">
-  <div class="f full"><label>AP findings</label><p>${(r.apFindings||"—").replace(/\n/g,"<br/>")}</p></div>
-  <div class="f full"><label>HR recommendation & findings</label><p>${getIRValue(r,"hrRec").replace(/\n/g,"<br/>")}</p></div>
-  <div class="f full"><label>Interview narrative</label><p>${(r.interviewNarrative||"—").replace(/\n/g,"<br/>")}</p></div>
-  </div>
-  <h2>Overview</h2><div class="g">
-  <div class="f"><label>Case ID</label><p>${r.caseId||r.id}</p></div>
-  <div class="f"><label>Date</label><p>${r.date||"—"}</p></div>
-  <div class="f"><label>Branch</label><p>${r.branch||"—"}</p></div>
-  <div class="f"><label>District leader</label><p>${r.district||"—"}</p></div>
-  <div class="f"><label>Submitted by</label><p>${r.submittedBy||"—"}</p></div>
-  <div class="f"><label>Location</label><p>${r.location||"—"} ${r.specificLocation||""}</p></div>
-  </div>
-  <h2>Details</h2><div class="g">
-  <div class="f"><label>Category</label><p>${r.category||"—"}</p></div>
-  <div class="f"><label>Incident type</label><p>${getIncidentTypes(r)}</p></div>
-  <div class="f"><label>Retain video</label><p>${r.retainVideo||"—"}</p></div>
-  </div>
-  <h2>Original narrative</h2><div class="narr">${getIRValue(r,"narrative").replace(/\n/g,"<br/>")}</div>
-  <h2>Subject</h2><div class="g">
-  <div class="f"><label>Name</label><p>${r.subjectName||"—"}</p></div>
-  <div class="f"><label>Injuries</label><p>${r.injuries||"—"}</p></div>
-  <div class="f"><label>Property damage</label><p>${r.propertyDamage||"—"}</p></div>
-  </div>
-  ${ds.length?`<h2>Deny Service</h2>${ds.map(d=>`<p><b>${d.subjectName||"Unknown"}</b> — ${d.status||""} — ${d.date||""}<br/>${d.narrative||""}</p>`).join("")}`:""}
-  ${vrs.length?`<h2>Video Requests</h2>${vrs.map(v=>`<div style="border:1px solid #ddd;padding:8px;border-radius:4px;margin-bottom:8px;"><b>${v.agency||""}</b> · ${v.status||""} · ${v.branch||""}<br/><i>${v.requestNarrative||""}</i></div>`).join("")}`:""}
-  <script>window.print();<\/script></body></html>`);
+  win.document.write("<!DOCTYPE html><html><head><title>"+(r.caseId||r.name)+"</title>"+
+    "<style>body{font-family:Georgia,serif;margin:40px;color:#222;font-size:13px;}h2{font-size:10px;color:#2d3a4a;border-bottom:1px solid #2d3a4a;padding-bottom:3px;margin:14px 0 7px;text-transform:uppercase;}.g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}.full{grid-column:1/-1;}.narr{background:#f9f9f9;padding:10px;white-space:pre-wrap;font-size:12px;}</style></head><body>"+
+    "<h1>"+displayName(r)+"</h1><p>"+(r.caseId||r.id)+"</p>"+
+    "<h2>Findings</h2><div class=\"g\">"+
+      "<div class=\"full\"><b>AP findings</b><p>"+(r.apFindings||"—")+"</p></div>"+
+      "<div class=\"full\"><b>HR</b><p>"+getIRValue(r,"hrRec")+"</p></div>"+
+      "<div class=\"full\"><b>Interview narrative</b><p>"+getIRValue(r,"interviewNarrative")+"</p></div>"+
+    "</div>"+
+    "<h2>Overview</h2><div class=\"g\">"+
+      "<div><b>Date</b><p>"+(r.date||"—")+"</p></div>"+
+      "<div><b>Branch</b><p>"+(r.branch||"—")+"</p></div>"+
+      "<div><b>Submitted by</b><p>"+(r.submittedBy||"—")+"</p></div>"+
+    "</div>"+
+    "<h2>Narrative</h2><div class=\"narr\">"+getIRValue(r,"narrative")+"</div>"+
+    "<script>window.print();<\/script></body></html>");
   win.document.close();
 }
 
 async function init() {
   try {
-    document.getElementById("live-badge").textContent="● Loading…";
-    const [ir,vr,ds] = await Promise.all([
+    const results = await Promise.all([
       fetchBoard(IR_BOARD, IR_COLS),
       fetchBoard(VR_BOARD, VR_COLS),
       fetchBoard(DS_BOARD, DS_COLS)
     ]);
-    irItems=ir; vrItems=vr; dsItems=ds;
-    document.getElementById("live-badge").textContent=`● Live — ${irItems.length} cases`;
+    irItems=results[0]; vrItems=results[1]; dsItems=results[2];
+    document.getElementById("live-badge").textContent="Live - "+irItems.length+" cases";
     populateFilters();
     renderList();
-    renderSettings();
   } catch(e) {
-    document.getElementById("list-panel").innerHTML=`<div class="err-msg">Error: ${e.message}</div>`;
-    document.getElementById("live-badge").textContent="● Error";
+    document.getElementById("list-panel").innerHTML="<div class=\"err-msg\">Error: "+e.message+"</div>";
+    document.getElementById("live-badge").textContent="Error";
   }
 }
 
