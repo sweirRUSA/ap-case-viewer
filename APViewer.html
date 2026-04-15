@@ -593,7 +593,7 @@ async function renderPreview(r) {
   const assetIds = files.filter(function(f){return f.assetId;}).map(function(f){return f.assetId;});
   if (assetIds.length) {
     try {
-      const q = "{assets(ids:["+assetIds.join(",")+"]){id public_url url name}}";
+      const q = "{assets(ids:["+assetIds.join(",")+"]){id public_url name}}";
       const data = await gql(q);
       const assets = data?.data?.assets || [];
       // Fetch image blobs through proxy to get around CORS
@@ -601,12 +601,23 @@ async function renderPreview(r) {
         const f = files.find(function(x){return String(x.assetId)===String(a.id);});
         if (!f || !a.public_url) return;
         f.directUrl = a.public_url;
-        // Use Monday protected_static URL which has proper CORS headers
-        f.url = a.url || a.public_url;
-        f.directUrl = a.url || a.public_url;
+        f.directUrl = a.public_url;
+        if (f.isImage) {
+          // Fetch image through corsproxy as blob to bypass CORS
+          f.url = a.public_url; // fallback, will be replaced by blob below
+          f._fetchUrl = a.public_url;
+        } else {
+          // PDFs open via Google Docs viewer
+          f.url = a.public_url;
+        }
       }));
     } catch(e) {}
   }
+
+  // Set image URLs through corsproxy as img src (not fetch)
+  files.filter(function(f){ return f.isImage && f._fetchUrl; }).forEach(function(f){
+    f.url = "https://corsproxy.io/?" + encodeURIComponent(f._fetchUrl);
+  });
 
   const imageFiles = files.filter(function(f){ return f.url && f.isImage; });
   window.currentImageFiles = imageFiles;
@@ -627,7 +638,7 @@ async function renderPreview(r) {
           "<span style='font-size:24px;'>🖼</span><a href='"+f.url+"' target='_blank' style='color:#5a9fd4;font-size:11px;'>"+f.name+"</a></div>"+
         "<div class='preview-thumb-label'>"+f.name+"</div></div>";
     } else if (isPdf) {
-      const pdfViewer = "https://docs.google.com/viewer?embedded=true&url=" + encodeURIComponent(f.url);
+      const pdfViewer = "https://docs.google.com/viewer?url=" + encodeURIComponent(f.url);
       return "<a class='preview-doc' href='" + pdfViewer + "' target='_blank'>"+
         "<div class='preview-doc-icon'>📄</div>"+
         "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
