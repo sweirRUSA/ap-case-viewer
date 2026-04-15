@@ -453,12 +453,18 @@ function selectItem(id) {
 }
 
 async function updateColumn(itemId, boardId, columnId, value, type) {
-  let colValue;
-  if (type==="text") colValue=JSON.stringify(value);
-  else if (type==="longtext") colValue=JSON.stringify({text:value});
-  else if (type==="status") colValue=JSON.stringify({label:value});
-  const mut="mutation{change_column_value(board_id:"+boardId+",item_id:"+itemId+",column_id:\""+columnId+"\",value:"+JSON.stringify(colValue)+"){id}}";
-  try { const res=await gql(mut); return !!(res&&res.data&&res.data.change_column_value&&res.data.change_column_value.id); }
+  let mut;
+  if (type==="longtext") {
+    // Use change_simple_column_value for long text — properly overwrites existing content
+    const escaped = value.replace(/\\/g,"\\\\").replace(/"/g,"\\\"").replace(/\n/g,"\\n");
+    mut = "mutation{change_simple_column_value(board_id:"+boardId+",item_id:"+itemId+",column_id:\""+columnId+"\",value:\""+escaped+"\"){id}}";
+  } else {
+    let colValue;
+    if (type==="text") colValue=JSON.stringify(value);
+    else if (type==="status") colValue=JSON.stringify({label:value});
+    mut = "mutation{change_column_value(board_id:"+boardId+",item_id:"+itemId+",column_id:\""+columnId+"\",value:"+JSON.stringify(colValue)+"){id}}";
+  }
+  try { const res=await gql(mut); return !!(res&&res.data&&(res.data.change_column_value||res.data.change_simple_column_value)); }
   catch(e) { return false; }
 }
 
