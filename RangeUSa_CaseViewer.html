@@ -582,11 +582,9 @@ async function renderPreview(r) {
       assets.forEach(function(a){
         const f = files.find(function(x){return String(x.assetId)===String(a.id);});
         if (f && a.public_url) {
-          // Remove the attachment disposition so browser displays instead of downloads
+          // Remove attachment disposition so files open/display instead of downloading
           let url = a.public_url.replace(/[&?]response-content-disposition=[^&]*/i, "");
-          // Images need proxy for display; PDFs/docs open directly in new tab
-          const isImg = f.isImage;
-          f.url = isImg ? PROXY + encodeURIComponent(url) : url;
+          f.url = url;
         }
       });
     } catch(e) {}
