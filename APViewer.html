@@ -593,7 +593,7 @@ async function renderPreview(r) {
   const assetIds = files.filter(function(f){return f.assetId;}).map(function(f){return f.assetId;});
   if (assetIds.length) {
     try {
-      const q = "{assets(ids:["+assetIds.join(",")+"]){id public_url name}}";
+      const q = "{assets(ids:["+assetIds.join(",")+"]){id public_url url name}}";
       const data = await gql(q);
       const assets = data?.data?.assets || [];
       // Fetch image blobs through proxy to get around CORS
@@ -601,18 +601,9 @@ async function renderPreview(r) {
         const f = files.find(function(x){return String(x.assetId)===String(a.id);});
         if (!f || !a.public_url) return;
         f.directUrl = a.public_url;
-        if (f.isImage) {
-          try {
-            const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(a.public_url);
-            const resp = await fetch(proxyUrl);
-            const blob = await resp.blob();
-            f.url = URL.createObjectURL(blob);
-          } catch(e) {
-            f.url = a.public_url;
-          }
-        } else {
-          f.url = a.public_url;
-        }
+        // Use Monday protected_static URL which has proper CORS headers
+        f.url = a.url || a.public_url;
+        f.directUrl = a.url || a.public_url;
       }));
     } catch(e) {}
   }
