@@ -975,87 +975,171 @@ function closeModal(e) {
   if (e.target.id==="vr-modal") document.getElementById("vr-modal").style.display="none";
 }
 
-function printCase(id) {
-  const r=irItems.find(function(x){return x.id===id;});
-  const vrs=getLinkedVR(r);
-  const ds=getLinkedDS(r);
-  const win=window.open("","_blank");
-  const cid=r.caseId||r.pushableCaseId||r.id;
-  win.document.write("<!DOCTYPE html><html><head><title>"+cid+"</title>"+
-    "<style>"+
-    "body{font-family:Georgia,serif;margin:40px;color:#222;font-size:13px;line-height:1.6;}"+
-    "h1{font-size:18px;color:#2d3a4a;margin-bottom:2px;}"+
-    ".sub{font-size:11px;color:#888;margin-bottom:16px;}"+
-    "h2{font-size:10px;color:#2d3a4a;border-bottom:2px solid #2d3a4a;padding-bottom:3px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:1px;}"+
-    ".g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 18px;margin-bottom:8px;}"+
-    ".g2{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-bottom:8px;}"+
-    ".f label{font-size:9px;color:#888;text-transform:uppercase;display:block;margin-bottom:1px;letter-spacing:.5px;}"+
-    ".f p{font-size:12px;margin:0;}"+
-    ".full{grid-column:1/-1;}"+
-    ".narr{background:#f9f9f9;padding:10px 12px;border-radius:4px;white-space:pre-wrap;font-size:12px;border:1px solid #eee;}"+
-    ".badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;margin-right:4px;}"+
-    ".bg-red{background:#fdecea;color:#c0392b;}"+
-    ".bg-green{background:#e6f4ec;color:#1a7a3f;}"+
-    ".bg-blue{background:#e6f0fb;color:#1a5fa8;}"+
-    ".bg-gray{background:#f0f0f0;color:#555;}"+
-    ".vr-box{border:1px solid #2d3a4a;border-radius:6px;padding:10px;margin-bottom:8px;}"+
-    ".ds-box{border:1px solid #f5c6c6;background:#fdecea;border-radius:6px;padding:10px;margin-bottom:8px;}"+
-    ".logo{font-size:20px;font-weight:800;color:#2d3a4a;letter-spacing:3px;margin-bottom:2px;}"+
-    ".ap-sub{font-size:10px;color:#c0392b;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}"+
-    "@media print{body{margin:20px;}@page{margin:1cm;}}"+
-    "</style></head><body>"+
-    "<div class='logo'>RANGE USA</div>"+
-    "<div class='ap-sub'>Asset Protection</div>"+
-    "<h1>"+displayName(r)+"</h1>"+
-    "<div class='sub'>"+cid+" &nbsp;|&nbsp; "+( r.date||"")+" &nbsp;|&nbsp; "+(r.branch||"")+"</div>"+
-    "<div>"+
-      (r.apFollowUp?"<span class='badge "+(r.apFollowUp.includes("Completed")?"bg-green":r.apFollowUp.includes("NEEDED")?"bg-red":"bg-gray")+"'>"+r.apFollowUp+"</span>":"")+
-      (r.hrRec&&r.hrRec!=="—"?"<span class='badge bg-red'>HR: "+r.hrRec+"</span>":"")+
-      ((r.retainVideo||"").includes("Yes")?"<span class='badge bg-blue'>Video Retained</span>":"")+
-      (ds.length?"<span class='badge bg-red'>DNS on file</span>":"")+
-    "</div>"+
-    "<h2>Findings</h2>"+
-    "<div class='g'>"+
-      "<div class='f full'><label>AP Findings</label><p>"+(r.apFindings||"—").replace(/\n/g,"<br/>")+"</p></div>"+
-      "<div class='f full'><label>HR Recommendation &amp; Findings</label><p>"+getIRValue(r,"hrRec").replace(/\n/g,"<br/>")+"</p></div>"+
-      "<div class='f full'><label>Interview Narrative</label><p>"+getIRValue(r,"interviewNarrative").replace(/\n/g,"<br/>")+"</p></div>"+
-    "</div>"+
-    "<h2>Overview</h2>"+
-    "<div class='g'>"+
-      "<div class='f'><label>Case ID</label><p>"+cid+"</p></div>"+
-      "<div class='f'><label>Incident Date</label><p>"+(r.date||"—")+"</p></div>"+
-      "<div class='f'><label>Incident Time</label><p>"+(r.incidentTime||"—")+"</p></div>"+
-      "<div class='f'><label>Branch</label><p>"+(r.branch||"—")+"</p></div>"+
-      "<div class='f'><label>District Leader</label><p>"+(r.district||"—")+"</p></div>"+
-      "<div class='f'><label>Submitted By</label><p>"+(r.submittedBy||"—")+"</p></div>"+
-      "<div class='f'><label>Location</label><p>"+(r.location||"—")+"</p></div>"+
-      "<div class='f'><label>Specific Location</label><p>"+(r.specificLocation||"—")+"</p></div>"+
-    "</div>"+
-    "<h2>Incident Details</h2>"+
-    "<div class='g'>"+
-      "<div class='f'><label>Category</label><p>"+(r.category||"—")+"</p></div>"+
-      "<div class='f half'><label>Incident Type</label><p>"+getIncidentTypes(r)+"</p></div>"+
-      "<div class='f'><label>AP Follow-up</label><p>"+(r.apFollowUp||"—")+"</p></div>"+
-      "<div class='f'><label>Retain Video</label><p>"+(r.retainVideo||"—")+"</p></div>"+
-      "<div class='f'><label>Police Report #</label><p>"+(r.policeReport||"—")+"</p></div>"+
-    "</div>"+
-    "<h2>Subject</h2>"+
-    "<div class='g'>"+
-      "<div class='f'><label>Subject Name</label><p>"+(r.subjectName||"—")+"</p></div>"+
-      "<div class='f'><label>Subject Type</label><p>"+(r.subjectType||"—")+"</p></div>"+
-      "<div class='f'><label>Injuries</label><p>"+(r.injuries||"—")+"</p></div>"+
-      "<div class='f'><label>Property Damage</label><p>"+(r.propertyDamage||"—")+"</p></div>"+
-    "</div>"+
-    "<h2>Original Narrative</h2>"+
-    "<div class='narr'>"+getIRValue(r,"narrative").replace(/\n/g,"<br/>")+"</div>"+
-    (ds.length?"<h2>Deny Service Records ("+ds.length+")</h2>"+ds.map(function(d){
+async function printCase(id) {
+  const r = irDetailCache[id] || irItems.find(function(x){return x.id===id;});
+  if (!r) return;
+  const vrs = getLinkedVR(r);
+  const ds = getLinkedDS(r);
+  const cid = r.caseId||r.pushableCaseId||r.id;
+
+  // Fetch image URLs for print
+  let imageHtml = "";
+  const files = [];
+  function parseFiles(raw) {
+    if (!raw || raw==="—" || raw==="") return;
+    try {
+      const parsed = JSON.parse(raw);
+      const arr = parsed.files || (Array.isArray(parsed) ? parsed : []);
+      arr.forEach(function(f){ if (f.assetId && (f.isImage==="true"||f.isImage===true)) files.push(f); });
+    } catch(e) {}
+  }
+  parseFiles(r.documents);
+  parseFiles(r.pictures);
+
+  if (files.length) {
+    try {
+      const q = "{assets(ids:["+files.map(function(f){return f.assetId;}).join(",")+"]){id public_url name}}";
+      const data = await gql(q);
+      const assets = data?.data?.assets || [];
+      const imgUrls = assets.map(function(a){
+        return {url:"https://images.weserv.nl/?url="+encodeURIComponent(a.public_url.replace(/^https:\/\//,""))+"&w=300&output=jpg", name:a.name};
+      });
+      if (imgUrls.length) {
+        imageHtml = "<div class='section'><div class='sec-title'>Documents &amp; Media</div>"+
+          "<div class='img-grid'>"+
+          imgUrls.map(function(img){
+            return "<div class='img-box'><img src='"+img.url+"' alt='"+img.name+"'/><div class='img-label'>"+img.name+"</div></div>";
+          }).join("")+
+          "</div></div>";
+      }
+    } catch(e) {}
+  }
+
+  const logoB64 = document.querySelector('img[alt="Range USA"]')?.src || "";
+  const apBadge = r.apFollowUp ? (r.apFollowUp.includes("Completed") ? "badge-green" : r.apFollowUp.includes("NEEDED") ? "badge-red" : "badge-gray") : "";
+
+  const win = window.open("","_blank");
+  win.document.write(`<!DOCTYPE html><html><head><title>${cid}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#1a1a1a;font-size:12px;line-height:1.6;}
+    .page{max-width:900px;margin:0 auto;padding:30px 40px;}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:3px solid #2d3a4a;margin-bottom:20px;}
+    .header-left{display:flex;flex-direction:column;gap:2px;}
+    .logo{height:50px;object-fit:contain;}
+    .ap-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#c0392b;font-weight:700;margin-top:2px;}
+    .header-right{text-align:right;}
+    .case-id{font-size:18px;font-weight:700;color:#2d3a4a;}
+    .case-meta{font-size:11px;color:#666;margin-top:3px;}
+    .badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .badge{font-size:10px;padding:3px 10px;border-radius:12px;font-weight:600;}
+    .badge-red{background:#fdecea;color:#c0392b;border:1px solid #f5c6c6;}
+    .badge-green{background:#e6f4ec;color:#1a7a3f;border:1px solid #b7dfc8;}
+    .badge-blue{background:#e6f0fb;color:#1a5fa8;border:1px solid #b3d0f5;}
+    .badge-gray{background:#f0f0f0;color:#555;border:1px solid #ddd;}
+    .section{margin-bottom:20px;}
+    .sec-title{font-size:9px;font-weight:700;color:#2d3a4a;text-transform:uppercase;letter-spacing:1.5px;padding-bottom:4px;border-bottom:2px solid #2d3a4a;margin-bottom:10px;}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 20px;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;}
+    .field label{font-size:9px;color:#999;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:1px;}
+    .field p{font-size:12px;color:#1a1a1a;}
+    .full{grid-column:1/-1;}
+    .narr{background:#f9f9f9;padding:10px 14px;border-radius:6px;white-space:pre-wrap;font-size:12px;border:1px solid #eee;line-height:1.7;}
+    .vr-box{border:1px solid #2d3a4a;border-radius:6px;padding:10px 14px;margin-bottom:8px;}
+    .vr-title{font-size:12px;font-weight:600;color:#2d3a4a;margin-bottom:6px;}
+    .ds-box{border:1px solid #f5c6c6;background:#fef9f9;border-radius:6px;padding:10px 14px;margin-bottom:8px;}
+    .img-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+    .img-box{border:1px solid #eee;border-radius:6px;overflow:hidden;break-inside:avoid;}
+    .img-box img{width:100%;height:140px;object-fit:cover;display:block;}
+    .img-label{font-size:9px;color:#888;padding:3px 6px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .divider{border:none;border-top:1px solid #eee;margin:16px 0;}
+    .footer{margin-top:24px;padding-top:12px;border-top:1px solid #eee;font-size:9px;color:#aaa;display:flex;justify-content:space-between;}
+    @media print{
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .page{padding:15px 20px;}
+      @page{margin:.5cm;size:letter;}
+    }
+  </style></head><body>
+  <div class="page">
+    <div class="header">
+      <div class="header-left">
+        ${logoB64 ? `<img src="${logoB64}" class="logo" alt="Range USA"/>` : `<div style="font-size:22px;font-weight:800;color:#2d3a4a;letter-spacing:2px;">RANGE USA</div>`}
+        <div class="ap-sub">Asset Protection</div>
+      </div>
+      <div class="header-right">
+        <div class="case-id">${cid}</div>
+        <div class="case-meta">${r.date||""} &nbsp;·&nbsp; ${r.branch||""} &nbsp;·&nbsp; Submitted by ${r.submittedBy||"—"}</div>
+      </div>
+    </div>
+
+    <div class="badges">
+      ${r.apFollowUp ? `<span class="badge ${apBadge}">${r.apFollowUp}</span>` : ""}
+      ${r.hrRec&&r.hrRec!=="—" ? `<span class="badge badge-red">HR: ${r.hrRec}</span>` : ""}
+      ${r.hrRecommendation&&r.hrRecommendation!=="—" ? `<span class="badge badge-red">${r.hrRecommendation}</span>` : ""}
+      ${(r.retainVideo||"").includes("Yes") ? `<span class="badge badge-blue">Video Retained</span>` : ""}
+      ${ds.length ? `<span class="badge badge-red">DNS on File</span>` : ""}
+      ${r.category ? `<span class="badge badge-gray">${r.category}</span>` : ""}
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Overview</div>
+      <div class="grid-3">
+        <div class="field"><label>Case ID</label><p>${cid}</p></div>
+        <div class="field"><label>Incident Date</label><p>${r.date||"—"}</p></div>
+        <div class="field"><label>Incident Time</label><p>${r.incidentTime||"—"}</p></div>
+        <div class="field"><label>Branch</label><p>${r.branch||"—"}</p></div>
+        <div class="field"><label>District Leader</label><p>${r.district||"—"}</p></div>
+        <div class="field"><label>Submitted By</label><p>${r.submittedBy||"—"}</p></div>
+        <div class="field"><label>Location</label><p>${r.location||"—"}</p></div>
+        <div class="field"><label>Specific Location</label><p>${r.specificLocation||"—"}</p></div>
+        <div class="field"><label>Incident Type</label><p>${getIncidentTypes(r)}</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Subject</div>
+      <div class="grid-3">
+        <div class="field"><label>Subject Name</label><p>${r.subjectName||"—"}</p></div>
+        <div class="field"><label>Subject Type</label><p>${r.subjectType||"—"}</p></div>
+        <div class="field"><label>Injuries</label><p>${r.injuries||"—"}</p></div>
+        <div class="field"><label>Property Damage</label><p>${r.propertyDamage||"—"}</p></div>
+        <div class="field"><label>Police Report #</label><p>${r.policeReport||"—"}</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Original Narrative</div>
+      <div class="narr">${getIRValue(r,"narrative").replace(/\n/g,"<br/>")}</div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Findings</div>
+      <div class="field full" style="margin-bottom:10px;"><label>AP Findings</label>
+        <div class="narr">${(r.apFindings||"—").replace(/\n/g,"<br/>")}</div></div>
+      <div class="field full" style="margin-bottom:10px;"><label>HR Recommendation &amp; Findings</label>
+        <div class="narr">${getIRValue(r,"hrRec").replace(/\n/g,"<br/>")}</div></div>
+      <div class="field full"><label>Interview Narrative</label>
+        <div class="narr">${getIRValue(r,"interviewNarrative").replace(/\n/g,"<br/>")}</div></div>
+    </div>
+
+    ${ds.length ? `<div class="section"><div class="sec-title">Deny Service Records (${ds.length})</div>${ds.map(function(d){
       const sn=[d.subjectFirstName,d.subjectLastName].filter(Boolean).join(" ")||"Unknown";
-      return "<div class='ds-box'><b>"+sn+"</b> — "+(d.status||"")+" — "+(d.date||"")+"<br/>"+(d.narrative||"")+"</div>";
-    }).join(""):"")+
-    (vrs.length?"<h2>Video Requests ("+vrs.length+")</h2>"+vrs.map(function(v){
-      return "<div class='vr-box'><b>"+(v.agency||"")+"</b> · "+(v.status||"")+" · "+(v.branch||"")+"<br/><i>"+(v.requestNarrative||"")+"</i>"+(v.sscSupplement?"<br/>SSC: "+v.sscSupplement:"")+"</div>";
-    }).join(""):"")+
-    "<script>window.print();<\/script></body></html>");
+      return `<div class="ds-box"><div style="font-weight:600;color:#c0392b;margin-bottom:4px;">${sn} — ${d.status||""} — ${d.date||""}</div><div>${d.narrative||""}</div></div>`;
+    }).join("")}</div>` : ""}
+
+    ${vrs.length ? `<div class="section"><div class="sec-title">Video Requests (${vrs.length})</div>${vrs.map(function(v){
+      return `<div class="vr-box"><div class="vr-title">${v.agency||"Video Request"} · ${v.status||""} · ${v.branch||""}</div><div>${v.requestNarrative||""}</div>${v.sscSupplement?`<div style="margin-top:4px;color:#555;">SSC: ${v.sscSupplement}</div>`:""}</div>`;
+    }).join("")}</div>` : ""}
+
+    ${imageHtml}
+
+    <div class="footer">
+      <span>Range USA — Asset Protection Case File</span>
+      <span>Printed ${new Date().toLocaleDateString()} · ${cid}</span>
+    </div>
+  </div>
+  <script>setTimeout(function(){window.print();},800);<\/script>
+  </body></html>`);
   win.document.close();
 }
 
