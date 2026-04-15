@@ -603,11 +603,12 @@ async function renderPreview(r) {
         f.directUrl = a.public_url;
         if (f.isImage) {
           try {
-            const resp = await fetch(PROXY + encodeURIComponent(a.public_url));
+            const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(a.public_url);
+            const resp = await fetch(proxyUrl);
             const blob = await resp.blob();
             f.url = URL.createObjectURL(blob);
           } catch(e) {
-            f.url = a.public_url; // fallback to direct
+            f.url = a.public_url;
           }
         } else {
           f.url = a.public_url;
@@ -635,10 +636,11 @@ async function renderPreview(r) {
           "<span style='font-size:24px;'>🖼</span><a href='"+f.url+"' target='_blank' style='color:#5a9fd4;font-size:11px;'>"+f.name+"</a></div>"+
         "<div class='preview-thumb-label'>"+f.name+"</div></div>";
     } else if (isPdf) {
-      return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
+      const pdfViewer = "https://docs.google.com/viewer?embedded=true&url=" + encodeURIComponent(f.url);
+      return "<a class='preview-doc' href='" + pdfViewer + "' target='_blank'>"+
         "<div class='preview-doc-icon'>📄</div>"+
         "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
-        "<div class='preview-doc-sub'>Click to open PDF</div></div></a>";
+        "<div class='preview-doc-sub'>Click to view PDF</div></div></a>";
     } else {
       return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
         "<div class='preview-doc-icon'>📎</div>"+
