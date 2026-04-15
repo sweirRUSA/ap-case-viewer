@@ -638,7 +638,8 @@ function renderDetail(r) {
 }
 
 async function saveApFindings(itemId) {
-  const val = document.getElementById("edit-apFindings").value;
+  const raw = document.getElementById("edit-apFindings").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
   const ok = await updateColumn(itemId, IR_BOARD, "text95", val, "text");
   showMsg("msg-apFindings", ok);
   if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.apFindings=val; }
@@ -980,26 +981,26 @@ async function populateDropdown(ddId) {
 }
 
 async function saveHrFindings(itemId) {
-  const val = document.getElementById("edit-hrFindings").value;
+  const raw = document.getElementById("edit-hrFindings").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
   const ok = await updateColumn(itemId, IR_BOARD, "long_text_mm0f4cbg", val, "longtext");
   showMsg("msg-hrFindings", ok);
   if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.hrFindings=val; }
 }
 
 async function saveInterviewNarrative(itemId) {
-  const val = document.getElementById("edit-interviewNarrative").value;
+  const raw = document.getElementById("edit-interviewNarrative").value;
+  // Insert "." between paragraphs (replace blank lines with a line containing just ".")
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
   const LIMIT = 2000;
   let part1 = val, part2 = "";
   if (val.length > LIMIT) {
-    // Split at last paragraph break before 2000 chars
-    let splitAt = val.lastIndexOf("\n\n", LIMIT);
-    if (splitAt < 1000) splitAt = val.lastIndexOf("\n", LIMIT);
-    if (splitAt < 1000) splitAt = val.lastIndexOf(". ", LIMIT);
+    let splitAt = val.lastIndexOf("\n.\n", LIMIT);
+    if (splitAt < 500) splitAt = val.lastIndexOf("\n", LIMIT);
     if (splitAt < 0) splitAt = LIMIT;
     part1 = val.substring(0, splitAt).trim();
     part2 = val.substring(splitAt).trim();
-    // Add ". " separator between parts if needed
-    if (part2 && !part1.endsWith(".")) part1 = part1 + ".";
+    if (!part1.endsWith(".")) part1 = part1 + "\n.";
   }
   const ok1 = await updateColumn(itemId, IR_BOARD, "long_text__1", part1, "longtext");
   let ok2 = true;
