@@ -322,6 +322,8 @@ async function gql(query) {
 function getVal(cols, id) {
   const c = cols.find(x => x.id === id);
   if (!c) return "";
+  // File columns — return raw JSON string for later parsing
+  if (id === "files" || id === "files9") return c.value || "";
   try {
     const v = JSON.parse(c.value);
     if (v === null) return "";
@@ -372,7 +374,11 @@ function getIncidentTypes(r) {
 
 function stripPeriodSeparators(text) {
   if (!text || text === "—") return "";
-  return text.replace(/\n\.\n/g, "\n\n").replace(/^\.\n?/, "").replace(/\n?\.$/, "").trim();
+  return text
+    .replace(/\n\.\n/g, "\n\n")   // replace .\n between paragraphs with blank line
+    .replace(/^\s*\.\s*\n/g, "")  // strip leading standalone period line
+    .replace(/\n\s*\.\s*$/g, "")  // strip trailing standalone period line
+    .trim();
 }
 
 function getIRValue(r, key) {
@@ -465,6 +471,8 @@ function renderList() {
   });
   const panel = document.getElementById("list-panel");
   if (!filtered.length) { panel.innerHTML="<div class=\"empty\">No cases match your filters.</div>"; return; }
+  // Sort most recent first
+  filtered.sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
   panel.innerHTML = filtered.map(function(r) {
     return "<div class=\"list-item " + (selectedId===r.id?"active":"") + "\" onclick=\"selectItem(\'"+r.id+"\')\">"+
       "<div class=\"item-name\">"+displayName(r)+"</div>"+
@@ -495,14 +503,20 @@ function renderPreview(r) {
 
   const files = [];
 
-  // Monday file columns — parse as JSON array of file objects
-  function parseFiles(raw, label) {
-    if (!raw || raw==="—") return;
+  // Monday file columns — JSON has {files: [{assetId, name, url, fileType}]}
+  function parseFiles(raw, defaultLabel) {
+    if (!raw || raw==="—" || raw==="") return;
     try {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) {
-        arr.forEach(function(f){ files.push({url:f.url||f.public_download_url, name:f.name||label, type:f.asset_type||"file"}); });
-      }
+      const parsed = JSON.parse(raw);
+      const arr = parsed.files || (Array.isArray(parsed) ? parsed : []);
+      arr.forEach(function(f){
+        const url = f.url || f.public_download_url || f.thumbUrl || "";
+        const name = f.name || defaultLabel;
+        const fileType = (f.fileType || f.type || "").toLowerCase();
+        const isImg = /^(image|jpg|jpeg|png|gif|webp)/.test(fileType) || /\.(png|jpg|jpeg|gif|webp)/i.test(name);
+        const isPdf = fileType==="pdf" || /\.pdf$/i.test(name);
+        if (url) files.push({url, name, isImg, isPdf, type:"monday"});
+      });
     } catch(e) {}
   }
   parseFiles(r.documents, "Document");
@@ -521,11 +535,9 @@ function renderPreview(r) {
   }
 
   body.innerHTML = files.map(function(f){
-    const isImg = /\.(png|jpg|jpeg|gif|webp)/i.test(f.url||"") || f.type==="image";
-    const isPdf = /\.pdf/i.test(f.url||"") || f.type==="pdf";
-    const isSP  = f.type==="sharepoint" || /sharepoint|onedrive/i.test(f.url||"");
+    const isSP = f.type==="sharepoint" || /sharepoint|onedrive/i.test(f.url||"");
 
-    if (isImg) {
+    if (f.isImg) {
       return "<div class='preview-thumb' onclick='openFullImg(\""+encodeURIComponent(f.url)+"\")'>"+
         "<img src='"+f.url+"' alt='"+f.name+"' onerror='this.parentNode.style.display=\"none\"'/>"+
         "<div class='preview-thumb-label'>"+f.name+"</div>"+
@@ -537,7 +549,7 @@ function renderPreview(r) {
           "<div class='preview-doc-name'>"+f.name+"</div>"+
           "<div class='preview-doc-sub'>Open in SharePoint</div>"+
         "</div></a>";
-    } else if (isPdf) {
+    } else if (f.isPdf) {
       return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
         "<div class='preview-doc-icon'>📄</div>"+
         "<div class='preview-doc-info'>"+
@@ -640,7 +652,7 @@ function renderDetail(r) {
     "sec-findings":
       "<div class=\"sec\" id=\"sec-findings\"><div class=\"sec-title\">Findings</div><div class=\"fgrid\">"+
         "<div class=\"f full fedit\"><div class=\"flabel\">AP findings</div>"+
-          "<textarea id=\"edit-apFindings\">"+(r.apFindings&&r.apFindings!=="—"?r.apFindings:"")+"</textarea>"+
+          "<textarea id=\"edit-apFindings\">"+stripPeriodSeparators(r.apFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
