@@ -500,7 +500,23 @@ function renderList() {
 }
 
 async function fetchItemDetail(id) {
-  if (irDetailCache[id]) return irDetailCache[id];
+  if (irDetailCache[id]) {
+    // Always clear file data from cache so we get fresh signed URLs
+    const cached = Object.assign({}, irDetailCache[id]);
+    delete cached.documents;
+    delete cached.pictures;
+    // Re-fetch just for fresh asset URLs if we have file data
+    if (irDetailCache[id].documents || irDetailCache[id].pictures) {
+      const q = "{items(ids:["+id+"]){id name column_values{id text value}}}";
+      const data = await gql(q);
+      const item = data?.data?.items?.[0];
+      if (item) {
+        cached.documents = getVal(item.column_values, "files");
+        cached.pictures = getVal(item.column_values, "files9");
+      }
+    }
+    return cached;
+  }
   // Fetch full detail columns for a single item
   const q = "{items(ids:["+id+"]){id name column_values{id text value}}}";
   const data = await gql(q);
@@ -583,13 +599,16 @@ async function renderPreview(r) {
       assets.forEach(function(a){
         const f = files.find(function(x){return String(x.assetId)===String(a.id);});
         if (f && a.public_url) {
-          // Remove attachment disposition so files display instead of forcing download
-          // Strip the response-content-disposition param from query string
-          let url = a.public_url;
-          url = url.replace(/&response-content-disposition=[^&]*/i, "");
-          url = url.replace(/\?response-content-disposition=[^&]*&/i, "?");
-          url = url.replace(/\?response-content-disposition=[^&]*/i, "");
-          f.url = url;
+          if (f.isImage) {
+            // For images: proxy the URL so we can display inline (CORS)
+            // Keep the full signed URL intact — only proxy it, don't modify
+            f.url = PROXY + encodeURIComponent(a.public_url);
+            // Also store the direct URL for lightbox fallback
+            f.directUrl = a.public_url;
+          } else {
+            // For PDFs/docs: use direct URL, opens in new tab fine
+            f.url = a.public_url;
+          }
         }
       });
     } catch(e) {}
@@ -635,7 +654,13 @@ function openLightbox(images, startIndex) {
 }
 
 function showLightboxImage() {
-  document.getElementById("lightbox-img").src = lightboxImages[lightboxIndex].url;
+  const f = lightboxImages[lightboxIndex];
+  const img = document.getElementById("lightbox-img");
+  img.src = f.url;
+  // If proxied image fails, try direct URL
+  img.onerror = function() {
+    if (f.directUrl && img.src !== f.directUrl) img.src = f.directUrl;
+  };
   document.getElementById("lightbox-counter").textContent = (lightboxIndex+1)+" / "+lightboxImages.length;
 }
 
@@ -793,7 +818,7 @@ function renderDetail(r) {
       "</div></div>",
     "sec-narrative":
       "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative</div>"+
-        "<div class=\"fval\" style=\"background:#f9f9f9;padding:10px 12px;border-radius:6px;border:1px solid #eee;\">"+getIRValue(r,"narrative")+"</div>"+
+        "<div class=\"fval\" style=\"background:#0d1520;padding:10px 12px;border-radius:6px;border:1px solid #1e2e40;\">"+getIRValue(r,"narrative")+"</div>"+
       "</div>",
     "sec-subject":
       "<div class=\"sec\" id=\"sec-subject\"><div class=\"sec-title\">Subject</div><div class=\"fgrid\">"+
