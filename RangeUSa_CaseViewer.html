@@ -389,8 +389,10 @@ function getIRValue(r, key) {
     return [rec,find].filter(Boolean).join("\n\n") || "—";
   }
   if (key==="interviewNarrative") {
-    const combined = [r.interviewNarrative1, r.interviewNarrative2].filter(Boolean).join("\n\n");
-    return stripPeriodSeparators(combined) || "—";
+    const parts = [r.interviewNarrative1, r.interviewNarrative2]
+      .filter(Boolean)
+      .map(function(p){ return p.replace(/^\s*\.\s*\n?/,"").replace(/\n\s*\.\s*$/,"").trim(); });
+    return parts.join("\n\n") || "—";
   }
   return r[key]||"—";
 }
@@ -496,35 +498,34 @@ function selectItem(id) {
   if (r) { renderDetail(r); updateStatusBar(r); renderPreview(r); }
 }
 
-function renderPreview(r) {
+async function renderPreview(r) {
   const body = document.getElementById("preview-body");
   const count = document.getElementById("preview-count");
   if (!r) { body.innerHTML="<div class='preview-empty'>Select a case to preview files</div>"; count.textContent=""; return; }
 
+  body.innerHTML="<div class='preview-empty'>Loading files...</div>";
+
   const files = [];
 
-  // Monday file columns — JSON has {files: [{assetId, name, url, fileType}]}
   function parseFiles(raw, defaultLabel) {
     if (!raw || raw==="—" || raw==="") return;
     try {
       const parsed = JSON.parse(raw);
       const arr = parsed.files || (Array.isArray(parsed) ? parsed : []);
       arr.forEach(function(f){
-        const url = f.url || f.public_download_url || f.thumbUrl || "";
-        const name = f.name || defaultLabel;
-        const fileType = (f.fileType || f.type || "").toLowerCase();
-        const isImg = /^(image|jpg|jpeg|png|gif|webp)/.test(fileType) || /\.(png|jpg|jpeg|gif|webp)/i.test(name);
-        const isPdf = fileType==="pdf" || /\.pdf$/i.test(name);
-        if (url) files.push({url, name, isImg, isPdf, type:"monday"});
+        files.push({
+          assetId: f.assetId,
+          name: f.name || defaultLabel,
+          isImage: f.isImage==="true" || f.isImage===true
+        });
       });
     } catch(e) {}
   }
   parseFiles(r.documents, "Document");
   parseFiles(r.pictures, "Picture");
 
-  // OneDrive link
   if (r.oneDriveLink && r.oneDriveLink!=="—") {
-    files.push({url:r.oneDriveLink, name:"OneDrive Video", type:"sharepoint"});
+    files.push({url:r.oneDriveLink, name:"OneDrive Video", isImage:false, isSP:true});
   }
 
   count.textContent = files.length ? files.length+" file"+(files.length>1?"s":"") : "";
@@ -534,35 +535,42 @@ function renderPreview(r) {
     return;
   }
 
-  body.innerHTML = files.map(function(f){
-    const isSP = f.type==="sharepoint" || /sharepoint|onedrive/i.test(f.url||"");
+  // Fetch public URLs from Monday for asset IDs
+  const assetIds = files.filter(function(f){return f.assetId;}).map(function(f){return f.assetId;});
+  if (assetIds.length) {
+    try {
+      const q = "{assets(ids:["+assetIds.join(",")+"]){id public_url name}}";
+      const data = await gql(q);
+      const assets = data?.data?.assets || [];
+      assets.forEach(function(a){
+        const f = files.find(function(x){return String(x.assetId)===String(a.id);});
+        if (f) f.url = a.public_url;
+      });
+    } catch(e) {}
+  }
 
-    if (f.isImg) {
-      return "<div class='preview-thumb' onclick='openFullImg(\""+encodeURIComponent(f.url)+"\")'>"+
-        "<img src='"+f.url+"' alt='"+f.name+"' onerror='this.parentNode.style.display=\"none\"'/>"+
-        "<div class='preview-thumb-label'>"+f.name+"</div>"+
-      "</div>";
-    } else if (isSP) {
+  body.innerHTML = files.map(function(f){
+    if (!f.url) return "";
+    const isPdf = /\.pdf$/i.test(f.name||"");
+    if (f.isSP) {
       return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
         "<div class='preview-doc-icon'>🎬</div>"+
-        "<div class='preview-doc-info'>"+
-          "<div class='preview-doc-name'>"+f.name+"</div>"+
-          "<div class='preview-doc-sub'>Open in SharePoint</div>"+
-        "</div></a>";
-    } else if (f.isPdf) {
+        "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
+        "<div class='preview-doc-sub'>Open in SharePoint</div></div></a>";
+    } else if (f.isImage) {
+      return "<div class='preview-thumb' onclick='openFullImg(\""+encodeURIComponent(f.url)+"\")'>"+
+        "<img src='"+f.url+"' alt='"+f.name+"' onerror='this.parentNode.style.display=\"none\"'/>"+
+        "<div class='preview-thumb-label'>"+f.name+"</div></div>";
+    } else if (isPdf) {
       return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
         "<div class='preview-doc-icon'>📄</div>"+
-        "<div class='preview-doc-info'>"+
-          "<div class='preview-doc-name'>"+f.name+"</div>"+
-          "<div class='preview-doc-sub'>Click to open PDF</div>"+
-        "</div></a>";
+        "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
+        "<div class='preview-doc-sub'>Click to open PDF</div></div></a>";
     } else {
       return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
         "<div class='preview-doc-icon'>📎</div>"+
-        "<div class='preview-doc-info'>"+
-          "<div class='preview-doc-name'>"+f.name+"</div>"+
-          "<div class='preview-doc-sub'>Click to open</div>"+
-        "</div></a>";
+        "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
+        "<div class='preview-doc-sub'>Click to open</div></div></a>";
     }
   }).join("");
 }
@@ -666,7 +674,14 @@ function renderDetail(r) {
         "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div><div class=\"fval\">"+(r.hrRecommendation||"—")+"</div></div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative"+
           "<span style=\"font-size:10px;color:#aaa;font-weight:400;margin-left:8px;\">(auto-splits into 2 fields if over 2000 chars)</span></div>"+
-          "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+stripPeriodSeparators([r.interviewNarrative1,r.interviewNarrative2].filter(Boolean).join("\n\n"))+"</textarea>"+
+          "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+
+            stripPeriodSeparators(
+              [r.interviewNarrative1, r.interviewNarrative2]
+                .filter(Boolean)
+                .map(function(p){ return p.replace(/^\s*\.\s*\n?/,"").replace(/\n\s*\.\s*$/,"").trim(); })
+                .join("\n\n")
+            )+
+          "</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewNarrative(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-interviewNarrative\" class=\"save-msg\"></span>"+
