@@ -221,12 +221,14 @@ function getVal(cols, id) {
   } catch(e) { return c.text || ""; }
 }
 
-async function fetchBoard(boardId, colMap) {
+async function fetchBoard(boardId, colMap, dateFilter) {
   let all=[], cursor=null;
   for (let p=0; p<30; p++) {
     let q;
     if (cursor) {
       q = "{next_items_page(limit:100,cursor:\"" + cursor + "\"){cursor items{id name column_values{id text value}}}}";
+    } else if (dateFilter) {
+      q = "{boards(ids:" + boardId + "){items_page(limit:100,query_params:{rules:[{column_id:\"date4\",compare_value:[\"" + dateFilter + "\"],operator:greater_than_or_equals}]}){cursor items{id name column_values{id text value}}}}}";
     } else {
       q = "{boards(ids:" + boardId + "){items_page(limit:100){cursor items{id name column_values{id text value}}}}}";
     }
@@ -602,10 +604,13 @@ function printCase(id) {
 
 async function init() {
   try {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const dateFilter = sixMonthsAgo.toISOString().split("T")[0];
     const results = await Promise.all([
-      fetchBoard(IR_BOARD, IR_COLS),
-      fetchBoard(VR_BOARD, VR_COLS),
-      fetchBoard(DS_BOARD, DS_COLS)
+      fetchBoard(IR_BOARD, IR_COLS, dateFilter),
+      fetchBoard(VR_BOARD, VR_COLS, dateFilter),
+      fetchBoard(DS_BOARD, DS_COLS, dateFilter)
     ]);
     irItems=results[0]; vrItems=results[1]; dsItems=results[2];
     document.getElementById("live-badge").textContent="Live - "+irItems.length+" cases";
