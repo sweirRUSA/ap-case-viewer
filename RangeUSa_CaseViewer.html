@@ -83,6 +83,23 @@ button:hover{background:#f5f5f5;}
 .empty{padding:40px;text-align:center;color:#aaa;font-size:13px;}
 .err-msg{padding:16px;color:#c0392b;font-size:13px;}
 .filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:#f8f8f8;border-bottom:1px solid #e8e8e8;}
+.status-bar{display:flex;gap:8px;flex-wrap:wrap;padding:10px 14px;background:#fff;border-bottom:1px solid #e8e8e8;align-items:center;}
+.status-bar-label{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.08em;margin-right:4px;}
+.sbutton{font-size:11px;padding:4px 12px;border-radius:20px;cursor:pointer;border:1.5px solid #ccc;background:#fff;font-family:inherit;font-weight:500;transition:all .15s;}
+.sbutton.active-green{background:#e6f4ec;color:#1a7a3f;border-color:#1a7a3f;}
+.sbutton.active-red{background:#fdecea;color:#c0392b;border-color:#c0392b;}
+.sbutton.active-blue{background:#e6f0fb;color:#1a5fa8;border-color:#1a5fa8;}
+.sbutton.active-orange{background:#fff8e6;color:#b07800;border-color:#b07800;}
+.settings-panel{background:#f9f9f9;border-bottom:1px solid #e0e0e0;padding:14px 18px;display:none;}
+.settings-panel.open{display:block;}
+.settings-tabs{display:flex;gap:4px;margin-bottom:12px;}
+.stab{padding:5px 14px;border:1px solid #ddd;border-radius:6px;background:#fff;font-size:12px;cursor:pointer;font-family:inherit;}
+.stab.active{background:#2d3a4a;color:#fff;border-color:#2d3a4a;}
+.stab-content{display:none;}
+.stab-content.active{display:block;}
+.settings-row{display:flex;flex-wrap:wrap;gap:8px;}
+.settings-check{display:flex;align-items:center;gap:5px;font-size:12px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:4px 10px;cursor:pointer;}
+.settings-check input{margin:0;}
 </style>
 </head>
 <body>
@@ -97,6 +114,21 @@ button:hover{background:#f5f5f5;}
 </div>
 <div class="toolbar">
   <input type="text" id="search" placeholder="Search case ID, name, branch..." oninput="renderList()" style="flex:1;min-width:160px;"/>
+  <button onclick="toggleSettings()" style="font-size:12px;">⚙ Settings</button>
+</div>
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-tabs">
+    <button class="stab active" onclick="switchTab('tab-fields')">Visible Fields</button>
+    <button class="stab" onclick="switchTab('tab-sections')">Sections</button>
+  </div>
+  <div id="tab-fields" class="stab-content active">
+    <div style="font-size:11px;color:#888;margin-bottom:8px;">Toggle which fields appear in the case detail view</div>
+    <div class="settings-row" id="field-toggles"></div>
+  </div>
+  <div id="tab-sections" class="stab-content">
+    <div style="font-size:11px;color:#888;margin-bottom:8px;">Toggle which sections appear in the case detail view</div>
+    <div class="settings-row" id="section-toggles"></div>
+  </div>
 </div>
 <div class="filter-row">
   <select id="f-branch" onchange="renderList()"><option value="">All branches</option></select>
@@ -127,6 +159,13 @@ button:hover{background:#f5f5f5;}
   <input type="date" id="f-date-from" onchange="renderList()" title="Date from"/>
   <input type="date" id="f-date-to" onchange="renderList()" title="Date to"/>
   <button onclick="clearFilters()" class="btn-small">Clear filters</button>
+</div>
+<div id="status-bar" class="status-bar" style="display:none;">
+  <span class="status-bar-label">Quick actions:</span>
+  <button class="sbutton" id="sb-ap" onclick="cycleStatus('ap')">AP Follow-up: —</button>
+  <button class="sbutton" id="sb-retain" onclick="cycleStatus('retain')">Retain Video: —</button>
+  <button class="sbutton" id="sb-deny" onclick="cycleStatus('deny')">Deny Service: —</button>
+  <button class="sbutton" id="sb-hr" onclick="cycleStatus('hr')">HR Review: —</button>
 </div>
 <div class="main">
   <div class="list" id="list-panel">
@@ -367,7 +406,7 @@ function selectItem(id) {
   selectedId=id;
   const r=irItems.find(function(x){return x.id===id;});
   renderList();
-  if (r) renderDetail(r);
+  if (r) { renderDetail(r); updateStatusBar(r); }
 }
 
 async function updateColumn(itemId, boardId, columnId, value, type) {
@@ -584,22 +623,199 @@ function printCase(id) {
   const vrs=getLinkedVR(r);
   const ds=getLinkedDS(r);
   const win=window.open("","_blank");
-  win.document.write("<!DOCTYPE html><html><head><title>"+(r.caseId||r.name)+"</title>"+
-    "<style>body{font-family:Georgia,serif;margin:40px;color:#222;font-size:13px;}h2{font-size:10px;color:#2d3a4a;border-bottom:1px solid #2d3a4a;padding-bottom:3px;margin:14px 0 7px;text-transform:uppercase;}.g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}.full{grid-column:1/-1;}.narr{background:#f9f9f9;padding:10px;white-space:pre-wrap;font-size:12px;}</style></head><body>"+
-    "<h1>"+displayName(r)+"</h1><p>"+(r.caseId||r.id)+"</p>"+
-    "<h2>Findings</h2><div class=\"g\">"+
-      "<div class=\"full\"><b>AP findings</b><p>"+(r.apFindings||"—")+"</p></div>"+
-      "<div class=\"full\"><b>HR</b><p>"+getIRValue(r,"hrRec")+"</p></div>"+
-      "<div class=\"full\"><b>Interview narrative</b><p>"+getIRValue(r,"interviewNarrative")+"</p></div>"+
+  const cid=r.caseId||r.pushableCaseId||r.id;
+  win.document.write("<!DOCTYPE html><html><head><title>"+cid+"</title>"+
+    "<style>"+
+    "body{font-family:Georgia,serif;margin:40px;color:#222;font-size:13px;line-height:1.6;}"+
+    "h1{font-size:18px;color:#2d3a4a;margin-bottom:2px;}"+
+    ".sub{font-size:11px;color:#888;margin-bottom:16px;}"+
+    "h2{font-size:10px;color:#2d3a4a;border-bottom:2px solid #2d3a4a;padding-bottom:3px;margin:18px 0 8px;text-transform:uppercase;letter-spacing:1px;}"+
+    ".g{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 18px;margin-bottom:8px;}"+
+    ".g2{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;margin-bottom:8px;}"+
+    ".f label{font-size:9px;color:#888;text-transform:uppercase;display:block;margin-bottom:1px;letter-spacing:.5px;}"+
+    ".f p{font-size:12px;margin:0;}"+
+    ".full{grid-column:1/-1;}"+
+    ".narr{background:#f9f9f9;padding:10px 12px;border-radius:4px;white-space:pre-wrap;font-size:12px;border:1px solid #eee;}"+
+    ".badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;margin-right:4px;}"+
+    ".bg-red{background:#fdecea;color:#c0392b;}"+
+    ".bg-green{background:#e6f4ec;color:#1a7a3f;}"+
+    ".bg-blue{background:#e6f0fb;color:#1a5fa8;}"+
+    ".bg-gray{background:#f0f0f0;color:#555;}"+
+    ".vr-box{border:1px solid #2d3a4a;border-radius:6px;padding:10px;margin-bottom:8px;}"+
+    ".ds-box{border:1px solid #f5c6c6;background:#fdecea;border-radius:6px;padding:10px;margin-bottom:8px;}"+
+    ".logo{font-size:20px;font-weight:800;color:#2d3a4a;letter-spacing:3px;margin-bottom:2px;}"+
+    ".ap-sub{font-size:10px;color:#c0392b;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}"+
+    "@media print{body{margin:20px;}@page{margin:1cm;}}"+
+    "</style></head><body>"+
+    "<div class='logo'>RANGE USA</div>"+
+    "<div class='ap-sub'>Asset Protection</div>"+
+    "<h1>"+displayName(r)+"</h1>"+
+    "<div class='sub'>"+cid+" &nbsp;|&nbsp; "+( r.date||"")+" &nbsp;|&nbsp; "+(r.branch||"")+"</div>"+
+    "<div>"+
+      (r.apFollowUp?"<span class='badge "+(r.apFollowUp.includes("Completed")?"bg-green":r.apFollowUp.includes("NEEDED")?"bg-red":"bg-gray")+"'>"+r.apFollowUp+"</span>":"")+
+      (r.hrRec&&r.hrRec!=="—"?"<span class='badge bg-red'>HR: "+r.hrRec+"</span>":"")+
+      ((r.retainVideo||"").includes("Yes")?"<span class='badge bg-blue'>Video Retained</span>":"")+
+      (ds.length?"<span class='badge bg-red'>DNS on file</span>":"")+
     "</div>"+
-    "<h2>Overview</h2><div class=\"g\">"+
-      "<div><b>Date</b><p>"+(r.date||"—")+"</p></div>"+
-      "<div><b>Branch</b><p>"+(r.branch||"—")+"</p></div>"+
-      "<div><b>Submitted by</b><p>"+(r.submittedBy||"—")+"</p></div>"+
+    "<h2>Findings</h2>"+
+    "<div class='g'>"+
+      "<div class='f full'><label>AP Findings</label><p>"+(r.apFindings||"—").replace(/\n/g,"<br/>")+"</p></div>"+
+      "<div class='f full'><label>HR Recommendation &amp; Findings</label><p>"+getIRValue(r,"hrRec").replace(/\n/g,"<br/>")+"</p></div>"+
+      "<div class='f full'><label>Interview Narrative</label><p>"+getIRValue(r,"interviewNarrative").replace(/\n/g,"<br/>")+"</p></div>"+
     "</div>"+
-    "<h2>Narrative</h2><div class=\"narr\">"+getIRValue(r,"narrative")+"</div>"+
+    "<h2>Overview</h2>"+
+    "<div class='g'>"+
+      "<div class='f'><label>Case ID</label><p>"+cid+"</p></div>"+
+      "<div class='f'><label>Incident Date</label><p>"+(r.date||"—")+"</p></div>"+
+      "<div class='f'><label>Incident Time</label><p>"+(r.incidentTime||"—")+"</p></div>"+
+      "<div class='f'><label>Branch</label><p>"+(r.branch||"—")+"</p></div>"+
+      "<div class='f'><label>District Leader</label><p>"+(r.district||"—")+"</p></div>"+
+      "<div class='f'><label>Submitted By</label><p>"+(r.submittedBy||"—")+"</p></div>"+
+      "<div class='f'><label>Location</label><p>"+(r.location||"—")+"</p></div>"+
+      "<div class='f'><label>Specific Location</label><p>"+(r.specificLocation||"—")+"</p></div>"+
+    "</div>"+
+    "<h2>Incident Details</h2>"+
+    "<div class='g'>"+
+      "<div class='f'><label>Category</label><p>"+(r.category||"—")+"</p></div>"+
+      "<div class='f half'><label>Incident Type</label><p>"+getIncidentTypes(r)+"</p></div>"+
+      "<div class='f'><label>AP Follow-up</label><p>"+(r.apFollowUp||"—")+"</p></div>"+
+      "<div class='f'><label>Retain Video</label><p>"+(r.retainVideo||"—")+"</p></div>"+
+      "<div class='f'><label>Police Report #</label><p>"+(r.policeReport||"—")+"</p></div>"+
+    "</div>"+
+    "<h2>Subject</h2>"+
+    "<div class='g'>"+
+      "<div class='f'><label>Subject Name</label><p>"+(r.subjectName||"—")+"</p></div>"+
+      "<div class='f'><label>Subject Type</label><p>"+(r.subjectType||"—")+"</p></div>"+
+      "<div class='f'><label>Injuries</label><p>"+(r.injuries||"—")+"</p></div>"+
+      "<div class='f'><label>Property Damage</label><p>"+(r.propertyDamage||"—")+"</p></div>"+
+    "</div>"+
+    "<h2>Original Narrative</h2>"+
+    "<div class='narr'>"+getIRValue(r,"narrative").replace(/\n/g,"<br/>")+"</div>"+
+    (ds.length?"<h2>Deny Service Records ("+ds.length+")</h2>"+ds.map(function(d){
+      const sn=[d.subjectFirstName,d.subjectLastName].filter(Boolean).join(" ")||"Unknown";
+      return "<div class='ds-box'><b>"+sn+"</b> — "+(d.status||"")+" — "+(d.date||"")+"<br/>"+(d.narrative||"")+"</div>";
+    }).join(""):"")+
+    (vrs.length?"<h2>Video Requests ("+vrs.length+")</h2>"+vrs.map(function(v){
+      return "<div class='vr-box'><b>"+(v.agency||"")+"</b> · "+(v.status||"")+" · "+(v.branch||"")+"<br/><i>"+(v.requestNarrative||"")+"</i>"+(v.sscSupplement?"<br/>SSC: "+v.sscSupplement:"")+"</div>";
+    }).join(""):"")+
     "<script>window.print();<\/script></body></html>");
   win.document.close();
+}
+
+// Settings panel
+const FIELD_DEFS = [
+  {id:"apFindings",label:"AP Findings"},
+  {id:"hrRec",label:"HR Rec & Findings"},
+  {id:"interviewNarrative",label:"Interview Narrative"},
+  {id:"narrative",label:"Original Narrative"},
+  {id:"subject",label:"Subject Info"},
+  {id:"overview",label:"Overview"},
+  {id:"details",label:"Details"},
+  {id:"documents",label:"Documents & Media"},
+  {id:"denialRecords",label:"Deny Service Records"},
+  {id:"videoRequests",label:"Video Requests"}
+];
+const SECTION_DEFS = [
+  {id:"sec-findings",label:"Findings"},
+  {id:"sec-overview",label:"Overview"},
+  {id:"sec-details",label:"Details"},
+  {id:"sec-narrative",label:"Original Narrative"},
+  {id:"sec-subject",label:"Subject"},
+  {id:"sec-documents",label:"Documents & Media"},
+  {id:"sec-dns",label:"Deny Service Records"},
+  {id:"sec-vr",label:"Video Requests"}
+];
+let hiddenFields = JSON.parse(localStorage.getItem("hiddenFields")||"[]");
+let hiddenSections = JSON.parse(localStorage.getItem("hiddenSections")||"[]");
+
+function toggleSettings() {
+  const panel = document.getElementById("settings-panel");
+  panel.classList.toggle("open");
+  if (panel.classList.contains("open")) buildSettingsUI();
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll(".stab-content").forEach(function(el){el.classList.remove("active");});
+  document.querySelectorAll(".stab").forEach(function(el){el.classList.remove("active");});
+  document.getElementById(tabId).classList.add("active");
+  event.target.classList.add("active");
+}
+
+function buildSettingsUI() {
+  const ft = document.getElementById("field-toggles");
+  ft.innerHTML = FIELD_DEFS.map(function(f){
+    const checked = hiddenFields.indexOf(f.id)<0;
+    return "<label class='settings-check'><input type='checkbox' "+(checked?"checked":"")+" onchange=\"toggleField('"+f.id+"',this.checked)\"/> "+f.label+"</label>";
+  }).join("");
+  const st = document.getElementById("section-toggles");
+  st.innerHTML = SECTION_DEFS.map(function(s){
+    const checked = hiddenSections.indexOf(s.id)<0;
+    return "<label class='settings-check'><input type='checkbox' "+(checked?"checked":"")+" onchange=\"toggleSection('"+s.id+"',this.checked)\"/> "+s.label+"</label>";
+  }).join("");
+}
+
+function toggleField(id, visible) {
+  if (visible) hiddenFields = hiddenFields.filter(function(x){return x!==id;});
+  else if (hiddenFields.indexOf(id)<0) hiddenFields.push(id);
+  localStorage.setItem("hiddenFields", JSON.stringify(hiddenFields));
+  if (selectedId) { const r=irItems.find(function(x){return x.id===selectedId;}); if(r) renderDetail(r); }
+}
+
+function toggleSection(id, visible) {
+  if (visible) hiddenSections = hiddenSections.filter(function(x){return x!==id;});
+  else if (hiddenSections.indexOf(id)<0) hiddenSections.push(id);
+  localStorage.setItem("hiddenSections", JSON.stringify(hiddenSections));
+  if (selectedId) { const r=irItems.find(function(x){return x.id===selectedId;}); if(r) renderDetail(r); }
+}
+
+function isSectionVisible(id) { return hiddenSections.indexOf(id)<0; }
+
+// Status bar
+const AP_STATUSES = ["YES - AP ACTION NEEDED","AP Review Completed","No - AP Action is not needed"];
+const HR_STATUSES = ["Termination","Final Written","Written Warning","Coaching","No HR Action Needed"];
+const RETAIN_STATUSES = ["Yes - Retain Video","No"];
+const DENY_STATUSES = ["Deny Service","No Deny Service"];
+
+function updateStatusBar(r) {
+  const bar = document.getElementById("status-bar");
+  if (!r) { bar.style.display="none"; return; }
+  bar.style.display="flex";
+  const apBtn = document.getElementById("sb-ap");
+  apBtn.textContent = "AP: "+(r.apFollowUp||"—");
+  apBtn.className = "sbutton"+(r.apFollowUp&&r.apFollowUp.includes("Completed")?" active-green":r.apFollowUp&&r.apFollowUp.includes("NEEDED")?" active-red":"");
+  const retBtn = document.getElementById("sb-retain");
+  retBtn.textContent = "Retain Video: "+((r.retainVideo||"").includes("Yes")?"Yes":"No");
+  retBtn.className = "sbutton"+((r.retainVideo||"").includes("Yes")?" active-blue":"");
+  const hrBtn = document.getElementById("sb-hr");
+  hrBtn.textContent = "HR: "+(r.hrRec&&r.hrRec!=="—"?r.hrRec:"—");
+  hrBtn.className = "sbutton"+(r.hrRec&&r.hrRec!=="—"?" active-red":"");
+  const denyBtn = document.getElementById("sb-deny");
+  const ds = getLinkedDS(r);
+  denyBtn.textContent = "DNS: "+(ds.length?ds[0].status||"On file":"None");
+  denyBtn.className = "sbutton"+(ds.length?" active-red":"");
+}
+
+async function cycleStatus(type) {
+  if (!selectedId) return;
+  const r = irItems.find(function(x){return x.id===selectedId;});
+  if (!r) return;
+  let colId, statuses, current, prop;
+  if (type==="ap") { colId="dup__of_hr_decision____1"; statuses=AP_STATUSES; current=r.apFollowUp; prop="apFollowUp"; }
+  else if (type==="retain") { colId="deny_service__"; statuses=RETAIN_STATUSES; current=r.retainVideo; prop="retainVideo"; }
+  else if (type==="hr") { colId="status_1__1"; statuses=HR_STATUSES; current=r.hrRec; prop="hrRec"; }
+  else if (type==="deny") { alert("Deny Service records are managed on the DNS board — open Monday.com to update."); return; }
+  const idx = statuses.indexOf(current);
+  const next = statuses[(idx+1)%statuses.length];
+  const ok = await updateColumn(selectedId, IR_BOARD, colId, next, "status");
+  if (ok) {
+    r[prop] = next;
+    updateStatusBar(r);
+    renderList();
+    const btn = document.getElementById("sb-"+type);
+    const orig = btn.textContent;
+    btn.textContent = "Saved!";
+    setTimeout(function(){ updateStatusBar(r); }, 1500);
+  }
 }
 
 async function init() {
