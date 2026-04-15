@@ -100,6 +100,20 @@ button:hover{background:#f5f5f5;}
 .settings-row{display:flex;flex-wrap:wrap;gap:8px;}
 .settings-check{display:flex;align-items:center;gap:5px;font-size:12px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:4px 10px;cursor:pointer;}
 .settings-check input{margin:0;}
+.drag-list{display:flex;flex-direction:column;gap:6px;max-width:400px;}
+.drag-item{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e0e0e0;border-radius:6px;padding:7px 12px;cursor:grab;font-size:12px;user-select:none;}
+.drag-item:active{cursor:grabbing;}
+.drag-item.dragging{opacity:.4;border-style:dashed;}
+.drag-item.drag-over{border-color:#3a7bd5;background:#e8f0fb;}
+.drag-handle{color:#bbb;font-size:14px;cursor:grab;}
+.drag-item input{margin:0;}
+.status-dropdown{position:relative;display:inline-block;}
+.status-dropdown-menu{position:absolute;top:100%;left:0;z-index:200;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:220px;padding:4px 0;margin-top:4px;display:none;}
+.status-dropdown-menu.open{display:block;}
+.status-option{padding:7px 14px;font-size:12px;cursor:pointer;white-space:nowrap;}
+.status-option:hover{background:#f0f4ff;}
+.status-option.current{font-weight:600;color:#2d3a4a;}
+.status-saving{font-size:11px;color:#888;padding:7px 14px;}
 </style>
 </head>
 <body>
@@ -118,16 +132,16 @@ button:hover{background:#f5f5f5;}
 </div>
 <div class="settings-panel" id="settings-panel">
   <div class="settings-tabs">
-    <button class="stab active" onclick="switchTab('tab-fields')">Visible Fields</button>
-    <button class="stab" onclick="switchTab('tab-sections')">Sections</button>
+    <button class="stab active" onclick="switchTab('tab-sections')">Section Order</button>
+    <button class="stab" onclick="switchTab('tab-fields')">Visible Fields</button>
   </div>
-  <div id="tab-fields" class="stab-content active">
+  <div id="tab-sections" class="stab-content active">
+    <div style="font-size:11px;color:#888;margin-bottom:10px;">Drag to reorder sections. Uncheck to hide.</div>
+    <div class="drag-list" id="section-drag-list"></div>
+  </div>
+  <div id="tab-fields" class="stab-content">
     <div style="font-size:11px;color:#888;margin-bottom:8px;">Toggle which fields appear in the case detail view</div>
     <div class="settings-row" id="field-toggles"></div>
-  </div>
-  <div id="tab-sections" class="stab-content">
-    <div style="font-size:11px;color:#888;margin-bottom:8px;">Toggle which sections appear in the case detail view</div>
-    <div class="settings-row" id="section-toggles"></div>
   </div>
 </div>
 <div class="filter-row">
@@ -162,10 +176,22 @@ button:hover{background:#f5f5f5;}
 </div>
 <div id="status-bar" class="status-bar" style="display:none;">
   <span class="status-bar-label">Quick actions:</span>
-  <button class="sbutton" id="sb-ap" onclick="cycleStatus('ap')">AP Follow-up: —</button>
-  <button class="sbutton" id="sb-retain" onclick="cycleStatus('retain')">Retain Video: —</button>
-  <button class="sbutton" id="sb-deny" onclick="cycleStatus('deny')">Deny Service: —</button>
-  <button class="sbutton" id="sb-hr" onclick="cycleStatus('hr')">HR Review: —</button>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-ap" onclick="toggleStatusDropdown('dd-ap',event)">AP Follow-up: —</button>
+    <div class="status-dropdown-menu" id="dd-ap"></div>
+  </div>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-retain" onclick="toggleStatusDropdown('dd-retain',event)">Retain Video: —</button>
+    <div class="status-dropdown-menu" id="dd-retain"></div>
+  </div>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-hr" onclick="toggleStatusDropdown('dd-hr',event)">HR Review: —</button>
+    <div class="status-dropdown-menu" id="dd-hr"></div>
+  </div>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-deny" onclick="toggleStatusDropdown('dd-deny',event)">DNS: —</button>
+    <div class="status-dropdown-menu" id="dd-deny"></div>
+  </div>
 </div>
 <div class="main">
   <div class="list" id="list-panel">
@@ -478,6 +504,79 @@ function renderDetail(r) {
       "</div></div>";
   }).join("") : "<div style=\"font-size:13px;color:#999;padding:6px 0\">No deny service records linked.</div>";
 
+  const SECTIONS = {
+    "sec-findings":
+      "<div class=\"sec\" id=\"sec-findings\"><div class=\"sec-title\">Findings</div><div class=\"fgrid\">"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">AP findings</div>"+
+          "<textarea id=\"edit-apFindings\">"+(r.apFindings&&r.apFindings!=="—"?r.apFindings:"")+"</textarea>"+
+          "<div class=\"fedit-actions\">"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
+          "</div></div>"+
+        "<div class=\"f full\"><div class=\"flabel\">HR recommendation and findings</div><div class=\"fval\">"+getIRValue(r,"hrRec")+"</div></div>"+
+        "<div class=\"f full\"><div class=\"flabel\">Interview narrative</div><div class=\"fval\">"+getIRValue(r,"interviewNarrative")+"</div></div>"+
+      "</div></div>",
+    "sec-overview":
+      "<div class=\"sec\" id=\"sec-overview\"><div class=\"sec-title\">Overview</div><div class=\"fgrid\">"+
+        "<div class=\"f\"><div class=\"flabel\">Case ID</div><div class=\"fval\">"+cid+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(r.date||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Incident time</div><div class=\"fval\">"+(r.incidentTime||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(r.branch||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">District leader</div><div class=\"fval\">"+(r.district||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Location</div><div class=\"fval\">"+(r.location||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Specific location</div><div class=\"fval\">"+(r.specificLocation||"—")+"</div></div>"+
+      "</div></div>",
+    "sec-details":
+      "<div class=\"sec\" id=\"sec-details\"><div class=\"sec-title\">Details</div><div class=\"fgrid\">"+
+        "<div class=\"f\"><div class=\"flabel\">Category</div><div class=\"fval\">"+(r.category||"—")+"</div></div>"+
+        "<div class=\"f half\"><div class=\"flabel\">Incident type</div><div class=\"fval\">"+getIncidentTypes(r)+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">AP follow-up</div><div class=\"fval\">"+(r.apFollowUp||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Deny service</div><div class=\"fval\">"+(r.denyService||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Retain video</div>"+
+          "<select id=\"edit-retainVideo\" onchange=\"saveRetainVideo(\'"+r.id+"\',this.value)\" style=\"font-size:12px;margin-top:2px;\">"+
+            "<option value=\"Yes - Retain Video\""+((r.retainVideo||"").includes("Yes")?" selected":"")+">Yes - Retain Video</option>"+
+            "<option value=\"No\""+((r.retainVideo||"")==="No"?" selected":"")+">No</option>"+
+          "</select>"+
+        "</div>"+
+      "</div></div>",
+    "sec-narrative":
+      "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative</div>"+
+        "<div class=\"fval\" style=\"background:#f9f9f9;padding:10px 12px;border-radius:6px;border:1px solid #eee;\">"+getIRValue(r,"narrative")+"</div>"+
+      "</div>",
+    "sec-subject":
+      "<div class=\"sec\" id=\"sec-subject\"><div class=\"sec-title\">Subject</div><div class=\"fgrid\">"+
+        "<div class=\"f\"><div class=\"flabel\">Subject name</div><div class=\"fval\">"+(r.subjectName||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Subject type</div><div class=\"fval\">"+(r.subjectType||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Injuries</div><div class=\"fval\">"+(r.injuries||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Property damage</div><div class=\"fval\">"+(r.propertyDamage||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Police report #</div><div class=\"fval\">"+(r.policeReport||"—")+"</div></div>"+
+      "</div></div>",
+    "sec-documents":
+      "<div class=\"sec\" id=\"sec-documents\"><div class=\"sec-title\">Documents and media</div><div class=\"fgrid\">"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">OneDrive video link</div>"+
+          "<div style=\"display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;\">"+
+            "<input type=\"text\" id=\"edit-oneDriveLink\" value=\""+el+"\" placeholder=\"Paste OneDrive link...\" style=\"flex:1;min-width:200px;\"/>"+
+            (el?"<a href=\""+el+"\" target=\"_blank\" style=\"font-size:11px;color:#3a7bd5;\">Open</a>":"")+
+          "</div>"+
+          "<div class=\"fedit-actions\">"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveOneDriveLink(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<button class=\"btn-small\" onclick=\"document.getElementById(\'edit-oneDriveLink\').value=\'\'\">Clear</button>"+
+            "<span id=\"msg-oneDriveLink\" class=\"save-msg\"></span>"+
+          "</div>"+
+        "</div>"+
+      "</div></div>",
+    "sec-dns":
+      "<div class=\"sec\" id=\"sec-dns\"><div class=\"sec-title\">Deny service records ("+ds.length+")</div>"+dsHTML+"</div>",
+    "sec-vr":
+      "<div class=\"sec\" id=\"sec-vr\"><div class=\"sec-title\">Video requests ("+vrs.length+")</div>"+vrHTML+"</div>"
+  };
+
+  const sectionsHTML = sectionOrder
+    .filter(function(sid){ return isSectionVisible(sid) && SECTIONS[sid]; })
+    .map(function(sid){ return SECTIONS[sid]; })
+    .join("");
+
   document.getElementById("detail-panel").innerHTML =
     "<div class=\"card\">"+
     "<div class=\"card-header\">"+
@@ -492,70 +591,7 @@ function renderDetail(r) {
       ((r.retainVideo||"").includes("Yes")?"<span class=\"badge bg-blue\">Video retained</span>":"")+
       (ds.length?"<span class=\"badge bg-red\">DNS: "+(ds[0].status||"Yes")+"</span>":"")+
     "</div>"+
-
-    "<div class=\"sec\"><div class=\"sec-title\">Findings</div><div class=\"fgrid\">"+
-      "<div class=\"f full fedit\"><div class=\"flabel\">AP findings</div>"+
-        "<textarea id=\"edit-apFindings\">"+(r.apFindings&&r.apFindings!=="—"?r.apFindings:"")+"</textarea>"+
-        "<div class=\"fedit-actions\">"+
-          "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings(\'"+r.id+"\')\">Save to Monday</button>"+
-          "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
-        "</div></div>"+
-      "<div class=\"f full\"><div class=\"flabel\">HR recommendation and findings</div><div class=\"fval\">"+getIRValue(r,"hrRec")+"</div></div>"+
-      "<div class=\"f full\"><div class=\"flabel\">Interview narrative</div><div class=\"fval\">"+getIRValue(r,"interviewNarrative")+"</div></div>"+
-    "</div></div>"+
-
-    "<div class=\"sec\"><div class=\"sec-title\">Overview</div><div class=\"fgrid\">"+
-      "<div class=\"f\"><div class=\"flabel\">Case ID</div><div class=\"fval\">"+cid+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(r.date||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Incident time</div><div class=\"fval\">"+(r.incidentTime||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(r.branch||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">District leader</div><div class=\"fval\">"+(r.district||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Location</div><div class=\"fval\">"+(r.location||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Specific location</div><div class=\"fval\">"+(r.specificLocation||"—")+"</div></div>"+
-    "</div></div>"+
-
-    "<div class=\"sec\"><div class=\"sec-title\">Details</div><div class=\"fgrid\">"+
-      "<div class=\"f\"><div class=\"flabel\">Category</div><div class=\"fval\">"+(r.category||"—")+"</div></div>"+
-      "<div class=\"f half\"><div class=\"flabel\">Incident type</div><div class=\"fval\">"+getIncidentTypes(r)+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">AP follow-up</div><div class=\"fval\">"+(r.apFollowUp||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Deny service</div><div class=\"fval\">"+(r.denyService||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Retain video</div>"+
-        "<select id=\"edit-retainVideo\" onchange=\"saveRetainVideo(\'"+r.id+"\',this.value)\" style=\"font-size:12px;margin-top:2px;\">"+
-          "<option value=\"Yes - Retain Video\""+((r.retainVideo||"").includes("Yes")?" selected":"")+">Yes - Retain Video</option>"+
-          "<option value=\"No\""+((r.retainVideo||"")==="No"?" selected":"")+">No</option>"+
-        "</select>"+
-      "</div>"+
-    "</div></div>"+
-
-    "<div class=\"sec\"><div class=\"sec-title\">Original narrative</div>"+
-      "<div class=\"fval\" style=\"background:#f9f9f9;padding:10px 12px;border-radius:6px;border:1px solid #eee;\">"+getIRValue(r,"narrative")+"</div>"+
-    "</div>"+
-
-    "<div class=\"sec\"><div class=\"sec-title\">Subject</div><div class=\"fgrid\">"+
-      "<div class=\"f\"><div class=\"flabel\">Subject name</div><div class=\"fval\">"+(r.subjectName||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Subject type</div><div class=\"fval\">"+(r.subjectType||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Injuries</div><div class=\"fval\">"+(r.injuries||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Property damage</div><div class=\"fval\">"+(r.propertyDamage||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Police report #</div><div class=\"fval\">"+(r.policeReport||"—")+"</div></div>"+
-    "</div></div>"+
-
-    "<div class=\"sec\"><div class=\"sec-title\">Documents and media</div><div class=\"fgrid\">"+
-      "<div class=\"f full fedit\"><div class=\"flabel\">OneDrive video link</div>"+
-        "<div style=\"display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;\">"+
-          "<input type=\"text\" id=\"edit-oneDriveLink\" value=\""+el+"\" placeholder=\"Paste OneDrive link...\" style=\"flex:1;min-width:200px;\"/>"+
-          (el?"<a href=\""+el+"\" target=\"_blank\" style=\"font-size:11px;color:#3a7bd5;\">Open</a>":"")+
-        "</div>"+
-        "<div class=\"fedit-actions\">"+
-          "<button class=\"btn-primary btn-small\" onclick=\"saveOneDriveLink(\'"+r.id+"\')\">Save to Monday</button>"+
-          "<button class=\"btn-small\" onclick=\"document.getElementById(\'edit-oneDriveLink\').value=\'\'\" >Clear</button>"+
-          "<span id=\"msg-oneDriveLink\" class=\"save-msg\"></span>"+
-        "</div>"+
-      "</div>"+
-    "</div></div>"+
-
-    "<div class=\"sec\"><div class=\"sec-title\">Deny service records ("+ds.length+")</div>"+dsHTML+"</div>"+
-    "<div class=\"sec\"><div class=\"sec-title\">Video requests ("+vrs.length+")</div>"+vrHTML+"</div>"+
+    sectionsHTML+
     "</div>";
 }
 
@@ -725,9 +761,14 @@ const SECTION_DEFS = [
   {id:"sec-dns",label:"Deny Service Records"},
   {id:"sec-vr",label:"Video Requests"}
 ];
+const DEFAULT_SECTION_ORDER = SECTION_DEFS.map(function(s){return s.id;});
+let sectionOrder = JSON.parse(localStorage.getItem("sectionOrder")||JSON.stringify(DEFAULT_SECTION_ORDER));
+// Make sure any new sections not in saved order get appended
+SECTION_DEFS.forEach(function(s){ if(sectionOrder.indexOf(s.id)<0) sectionOrder.push(s.id); });
 let hiddenFields = JSON.parse(localStorage.getItem("hiddenFields")||"[]");
 let hiddenSections = JSON.parse(localStorage.getItem("hiddenSections")||"[]");
 
+// ── Settings panel ──────────────────────────────────────────
 function toggleSettings() {
   const panel = document.getElementById("settings-panel");
   panel.classList.toggle("open");
@@ -742,16 +783,55 @@ function switchTab(tabId) {
 }
 
 function buildSettingsUI() {
+  // Field toggles
   const ft = document.getElementById("field-toggles");
   ft.innerHTML = FIELD_DEFS.map(function(f){
     const checked = hiddenFields.indexOf(f.id)<0;
     return "<label class='settings-check'><input type='checkbox' "+(checked?"checked":"")+" onchange=\"toggleField('"+f.id+"',this.checked)\"/> "+f.label+"</label>";
   }).join("");
-  const st = document.getElementById("section-toggles");
-  st.innerHTML = SECTION_DEFS.map(function(s){
-    const checked = hiddenSections.indexOf(s.id)<0;
-    return "<label class='settings-check'><input type='checkbox' "+(checked?"checked":"")+" onchange=\"toggleSection('"+s.id+"',this.checked)\"/> "+s.label+"</label>";
+  // Section drag list
+  buildSectionDragList();
+}
+
+function buildSectionDragList() {
+  const list = document.getElementById("section-drag-list");
+  list.innerHTML = sectionOrder.map(function(sid){
+    const def = SECTION_DEFS.find(function(s){return s.id===sid;});
+    if (!def) return "";
+    const visible = hiddenSections.indexOf(sid)<0;
+    return "<div class='drag-item' draggable='true' data-id='"+sid+"' ondragstart='dragStart(event)' ondragover='dragOver(event)' ondrop='dropSection(event)' ondragleave='dragLeave(event)'>"+
+      "<span class='drag-handle'>⠿</span>"+
+      "<input type='checkbox' "+(visible?"checked":"")+" onchange=\"toggleSection('"+sid+"',this.checked)\"/>"+
+      "<span>"+def.label+"</span>"+
+    "</div>";
   }).join("");
+}
+
+let dragSrcId = null;
+function dragStart(e) {
+  dragSrcId = e.currentTarget.dataset.id;
+  e.currentTarget.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+}
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  e.currentTarget.classList.add("drag-over");
+}
+function dragLeave(e) { e.currentTarget.classList.remove("drag-over"); }
+function dropSection(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove("drag-over");
+  const targetId = e.currentTarget.dataset.id;
+  if (!dragSrcId || dragSrcId === targetId) return;
+  const srcIdx = sectionOrder.indexOf(dragSrcId);
+  const tgtIdx = sectionOrder.indexOf(targetId);
+  sectionOrder.splice(srcIdx, 1);
+  sectionOrder.splice(tgtIdx, 0, dragSrcId);
+  dragSrcId = null;
+  localStorage.setItem("sectionOrder", JSON.stringify(sectionOrder));
+  buildSectionDragList();
+  if (selectedId) { const r=irItems.find(function(x){return x.id===selectedId;}); if(r) renderDetail(r); }
 }
 
 function toggleField(id, visible) {
@@ -770,11 +850,21 @@ function toggleSection(id, visible) {
 
 function isSectionVisible(id) { return hiddenSections.indexOf(id)<0; }
 
-// Status bar
-const AP_STATUSES = ["YES - AP ACTION NEEDED","AP Review Completed","No - AP Action is not needed"];
-const HR_STATUSES = ["Termination","Final Written","Written Warning","Coaching","No HR Action Needed"];
-const RETAIN_STATUSES = ["Yes - Retain Video","No"];
-const DENY_STATUSES = ["Deny Service","No Deny Service"];
+// ── Status bar with live dropdowns ───────────────────────────
+let columnOptionsCache = {};
+
+async function fetchColumnOptions(colId) {
+  if (columnOptionsCache[colId]) return columnOptionsCache[colId];
+  try {
+    const q = "{boards(ids:"+IR_BOARD+"){columns(ids:[\""+colId+"\"]){settings_str}}}";
+    const data = await gql(q);
+    const settings = JSON.parse(data?.data?.boards?.[0]?.columns?.[0]?.settings_str||"{}");
+    const labels = settings.labels || {};
+    const options = Object.values(labels).filter(Boolean);
+    columnOptionsCache[colId] = options;
+    return options;
+  } catch(e) { return []; }
+}
 
 function updateStatusBar(r) {
   const bar = document.getElementById("status-bar");
@@ -784,37 +874,77 @@ function updateStatusBar(r) {
   apBtn.textContent = "AP: "+(r.apFollowUp||"—");
   apBtn.className = "sbutton"+(r.apFollowUp&&r.apFollowUp.includes("Completed")?" active-green":r.apFollowUp&&r.apFollowUp.includes("NEEDED")?" active-red":"");
   const retBtn = document.getElementById("sb-retain");
-  retBtn.textContent = "Retain Video: "+((r.retainVideo||"").includes("Yes")?"Yes":"No");
+  retBtn.textContent = "Retain: "+((r.retainVideo||"").includes("Yes")?"Yes":"No");
   retBtn.className = "sbutton"+((r.retainVideo||"").includes("Yes")?" active-blue":"");
   const hrBtn = document.getElementById("sb-hr");
   hrBtn.textContent = "HR: "+(r.hrRec&&r.hrRec!=="—"?r.hrRec:"—");
   hrBtn.className = "sbutton"+(r.hrRec&&r.hrRec!=="—"?" active-red":"");
-  const denyBtn = document.getElementById("sb-deny");
   const ds = getLinkedDS(r);
+  const denyBtn = document.getElementById("sb-deny");
   denyBtn.textContent = "DNS: "+(ds.length?ds[0].status||"On file":"None");
   denyBtn.className = "sbutton"+(ds.length?" active-red":"");
 }
 
-async function cycleStatus(type) {
+function toggleStatusDropdown(ddId, e) {
+  e.stopPropagation();
+  const dd = document.getElementById(ddId);
+  const isOpen = dd.classList.contains("open");
+  // Close all dropdowns first
+  document.querySelectorAll(".status-dropdown-menu").forEach(function(el){el.classList.remove("open");});
+  if (!isOpen) {
+    dd.classList.add("open");
+    populateDropdown(ddId);
+  }
+}
+
+document.addEventListener("click", function(){
+  document.querySelectorAll(".status-dropdown-menu").forEach(function(el){el.classList.remove("open");});
+});
+
+async function populateDropdown(ddId) {
   if (!selectedId) return;
   const r = irItems.find(function(x){return x.id===selectedId;});
   if (!r) return;
-  let colId, statuses, current, prop;
-  if (type==="ap") { colId="dup__of_hr_decision____1"; statuses=AP_STATUSES; current=r.apFollowUp; prop="apFollowUp"; }
-  else if (type==="retain") { colId="deny_service__"; statuses=RETAIN_STATUSES; current=r.retainVideo; prop="retainVideo"; }
-  else if (type==="hr") { colId="status_1__1"; statuses=HR_STATUSES; current=r.hrRec; prop="hrRec"; }
-  else if (type==="deny") { alert("Deny Service records are managed on the DNS board — open Monday.com to update."); return; }
-  const idx = statuses.indexOf(current);
-  const next = statuses[(idx+1)%statuses.length];
-  const ok = await updateColumn(selectedId, IR_BOARD, colId, next, "status");
+  const dd = document.getElementById(ddId);
+  dd.innerHTML = "<div class='status-saving'>Loading options...</div>";
+
+  let colId, prop, current;
+  if (ddId==="dd-ap")     { colId="dup__of_hr_decision____1"; prop="apFollowUp";  current=r.apFollowUp; }
+  else if (ddId==="dd-retain") { colId="deny_service__";    prop="retainVideo"; current=r.retainVideo; }
+  else if (ddId==="dd-hr")    { colId="status_1__1";        prop="hrRec";       current=r.hrRec; }
+  else if (ddId==="dd-deny")  {
+    dd.innerHTML = "<div class='status-saving' style='color:#c0392b;'>DNS records are managed on the DNS board in Monday.com</div>";
+    return;
+  }
+
+  const options = await fetchColumnOptions(colId);
+  if (!options.length) {
+    dd.innerHTML = "<div class='status-saving'>No options found</div>";
+    return;
+  }
+  dd.innerHTML = options.map(function(opt){
+    const isCurrent = opt === current;
+    return "<div class='status-option"+(isCurrent?" current":"")+"' onclick='selectStatus(\""+ddId+"\",\""+colId+"\",\""+prop+"\",\""+opt.replace(/"/g,"&quot;")+"\")'>"+
+      (isCurrent?"✓ ":"")+opt+
+    "</div>";
+  }).join("");
+}
+
+async function selectStatus(ddId, colId, prop, value) {
+  if (!selectedId) return;
+  const r = irItems.find(function(x){return x.id===selectedId;});
+  if (!r) return;
+  const dd = document.getElementById(ddId);
+  dd.innerHTML = "<div class='status-saving'>Saving...</div>";
+  const ok = await updateColumn(selectedId, IR_BOARD, colId, value, "status");
+  dd.classList.remove("open");
   if (ok) {
-    r[prop] = next;
+    r[prop] = value;
     updateStatusBar(r);
     renderList();
-    const btn = document.getElementById("sb-"+type);
-    const orig = btn.textContent;
-    btn.textContent = "Saved!";
-    setTimeout(function(){ updateStatusBar(r); }, 1500);
+    if (selectedId) renderDetail(r);
+  } else {
+    alert("Save failed — please try again.");
   }
 }
 
