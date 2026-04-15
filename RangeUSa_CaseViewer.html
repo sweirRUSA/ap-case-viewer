@@ -28,8 +28,26 @@ button:hover{background:#f5f5f5;}
 .item-meta{display:grid;grid-template-columns:1fr 1fr;gap:2px 6px;}
 .item-meta span{font-size:10px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .item-meta .lbl{color:#aaa;}
-.detail{flex:1;overflow-y:auto;padding:14px;}
-.card{background:#fff;border-radius:10px;border:1px solid #e0e0e0;padding:16px 18px;max-width:1100px;}
+.detail{flex:1;overflow-y:auto;padding:14px;min-width:0;}
+.card{background:#fff;border-radius:10px;border:1px solid #e0e0e0;padding:16px 18px;}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.card-name{font-size:15px;font-weight:600;}
+.card-caseid{font-size:11px;color:#999;margin-top:2px;}
+.preview-panel{width:320px;min-width:320px;border-left:1px solid #e0e0e0;background:#f9f9f9;display:flex;flex-direction:column;overflow:hidden;}
+.preview-panel.empty-preview{display:flex;align-items:center;justify-content:center;}
+.preview-header{padding:10px 14px;font-size:11px;font-weight:700;color:#2d3a4a;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #e0e0e0;background:#fff;display:flex;justify-content:space-between;align-items:center;}
+.preview-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.preview-thumb{border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;background:#fff;cursor:pointer;}
+.preview-thumb img{width:100%;height:180px;object-fit:cover;display:block;}
+.preview-thumb-label{font-size:11px;color:#555;padding:6px 10px;border-top:1px solid #f0f0f0;}
+.preview-doc{border-radius:8px;border:1px solid #e0e0e0;background:#fff;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;}
+.preview-doc-icon{font-size:28px;flex-shrink:0;}
+.preview-doc-info{flex:1;min-width:0;}
+.preview-doc-name{font-size:12px;font-weight:500;color:#2d3a4a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.preview-doc-sub{font-size:10px;color:#aaa;margin-top:2px;}
+.preview-empty{text-align:center;color:#bbb;font-size:12px;padding:40px 20px;}
+.preview-fullimg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.preview-fullimg img{max-width:90vw;max-height:90vh;border-radius:8px;}
 .card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .card-name{font-size:15px;font-weight:600;}
 .card-caseid{font-size:11px;color:#999;margin-top:2px;}
@@ -216,9 +234,21 @@ button:hover{background:#f5f5f5;}
   <div class="detail" id="detail-panel">
     <div class="empty">Select a case from the list</div>
   </div>
+  <div class="preview-panel" id="preview-panel">
+    <div class="preview-header">
+      <span>Files &amp; Media</span>
+      <span id="preview-count" style="font-size:10px;color:#aaa;font-weight:400;"></span>
+    </div>
+    <div class="preview-body" id="preview-body">
+      <div class="preview-empty">Select a case to preview files</div>
+    </div>
+  </div>
 </div>
 <div class="modal-overlay" id="vr-modal" style="display:none" onclick="closeModal(event)">
   <div class="modal" id="vr-modal-content"></div>
+</div>
+<div class="preview-fullimg" id="preview-fullimg" style="display:none" onclick="this.style.display='none'">
+  <img id="preview-fullimg-src" src="" alt="preview"/>
 </div>
 <script>
 const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY0NTkzMzIyMywiYWFpIjoxMSwidWlkIjo1OTA4NDY1LCJpYWQiOiIyMDI2LTA0LTE1VDEyOjI1OjI5LjQ5M1oiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjoyNjYzMjIyLCJyZ24iOiJ1c2UxIn0.rgL69-eLXXiuFRVqngxm37G0nWb4DB1EvCXS9ROmcKY";
@@ -340,6 +370,11 @@ function getIncidentTypes(r) {
   return [r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4].filter(Boolean).join(", ") || "—";
 }
 
+function stripPeriodSeparators(text) {
+  if (!text || text === "—") return "";
+  return text.replace(/\n\.\n/g, "\n\n").replace(/^\.\n?/, "").replace(/\n?\.$/, "").trim();
+}
+
 function getIRValue(r, key) {
   if (key==="narrative") return cleanNarrative([r.narrative1,r.narrative2,r.narrative3,r.narrative4]) || "—";
   if (key==="hrRec") {
@@ -347,7 +382,10 @@ function getIRValue(r, key) {
     const find = r.hrFindings && r.hrFindings!=="—" ? "Findings: "+r.hrFindings : "";
     return [rec,find].filter(Boolean).join("\n\n") || "—";
   }
-  if (key==="interviewNarrative") return cleanNarrative([r.interviewNarrative1,r.interviewNarrative2]) || "—";
+  if (key==="interviewNarrative") {
+    const combined = [r.interviewNarrative1, r.interviewNarrative2].filter(Boolean).join("\n\n");
+    return stripPeriodSeparators(combined) || "—";
+  }
   return r[key]||"—";
 }
 
@@ -428,19 +466,17 @@ function renderList() {
   const panel = document.getElementById("list-panel");
   if (!filtered.length) { panel.innerHTML="<div class=\"empty\">No cases match your filters.</div>"; return; }
   panel.innerHTML = filtered.map(function(r) {
-    const ds=getLinkedDS(r);
     return "<div class=\"list-item " + (selectedId===r.id?"active":"") + "\" onclick=\"selectItem(\'"+r.id+"\')\">"+
       "<div class=\"item-name\">"+displayName(r)+"</div>"+
       "<div class=\"item-caseid\">"+(r.caseId||r.pushableCaseId||r.id)+"</div>"+
       "<div class=\"item-meta\">"+
-        "<span><span class=\"lbl\">Branch </span>"+(r.branch||"—")+"</span>"+
         "<span><span class=\"lbl\">Date </span>"+(r.date||"—")+"</span>"+
         "<span><span class=\"lbl\">Category </span>"+(r.category||"—")+"</span>"+
         "<span><span class=\"lbl\">Type </span>"+getIncidentTypes(r).substring(0,22)+"</span>"+
+        "<span><span class=\"lbl\">Ownership </span>"+(r.currentOwnership||"—")+"</span>"+
         "<span><span class=\"lbl\">AP </span>"+(r.apFollowUp||"—")+"</span>"+
-        "<span><span class=\"lbl\">HR </span>"+(r.hrRec||"—")+"</span>"+
-        "<span><span class=\"lbl\">Video </span>"+(r.retainVideo||"—")+"</span>"+
-        "<span><span class=\"lbl\">DNS </span>"+(ds.length?ds[0].status||"Yes":"None")+"</span>"+
+        "<span><span class=\"lbl\">HR Review </span>"+(r.hrRec||"—")+"</span>"+
+        "<span><span class=\"lbl\">HR Rec </span>"+(r.hrRecommendation||"—")+"</span>"+
       "</div></div>";
   }).join("");
 }
@@ -449,7 +485,80 @@ function selectItem(id) {
   selectedId=id;
   const r=irItems.find(function(x){return x.id===id;});
   renderList();
-  if (r) { renderDetail(r); updateStatusBar(r); }
+  if (r) { renderDetail(r); updateStatusBar(r); renderPreview(r); }
+}
+
+function renderPreview(r) {
+  const body = document.getElementById("preview-body");
+  const count = document.getElementById("preview-count");
+  if (!r) { body.innerHTML="<div class='preview-empty'>Select a case to preview files</div>"; count.textContent=""; return; }
+
+  const files = [];
+
+  // Monday file columns — parse as JSON array of file objects
+  function parseFiles(raw, label) {
+    if (!raw || raw==="—") return;
+    try {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        arr.forEach(function(f){ files.push({url:f.url||f.public_download_url, name:f.name||label, type:f.asset_type||"file"}); });
+      }
+    } catch(e) {}
+  }
+  parseFiles(r.documents, "Document");
+  parseFiles(r.pictures, "Picture");
+
+  // OneDrive link
+  if (r.oneDriveLink && r.oneDriveLink!=="—") {
+    files.push({url:r.oneDriveLink, name:"OneDrive Video", type:"sharepoint"});
+  }
+
+  count.textContent = files.length ? files.length+" file"+(files.length>1?"s":"") : "";
+
+  if (!files.length) {
+    body.innerHTML="<div class='preview-empty'>No files attached to this case</div>";
+    return;
+  }
+
+  body.innerHTML = files.map(function(f){
+    const isImg = /\.(png|jpg|jpeg|gif|webp)/i.test(f.url||"") || f.type==="image";
+    const isPdf = /\.pdf/i.test(f.url||"") || f.type==="pdf";
+    const isSP  = f.type==="sharepoint" || /sharepoint|onedrive/i.test(f.url||"");
+
+    if (isImg) {
+      return "<div class='preview-thumb' onclick='openFullImg(\""+encodeURIComponent(f.url)+"\")'>"+
+        "<img src='"+f.url+"' alt='"+f.name+"' onerror='this.parentNode.style.display=\"none\"'/>"+
+        "<div class='preview-thumb-label'>"+f.name+"</div>"+
+      "</div>";
+    } else if (isSP) {
+      return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
+        "<div class='preview-doc-icon'>🎬</div>"+
+        "<div class='preview-doc-info'>"+
+          "<div class='preview-doc-name'>"+f.name+"</div>"+
+          "<div class='preview-doc-sub'>Open in SharePoint</div>"+
+        "</div></a>";
+    } else if (isPdf) {
+      return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
+        "<div class='preview-doc-icon'>📄</div>"+
+        "<div class='preview-doc-info'>"+
+          "<div class='preview-doc-name'>"+f.name+"</div>"+
+          "<div class='preview-doc-sub'>Click to open PDF</div>"+
+        "</div></a>";
+    } else {
+      return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
+        "<div class='preview-doc-icon'>📎</div>"+
+        "<div class='preview-doc-info'>"+
+          "<div class='preview-doc-name'>"+f.name+"</div>"+
+          "<div class='preview-doc-sub'>Click to open</div>"+
+        "</div></a>";
+    }
+  }).join("");
+}
+
+function openFullImg(encodedUrl) {
+  const url = decodeURIComponent(encodedUrl);
+  document.getElementById("preview-fullimg-src").src = url;
+  document.getElementById("preview-fullimg").style.display = "flex";
 }
 
 async function updateColumn(itemId, boardId, columnId, value, type) {
@@ -537,7 +646,7 @@ function renderDetail(r) {
             "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
           "</div></div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">HR findings</div>"+
-          "<textarea id=\"edit-hrFindings\">"+(r.hrFindings&&r.hrFindings!=="—"?r.hrFindings:"")+"</textarea>"+
+          "<textarea id=\"edit-hrFindings\">"+stripPeriodSeparators(r.hrFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveHrFindings(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-hrFindings\" class=\"save-msg\"></span>"+
@@ -545,7 +654,7 @@ function renderDetail(r) {
         "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div><div class=\"fval\">"+(r.hrRecommendation||"—")+"</div></div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative"+
           "<span style=\"font-size:10px;color:#aaa;font-weight:400;margin-left:8px;\">(auto-splits into 2 fields if over 2000 chars)</span></div>"+
-          "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+getIRValue(r,"interviewNarrative").replace(/^—$/,"")+"</textarea>"+
+          "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+stripPeriodSeparators([r.interviewNarrative1,r.interviewNarrative2].filter(Boolean).join("\n\n"))+"</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewNarrative(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-interviewNarrative\" class=\"save-msg\"></span>"+
