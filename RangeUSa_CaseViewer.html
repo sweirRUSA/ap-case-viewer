@@ -181,16 +181,32 @@ button:hover{background:#f5f5f5;}
     <div class="status-dropdown-menu" id="dd-ap"></div>
   </div>
   <div class="status-dropdown">
-    <button class="sbutton" id="sb-retain" onclick="toggleStatusDropdown('dd-retain',event)">Retain Video: —</button>
-    <div class="status-dropdown-menu" id="dd-retain"></div>
+    <button class="sbutton" id="sb-category" onclick="toggleStatusDropdown('dd-category',event)">Category: —</button>
+    <div class="status-dropdown-menu" id="dd-category"></div>
+  </div>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-video" onclick="toggleStatusDropdown('dd-video',event)">Video: —</button>
+    <div class="status-dropdown-menu" id="dd-video"></div>
+  </div>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-deny" onclick="toggleStatusDropdown('dd-deny',event)">Deny Service: —</button>
+    <div class="status-dropdown-menu" id="dd-deny"></div>
   </div>
   <div class="status-dropdown">
     <button class="sbutton" id="sb-hr" onclick="toggleStatusDropdown('dd-hr',event)">HR Review: —</button>
     <div class="status-dropdown-menu" id="dd-hr"></div>
   </div>
   <div class="status-dropdown">
-    <button class="sbutton" id="sb-deny" onclick="toggleStatusDropdown('dd-deny',event)">DNS: —</button>
-    <div class="status-dropdown-menu" id="dd-deny"></div>
+    <button class="sbutton" id="sb-hrrec" onclick="toggleStatusDropdown('dd-hrrec',event)">HR Rec: —</button>
+    <div class="status-dropdown-menu" id="dd-hrrec"></div>
+  </div>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-handshake" onclick="toggleStatusDropdown('dd-handshake',event)">Rich Handshake: —</button>
+    <div class="status-dropdown-menu" id="dd-handshake"></div>
+  </div>
+  <div class="status-dropdown">
+    <button class="sbutton" id="sb-ownership" onclick="toggleStatusDropdown('dd-ownership',event)">Ownership: —</button>
+    <div class="status-dropdown-menu" id="dd-ownership"></div>
   </div>
 </div>
 <div class="main">
@@ -233,7 +249,8 @@ const IR_COLS = {
   injuries:"dropdown58", propertyDamage:"ems_transport2",
   policeReport:"short_text_mkm825q2",
   oneDriveLink:"one_drive_link",
-  documents:"files", pictures:"files9"
+  documents:"files", pictures:"files9",
+  richHandshake:"color_mm0rs4kc", currentOwnership:"color_mm0q8n2x"
 };
 
 const VR_COLS = {
@@ -513,8 +530,21 @@ function renderDetail(r) {
             "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
           "</div></div>"+
-        "<div class=\"f full\"><div class=\"flabel\">HR recommendation and findings</div><div class=\"fval\">"+getIRValue(r,"hrRec")+"</div></div>"+
-        "<div class=\"f full\"><div class=\"flabel\">Interview narrative</div><div class=\"fval\">"+getIRValue(r,"interviewNarrative")+"</div></div>"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">HR findings</div>"+
+          "<textarea id=\"edit-hrFindings\">"+(r.hrFindings&&r.hrFindings!=="—"?r.hrFindings:"")+"</textarea>"+
+          "<div class=\"fedit-actions\">"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveHrFindings(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<span id=\"msg-hrFindings\" class=\"save-msg\"></span>"+
+          "</div></div>"+
+        "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div><div class=\"fval\">"+(r.hrRecommendation||"—")+"</div></div>"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative"+
+          "<span style=\"font-size:10px;color:#aaa;font-weight:400;margin-left:8px;\">(auto-splits into 2 fields if over 2000 chars)</span></div>"+
+          "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+getIRValue(r,"interviewNarrative").replace(/^—$/,"")+"</textarea>"+
+          "<div class=\"fedit-actions\">"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewNarrative(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<span id=\"msg-interviewNarrative\" class=\"save-msg\"></span>"+
+            "<span style=\"font-size:11px;color:#aaa;\" id=\"narrative-charcount\"></span>"+
+          "</div></div>"+
       "</div></div>",
     "sec-overview":
       "<div class=\"sec\" id=\"sec-overview\"><div class=\"sec-title\">Overview</div><div class=\"fgrid\">"+
@@ -533,12 +563,9 @@ function renderDetail(r) {
         "<div class=\"f half\"><div class=\"flabel\">Incident type</div><div class=\"fval\">"+getIncidentTypes(r)+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">AP follow-up</div><div class=\"fval\">"+(r.apFollowUp||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Deny service</div><div class=\"fval\">"+(r.denyService||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Retain video</div>"+
-          "<select id=\"edit-retainVideo\" onchange=\"saveRetainVideo(\'"+r.id+"\',this.value)\" style=\"font-size:12px;margin-top:2px;\">"+
-            "<option value=\"Yes - Retain Video\""+((r.retainVideo||"").includes("Yes")?" selected":"")+">Yes - Retain Video</option>"+
-            "<option value=\"No\""+((r.retainVideo||"")==="No"?" selected":"")+">No</option>"+
-          "</select>"+
-        "</div>"+
+        "<div class=\"f\"><div class=\"flabel\">Retain video</div><div class=\"fval\">"+(r.retainVideo||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Rich handshake</div><div class=\"fval\">"+(r.richHandshake||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Current ownership</div><div class=\"fval\">"+(r.currentOwnership||"—")+"</div></div>"+
       "</div></div>",
     "sec-narrative":
       "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative</div>"+
@@ -593,6 +620,21 @@ function renderDetail(r) {
     "</div>"+
     sectionsHTML+
     "</div>";
+
+  // Wire up interview narrative char counter
+  setTimeout(function(){
+    const ta = document.getElementById("edit-interviewNarrative");
+    const cc = document.getElementById("narrative-charcount");
+    if (ta && cc) {
+      function updateCount() {
+        const len = ta.value.length;
+        cc.textContent = len+" chars"+(len>2000?" — will split into 2 fields":"");
+        cc.style.color = len>2000?"#b07800":"#aaa";
+      }
+      ta.addEventListener("input", updateCount);
+      updateCount();
+    }
+  }, 50);
 }
 
 async function saveApFindings(itemId) {
@@ -870,19 +912,22 @@ function updateStatusBar(r) {
   const bar = document.getElementById("status-bar");
   if (!r) { bar.style.display="none"; return; }
   bar.style.display="flex";
-  const apBtn = document.getElementById("sb-ap");
-  apBtn.textContent = "AP: "+(r.apFollowUp||"—");
-  apBtn.className = "sbutton"+(r.apFollowUp&&r.apFollowUp.includes("Completed")?" active-green":r.apFollowUp&&r.apFollowUp.includes("NEEDED")?" active-red":"");
-  const retBtn = document.getElementById("sb-retain");
-  retBtn.textContent = "Retain: "+((r.retainVideo||"").includes("Yes")?"Yes":"No");
-  retBtn.className = "sbutton"+((r.retainVideo||"").includes("Yes")?" active-blue":"");
-  const hrBtn = document.getElementById("sb-hr");
-  hrBtn.textContent = "HR: "+(r.hrRec&&r.hrRec!=="—"?r.hrRec:"—");
-  hrBtn.className = "sbutton"+(r.hrRec&&r.hrRec!=="—"?" active-red":"");
-  const ds = getLinkedDS(r);
-  const denyBtn = document.getElementById("sb-deny");
-  denyBtn.textContent = "DNS: "+(ds.length?ds[0].status||"On file":"None");
-  denyBtn.className = "sbutton"+(ds.length?" active-red":"");
+
+  function setBtn(id, label, val, activeClass) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.textContent = label+": "+(val&&val!=="—"?val:"—");
+    btn.className = "sbutton"+(val&&val!=="—"?" "+(activeClass||"active-blue"):"");
+  }
+
+  setBtn("sb-ap",       "AP Follow-up",   r.apFollowUp,        r.apFollowUp&&r.apFollowUp.includes("Completed")?"active-green":"active-red");
+  setBtn("sb-category", "Category",       r.category,          "active-gray");
+  setBtn("sb-video",    "Video",          r.retainVideo,       (r.retainVideo||"").includes("Yes")?"active-blue":"");
+  setBtn("sb-deny",     "Deny Service",   r.denyService,       "active-red");
+  setBtn("sb-hr",       "HR Review",      r.hrRec,             "active-red");
+  setBtn("sb-hrrec",    "HR Rec",         r.hrRecommendation,  "active-orange");
+  setBtn("sb-handshake","Rich Handshake", r.richHandshake,     "active-green");
+  setBtn("sb-ownership","Ownership",      r.currentOwnership,  "active-blue");
 }
 
 function toggleStatusDropdown(ddId, e) {
@@ -908,26 +953,67 @@ async function populateDropdown(ddId) {
   const dd = document.getElementById(ddId);
   dd.innerHTML = "<div class='status-saving'>Loading options...</div>";
 
-  let colId, prop, current;
-  if (ddId==="dd-ap")     { colId="dup__of_hr_decision____1"; prop="apFollowUp";  current=r.apFollowUp; }
-  else if (ddId==="dd-retain") { colId="deny_service__";    prop="retainVideo"; current=r.retainVideo; }
-  else if (ddId==="dd-hr")    { colId="status_1__1";        prop="hrRec";       current=r.hrRec; }
-  else if (ddId==="dd-deny")  {
-    dd.innerHTML = "<div class='status-saving' style='color:#c0392b;'>DNS records are managed on the DNS board in Monday.com</div>";
-    return;
-  }
+  const MAP = {
+    "dd-ap":        {colId:"dup__of_hr_decision____1", prop:"apFollowUp"},
+    "dd-category":  {colId:"color_mknf4hd3",           prop:"category"},
+    "dd-video":     {colId:"deny_service__",            prop:"retainVideo"},
+    "dd-deny":      {colId:"district_leader",           prop:"denyService"},
+    "dd-hr":        {colId:"status_1__1",               prop:"hrRec"},
+    "dd-hrrec":     {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
+    "dd-handshake": {colId:"color_mm0rs4kc",            prop:"richHandshake"},
+    "dd-ownership": {colId:"color_mm0q8n2x",            prop:"currentOwnership"}
+  };
 
-  const options = await fetchColumnOptions(colId);
-  if (!options.length) {
-    dd.innerHTML = "<div class='status-saving'>No options found</div>";
-    return;
-  }
+  const entry = MAP[ddId];
+  if (!entry) { dd.innerHTML = "<div class='status-saving'>Not configurable here</div>"; return; }
+
+  const options = await fetchColumnOptions(entry.colId);
+  if (!options.length) { dd.innerHTML = "<div class='status-saving'>No options found</div>"; return; }
+
+  const current = r[entry.prop];
   dd.innerHTML = options.map(function(opt){
     const isCurrent = opt === current;
-    return "<div class='status-option"+(isCurrent?" current":"")+"' onclick='selectStatus(\""+ddId+"\",\""+colId+"\",\""+prop+"\",\""+opt.replace(/"/g,"&quot;")+"\")'>"+
+    return "<div class='status-option"+(isCurrent?" current":"")+"' onclick='selectStatus(\""+ddId+"\",\""+entry.colId+"\",\""+entry.prop+"\",\""+opt.replace(/"/g,"&quot;")+"\")'>"+
       (isCurrent?"✓ ":"")+opt+
     "</div>";
   }).join("");
+}
+
+async function saveHrFindings(itemId) {
+  const val = document.getElementById("edit-hrFindings").value;
+  const ok = await updateColumn(itemId, IR_BOARD, "long_text_mm0f4cbg", val, "longtext");
+  showMsg("msg-hrFindings", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.hrFindings=val; }
+}
+
+async function saveInterviewNarrative(itemId) {
+  const val = document.getElementById("edit-interviewNarrative").value;
+  const LIMIT = 2000;
+  let part1 = val, part2 = "";
+  if (val.length > LIMIT) {
+    // Split at last paragraph break before 2000 chars
+    let splitAt = val.lastIndexOf("\n\n", LIMIT);
+    if (splitAt < 1000) splitAt = val.lastIndexOf("\n", LIMIT);
+    if (splitAt < 1000) splitAt = val.lastIndexOf(". ", LIMIT);
+    if (splitAt < 0) splitAt = LIMIT;
+    part1 = val.substring(0, splitAt).trim();
+    part2 = val.substring(splitAt).trim();
+    // Add ". " separator between parts if needed
+    if (part2 && !part1.endsWith(".")) part1 = part1 + ".";
+  }
+  const ok1 = await updateColumn(itemId, IR_BOARD, "long_text__1", part1, "longtext");
+  let ok2 = true;
+  if (part2) {
+    ok2 = await updateColumn(itemId, IR_BOARD, "long_text3__1", part2, "longtext");
+  } else {
+    ok2 = await updateColumn(itemId, IR_BOARD, "long_text3__1", "", "longtext");
+  }
+  const ok = ok1 && ok2;
+  showMsg("msg-interviewNarrative", ok);
+  if (ok) {
+    const item = irItems.find(function(x){return x.id===itemId;});
+    if (item) { item.interviewNarrative1=part1; item.interviewNarrative2=part2; }
+  }
 }
 
 async function selectStatus(ddId, colId, prop, value) {
