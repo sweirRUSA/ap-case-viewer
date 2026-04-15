@@ -116,6 +116,27 @@ button:hover{background:#243447;}
 .status-option:hover{background:#1e3a5f;}
 .status-option.current{font-weight:600;color:#5a9fd4;}
 .status-saving{font-size:11px;color:#4a6a8a;padding:7px 14px;}
+.preview-panel{width:380px;min-width:380px;border-left:1px solid #1a2535;background:#1a2535;display:flex;flex-direction:column;overflow:hidden;}
+.preview-header{padding:10px 14px;font-size:11px;font-weight:700;color:#8fa8c0;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid #243447;background:#1a2535;display:flex;justify-content:space-between;align-items:center;}
+.preview-body{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;}
+.preview-thumb{border-radius:6px;overflow:hidden;background:#243447;cursor:pointer;position:relative;}
+.preview-thumb img{width:100%;height:200px;object-fit:cover;display:block;}
+.preview-thumb:hover img{opacity:.85;}
+.preview-thumb-label{font-size:11px;color:#8fa8c0;padding:5px 8px;background:#1e2e40;}
+.preview-doc{border-radius:6px;border:1px solid #2d3f55;background:#243447;padding:10px 12px;display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none;}
+.preview-doc:hover{background:#2d4a6a;}
+.preview-doc-icon{font-size:26px;flex-shrink:0;}
+.preview-doc-info{flex:1;min-width:0;}
+.preview-doc-name{font-size:12px;font-weight:500;color:#e0eaf5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.preview-doc-sub{font-size:10px;color:#6a8aaa;margin-top:2px;}
+.preview-empty{text-align:center;color:#4a6a8a;font-size:12px;padding:40px 20px;}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.lightbox-img{max-width:85vw;max-height:75vh;width:auto;height:auto;border-radius:6px;object-fit:contain;}
+.lightbox-nav{display:flex;align-items:center;gap:20px;margin-top:16px;}
+.lightbox-btn{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:22px;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.lightbox-btn:hover{background:rgba(255,255,255,.3);}
+.lightbox-counter{color:#aaa;font-size:12px;min-width:60px;text-align:center;}
+.lightbox-close{position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;}
 </style>
 </head>
 <body>
