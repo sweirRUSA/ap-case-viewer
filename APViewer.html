@@ -309,7 +309,8 @@ const IR_COLS = {
   policeReport:"short_text_mkm825q2",
   oneDriveLink:"one_drive_link",
   documents:"files", pictures:"files9",
-  richHandshake:"color_mm0rs4kc", currentOwnership:"color_mm0q8n2x"
+  richHandshake:"color_mm0rs4kc", currentOwnership:"color_mm0q8n2x",
+  vrNotes:"text_mm2fvpmd"
 };
 
 const VR_COLS = {
@@ -859,6 +860,14 @@ function renderDetail(r) {
       "</div></div>",
     "sec-documents":
       "<div class=\"sec\" id=\"sec-documents\"><div class=\"sec-title\">Documents and media</div><div class=\"fgrid\">"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">Video request notes</div>"+
+          "<textarea id=\"edit-vrNotes\" style=\"min-height:60px;\">"+stripPeriodSeparators(r.vrNotes)+"</textarea>"+
+          "<div class=\"fedit-actions\">"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveVrNotes(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<span id=\"msg-vrNotes\" class=\"save-msg\"></span>"+
+            "<span style=\"font-size:10px;color:#6a8aaa;\">These notes prepend to the narrative when a Video Request is created</span>"+
+          "</div>"+
+        "</div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">OneDrive video link</div>"+
           "<div style=\"display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;\">"+
             "<input type=\"text\" id=\"edit-oneDriveLink\" value=\""+el+"\" placeholder=\"Paste OneDrive link...\" style=\"flex:1;min-width:200px;\"/>"+
@@ -921,6 +930,14 @@ async function saveApFindings(itemId) {
   const ok = await updateColumn(itemId, IR_BOARD, "text95", val, "text");
   showMsg("msg-apFindings", ok);
   if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.apFindings=val; }
+}
+
+async function saveVrNotes(itemId) {
+  const raw = document.getElementById("edit-vrNotes").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const ok = await updateColumn(itemId, IR_BOARD, "text_mm2fvpmd", val, "text");
+  showMsg("msg-vrNotes", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.vrNotes=val; }
 }
 
 async function saveOneDriveLink(itemId) {
