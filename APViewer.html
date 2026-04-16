@@ -860,14 +860,6 @@ function renderDetail(r) {
       "</div></div>",
     "sec-documents":
       "<div class=\"sec\" id=\"sec-documents\"><div class=\"sec-title\">Documents and media</div><div class=\"fgrid\">"+
-        "<div class=\"f full fedit\"><div class=\"flabel\">Video request notes</div>"+
-          "<textarea id=\"edit-vrNotes\" style=\"min-height:60px;\">"+stripPeriodSeparators(r.vrNotes)+"</textarea>"+
-          "<div class=\"fedit-actions\">"+
-            "<button class=\"btn-primary btn-small\" onclick=\"saveVrNotes(\'"+r.id+"\')\">Save to Monday</button>"+
-            "<span id=\"msg-vrNotes\" class=\"save-msg\"></span>"+
-            "<span style=\"font-size:10px;color:#6a8aaa;\">These notes prepend to the narrative when a Video Request is created</span>"+
-          "</div>"+
-        "</div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">OneDrive video link</div>"+
           "<div style=\"display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;\">"+
             "<input type=\"text\" id=\"edit-oneDriveLink\" value=\""+el+"\" placeholder=\"Paste OneDrive link...\" style=\"flex:1;min-width:200px;\"/>"+
@@ -883,7 +875,23 @@ function renderDetail(r) {
     "sec-dns":
       "<div class=\"sec\" id=\"sec-dns\"><div class=\"sec-title\">Deny service records ("+ds.length+")</div>"+dsHTML+"</div>",
     "sec-vr":
-      "<div class=\"sec\" id=\"sec-vr\"><div class=\"sec-title\">Video requests ("+vrs.length+")</div>"+vrHTML+"</div>"
+      "<div class=\"sec\" id=\"sec-vr\"><div class=\"sec-title\">Video requests ("+vrs.length+")</div>"+
+      vrHTML+
+      "<div style=\"margin-top:14px;padding:14px;background:#0d1520;border-radius:8px;border:1px solid #1e3a5f;\">"+
+        "<div class=\"flabel\" style=\"margin-bottom:6px;\">"+
+          (vrs.length ? "Submit additional video request" : "Start video request")+
+        "</div>"+
+        "<textarea id=\"edit-vrNotes\" style=\"width:100%;min-height:70px;font-size:13px;padding:6px 8px;border:1px solid #2d3f55;border-radius:6px;font-family:inherit;resize:vertical;background:#0f1923;color:#e0eaf5;\" placeholder=\"Enter video request notes...\">"+stripPeriodSeparators(r.vrNotes)+"</textarea>"+
+        "<div style=\"display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;\">"+
+          "<button class=\"btn-primary btn-small\" onclick=\"saveAndSubmitVR(\'"+r.id+"\')\">"+
+            (vrs.length ? "💾 Save Notes &amp; Submit New Request" : "💾 Save Notes &amp; Submit Video Request")+
+          "</button>"+
+          "<button class=\"btn-small\" onclick=\"saveVrNotes(\'"+r.id+"\')\">Save notes only</button>"+
+          "<span id=\"msg-vrNotes\" class=\"save-msg\"></span>"+
+        "</div>"+
+        "<div style=\"font-size:10px;color:#4a6a8a;margin-top:6px;\">Notes will prepend to the narrative on the video request</div>"+
+      "</div>"+
+      "</div>",
   };
 
   const sectionsHTML = sectionOrder
@@ -930,6 +938,64 @@ async function saveApFindings(itemId) {
   const ok = await updateColumn(itemId, IR_BOARD, "text95", val, "text");
   showMsg("msg-apFindings", ok);
   if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.apFindings=val; }
+}
+
+async function saveAndSubmitVR(itemId) {
+  const btn = document.querySelector("#sec-vr .btn-primary");
+  if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
+  const msgEl = document.getElementById("msg-vrNotes");
+
+  try {
+    const r = irDetailCache[itemId] || irItems.find(function(x){return x.id===itemId;});
+    if (!r) throw new Error("Case not found");
+
+    // 1. Save notes to IR board
+    const raw = document.getElementById("edit-vrNotes").value;
+    const notesVal = raw.replace(/\n\s*\n/g, "\n.\n");
+    await updateColumn(itemId, IR_BOARD, "text_mm2fvpmd", notesVal, "text");
+    if (r) r.vrNotes = notesVal;
+
+    // 2. Build narrative: notes + " - " + original narrative
+    const narrative = getIRValue(r, "narrative");
+    const fullNarrative = (raw.trim() ? "VIDEO REQUEST : "+raw.trim()+" - " : "") + narrative;
+
+    // 3. Get today's date
+    const today = new Date().toISOString().split("T")[0];
+
+    // 4. Create VR item on VR board
+    const cid = r.caseId||r.pushableCaseId||r.id;
+    const itemName = cid;
+    const colVals = JSON.stringify({
+      "status6": {"label": r.branch||"Incident Review"},
+      "dropdown0": r.branch ? {"label": r.branch} : undefined,
+      "date4": today ? {"date": today} : undefined,
+      "long_text": {"text": fullNarrative},
+      "text_mkwz2hhp": String(itemId),
+      "text_mm0q7wkt": cid
+    }).replace(/:undefined/g, ":null");
+
+    const mut = "mutation{create_item(board_id:"+VR_BOARD+",item_name:\""+itemName.replace(/"/g,'\\"')+"\",column_values:"+JSON.stringify(colVals)+"){id}}";
+    const res = await gql(mut);
+    const newId = res?.data?.create_item?.id;
+
+    if (newId) {
+      if (msgEl) { msgEl.textContent = "Video Request created!"; msgEl.className = "save-msg ok"; }
+      // Refresh VR items in background
+      setTimeout(async function(){
+        const dateFilter = new Date(); dateFilter.setDate(dateFilter.getDate()-90);
+        vrItems = await fetchBoard(VR_BOARD, VR_COLS, dateFilter.toISOString().split("T")[0]);
+        const detail = irDetailCache[itemId];
+        if (detail) renderDetail(detail);
+      }, 1500);
+    } else {
+      throw new Error("No item ID returned");
+    }
+  } catch(e) {
+    if (msgEl) { msgEl.textContent = "Failed: "+e.message; msgEl.className = "save-msg err"; }
+  }
+
+  if (btn) { btn.textContent = btn.textContent.includes("additional") ? "💾 Save Notes & Submit New Request" : "💾 Save Notes & Submit Video Request"; btn.disabled = false; }
+  if (msgEl) setTimeout(function(){ msgEl.textContent = ""; }, 4000);
 }
 
 async function saveVrNotes(itemId) {
