@@ -111,12 +111,8 @@ tbody td.neg{color:#e05050;}
   </div>
   <div class="table-wrap" id="gc-table-wrap">
     <div class="empty-state">
-      <div class="empty-icon">🎁</div>
-      <div class="empty-title">Gift Card Report</div>
-      <div class="empty-sub">Connect to your SQL Server backend to load live gift card transaction data. This report shows activations, redemptions, balances, and store responsibility.</div>
-      <div style="margin-top:16px;">
-        <button class="btn-primary" onclick="showConnectModal('gift-card')">⚡ Connect to SQL Server</button>
-      </div>
+      <div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div>
+      <div class="empty-title">Loading Gift Card Data...</div>
     </div>
   </div>
 </div>
@@ -261,15 +257,36 @@ const GC_COLS = [
   {key:'Store_Responsibility', label:'Responsibility', badge:true},
 ];
 
+function parseCSV(text) {
+  const lines = text.split('\n').filter(l => l.trim());
+  if (!lines.length) return [];
+  const headers = parseCSVRow(lines[0]);
+  return lines.slice(1).map(line => {
+    const vals = parseCSVRow(line);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h.trim()] = (vals[i] || '').trim(); });
+    return obj;
+  });
+}
+function parseCSVRow(line) {
+  const result = []; let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    if (line[i] === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+    else if (line[i] === ',' && !inQ) { result.push(cur); cur = ''; }
+    else cur += line[i];
+  }
+  result.push(cur);
+  return result;
+}
+
 async function loadGCData() {
   const wrap = document.getElementById('gc-table-wrap');
   wrap.innerHTML = '<div class="empty-state"><div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div><div class="empty-title">Loading Gift Card Data...</div></div>';
   try {
-    const headers = {'Content-Type':'application/json'};
-    if (apiKey) headers['X-API-Key'] = apiKey;
-    const r = await fetch(apiUrl + '/api/gift-cards', {headers});
-    const data = await r.json();
-    gcData = Array.isArray(data) ? data : data.data || [];
+    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/Weekly%20GC%20Report.csv');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const text = await r.text();
+    gcData = parseCSV(text);
     populateGCFilters();
     applyGCFilters();
     document.getElementById('gc-summary').style.display = 'flex';
@@ -496,10 +513,8 @@ function exportToExcel(tableId, filename) {
   a.click();
 }
 
-// If API URL already saved, try to auto-load
-if (apiUrl) {
-  document.getElementById('api-url') && (document.getElementById('api-url').value = apiUrl);
-}
+// Auto-load GC data from GitHub CSV
+loadGCData();
 </script>
 </body>
 </html>
