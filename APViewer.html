@@ -291,7 +291,8 @@ const IR_COLS = {
   caseId:"formula_mm0q4bmm", pushableCaseId:"text_mm0q5kyg",
   date:"date4", incidentTime:"text19",
   branch:"dropdown0", district:"status1",
-  submittedBy:"primary_contributor",
+  submittedBy:"primary_contributor", submittedByEmail:"short_text_mkm8dpnn",
+  primaryContributor:"dup__of_submitted_by",
   location:"incident_category", specificLocation:"text8",
   category:"color_mknf4hd3",
   incidentType1:"dropdown_mkqakpqf", incidentType2:"dropdown_mkq4h3my",
@@ -305,8 +306,13 @@ const IR_COLS = {
   apFindings:"text95",
   interviewNarrative1:"long_text__1", interviewNarrative2:"long_text3__1",
   subjectName:"text61", subjectType:"text22",
+  subjectPhone:"text96", customerId:"dup__of_id__", dob:"text39",
   injuries:"dropdown58", propertyDamage:"ems_transport2",
-  policeReport:"short_text_mkm825q2",
+  policeReport:"short_text_mkm825q2", policeBadge:"text_mkt4vwhf",
+  form4473:"text_mkt4v4hr", codeRed:"dropdown_mkr4v9w3",
+  rentalFirearm:"dropdown_mkr4apes", ammoPurchase:"dropdown_mm21ek66",
+  serialNumber:"text_mkr4xj1j", upcLot:"text_mkr4xj1j",
+  witnessName:"text05", witnessType:"dropdown70", witnessPhone:"text41",
   oneDriveLink:"one_drive_link",
   documents:"files", pictures:"files9",
   richHandshake:"color_mm0rs4kc", currentOwnership:"color_mm0q8n2x",
@@ -833,18 +839,29 @@ function renderDetail(r) {
         "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(r.branch||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">District leader</div><div class=\"fval\">"+(r.district||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Submitted by email</div><div class=\"fval\">"+(r.submittedByEmail||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Primary contributor</div><div class=\"fval\">"+(r.primaryContributor||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Location</div><div class=\"fval\">"+(r.location||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Specific location</div><div class=\"fval\">"+(r.specificLocation||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Category</div><div class=\"fval\">"+(r.category||"—")+"</div></div>"+
+        "<div class=\"f half\"><div class=\"flabel\">Incident type</div><div class=\"fval\">"+getIncidentTypes(r)+"</div></div>"+
       "</div></div>",
     "sec-details":
       "<div class=\"sec\" id=\"sec-details\"><div class=\"sec-title\">Details</div><div class=\"fgrid\">"+
-        "<div class=\"f\"><div class=\"flabel\">Category</div><div class=\"fval\">"+(r.category||"—")+"</div></div>"+
-        "<div class=\"f half\"><div class=\"flabel\">Incident type</div><div class=\"fval\">"+getIncidentTypes(r)+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">AP follow-up</div><div class=\"fval\">"+(r.apFollowUp||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Deny service</div><div class=\"fval\">"+(r.denyService||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Retain video</div><div class=\"fval\">"+(r.retainVideo||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Rich handshake</div><div class=\"fval\">"+(r.richHandshake||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Current ownership</div><div class=\"fval\">"+(r.currentOwnership||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Injuries</div><div class=\"fval\">"+(r.injuries||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Police report #</div><div class=\"fval\">"+(r.policeReport||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Police name / badge</div><div class=\"fval\">"+(r.policeBadge||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Submitted by email</div><div class=\"fval\">"+(r.submittedByEmail||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Code red</div><div class=\"fval\">"+(r.codeRed||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Primary contributor</div><div class=\"fval\">"+(r.primaryContributor||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Property damage</div><div class=\"fval\">"+(r.propertyDamage||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">4473 #</div><div class=\"fval\">"+(r.form4473||"—")+"</div></div>"+
       "</div></div>",
     "sec-narrative":
       "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative</div>"+
@@ -854,10 +871,24 @@ function renderDetail(r) {
       "<div class=\"sec\" id=\"sec-subject\"><div class=\"sec-title\">Subject</div><div class=\"fgrid\">"+
         "<div class=\"f\"><div class=\"flabel\">Subject name</div><div class=\"fval\">"+(r.subjectName||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Subject type</div><div class=\"fval\">"+(r.subjectType||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Injuries</div><div class=\"fval\">"+(r.injuries||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Property damage</div><div class=\"fval\">"+(r.propertyDamage||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Police report #</div><div class=\"fval\">"+(r.policeReport||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Customer ID #</div><div class=\"fval\">"+(r.customerId||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Subject phone #</div><div class=\"fval\">"+(r.subjectPhone||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">DOB</div><div class=\"fval\">"+(r.dob||"—")+"</div></div>"+
       "</div></div>",
+    "sec-witness":
+      "<div class=\"sec\" id=\"sec-witness\"><div class=\"sec-title\">Witness</div><div class=\"fgrid\">"+
+        "<div class=\"f\"><div class=\"flabel\">Witness name</div><div class=\"fval\">"+(r.witnessName||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Witness type</div><div class=\"fval\">"+(r.witnessType||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Witness phone #</div><div class=\"fval\">"+(r.witnessPhone||"—")+"</div></div>"+
+      "</div></div>",
+    "sec-rental":
+      ((r.rentalFirearm&&r.rentalFirearm!=="—")||(r.ammoPurchase&&r.ammoPurchase!=="—") ?
+      "<div class=\"sec\" id=\"sec-rental\"><div class=\"sec-title\">Rental Firearm / Ammo Details</div><div class=\"fgrid\">"+
+        "<div class=\"f\"><div class=\"flabel\">Rental firearm involved?</div><div class=\"fval\">"+(r.rentalFirearm||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Range USA ammo purchase?</div><div class=\"fval\">"+(r.ammoPurchase||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Serial #</div><div class=\"fval\">"+(r.serialNumber||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">UPC and Lot #</div><div class=\"fval\">"+(r.upcLot||"—")+"</div></div>"+
+      "</div></div>" : ""),
     "sec-documents":
       "<div class=\"sec\" id=\"sec-documents\"><div class=\"sec-title\">Documents and media</div><div class=\"fgrid\">"+
         "<div class=\"f full fedit\"><div class=\"flabel\">OneDrive video link</div>"+
@@ -904,7 +935,7 @@ function renderDetail(r) {
     "<div class=\"card-header\">"+
       "<div><div class=\"card-name\">"+displayName(r)+"</div>"+
       "<div class=\"card-caseid\">"+cid+"</div></div>"+
-      "<div class=\"card-actions\"><button class=\"btn-small\" onclick=\"refreshCase(\'"+r.id+"\')\">↺ Refresh</button><button class=\"btn-small\" onclick=\"printCase(\'"+r.id+"\')\">Print</button></div>"+
+      "<div class=\"card-actions\"><button class=\"btn-small\" onclick=\"refreshCase(\'"+r.id+"\')\">↺ Refresh</button><button class=\"btn-small btn-primary\" onclick=\"saveAll(\'"+r.id+"\')\">💾 Update All</button><button class=\"btn-small\" onclick=\"printCase(\'"+r.id+"\')\">Print</button></div>"+
     "</div>"+
     "<div class=\"badges\">"+
       (r.apFollowUp?"<span class=\"badge "+badgeCls(r.apFollowUp)+"\">"+r.apFollowUp+"</span>":"")+
@@ -996,6 +1027,45 @@ async function saveAndSubmitVR(itemId) {
 
   if (btn) { btn.textContent = btn.textContent.includes("additional") ? "💾 Save Notes & Submit New Request" : "💾 Save Notes & Submit Video Request"; btn.disabled = false; }
   if (msgEl) setTimeout(function(){ msgEl.textContent = ""; }, 4000);
+}
+
+async function saveAll(itemId) {
+  const btn = document.querySelector(".btn-primary.btn-small");
+  if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
+  const results = [];
+
+  // Save all editable fields that exist on the page
+  async function tryField(elId, colId, type) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const val = el.value;
+    const ok = await updateColumn(itemId, IR_BOARD, colId, val, type);
+    results.push({field: elId, ok});
+    // Update cache
+    const item = irItems.find(function(x){return x.id===itemId;});
+    if (item && ok) {
+      if (elId==="edit-apFindings") item.apFindings = val;
+      if (elId==="edit-hrFindings") item.hrFindings = val;
+      if (elId==="edit-interviewNarrative") { item.interviewNarrative1 = val; }
+      if (elId==="edit-oneDriveLink") item.oneDriveLink = val;
+      if (elId==="edit-vrNotes") item.vrNotes = val;
+    }
+  }
+
+  await tryField("edit-apFindings",        "text95",              "text");
+  await tryField("edit-hrFindings",        "long_text_mm0f4cbg",  "longtext");
+  await tryField("edit-interviewNarrative","long_text__1",        "longtext");
+  await tryField("edit-oneDriveLink",      "one_drive_link",      "text");
+  await tryField("edit-vrNotes",           "text_mm2fvpmd",       "text");
+
+  const failed = results.filter(function(r){return !r.ok;}).length;
+  const saved  = results.filter(function(r){return r.ok;}).length;
+
+  if (btn) {
+    btn.textContent = saved+" saved"+(failed?" · "+failed+" failed":"");
+    btn.disabled = false;
+    setTimeout(function(){ btn.textContent = "💾 Update All"; }, 3000);
+  }
 }
 
 async function saveVrNotes(itemId) {
@@ -1110,7 +1180,7 @@ async function printCase(id) {
     .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:3px solid #2d3a4a;margin-bottom:20px;}
     .header-left{display:flex;flex-direction:column;gap:2px;}
     .logo{height:50px;object-fit:contain;}
-    .ap-sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#c0392b;font-weight:700;margin-top:2px;}
+    .ap-sub{font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#ffffff;font-weight:700;margin-top:4px;}
     .header-right{text-align:right;}
     .case-id{font-size:18px;font-weight:700;color:#2d3a4a;}
     .case-meta{font-size:11px;color:#666;margin-top:3px;}
@@ -1245,6 +1315,8 @@ const SECTION_DEFS = [
   {id:"sec-details",label:"Details"},
   {id:"sec-narrative",label:"Original Narrative"},
   {id:"sec-subject",label:"Subject"},
+  {id:"sec-witness",label:"Witness"},
+  {id:"sec-rental",label:"Rental Firearm / Ammo Details"},
   {id:"sec-documents",label:"Documents & Media"},
   {id:"sec-dns",label:"Deny Service Records"},
   {id:"sec-vr",label:"Video Requests"}
