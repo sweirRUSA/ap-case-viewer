@@ -598,7 +598,7 @@ async function renderPreview(r) {
         files.push({
           assetId: f.assetId,
           name: f.name || defaultLabel,
-          isImage: f.isImage==="true" || f.isImage===true
+          isImage: f.isImage==="true" || f.isImage===true || /\.jfif$/i.test(f.name||'')
         });
       });
     } catch(e) {}
@@ -809,7 +809,7 @@ function renderDetail(r) {
             "<button class=\"btn-small\" onclick=\"toggleStatusDropdown(\'dd-hr\',event)\">HR Review ▾</button>"+
             "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
           "</div>"+
-          "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in AP Findings and Interview Narrative completely before transferring to HR Review</div>"+
+          "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in AP Findings and Interview Narrative completely before transferring to HR Review (save first, then click HR Review)</div>"+
         "</div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">HR findings</div>"+
           "<textarea id=\"edit-hrFindings\">"+stripPeriodSeparators(r.hrFindings)+"</textarea>"+
@@ -820,9 +820,9 @@ function renderDetail(r) {
           "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in HR Finding Notes before selecting HR Recommendation</div>"+
         "</div>"+
         "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div>"+
-          "<div style=\"display:flex;align-items:center;gap:10px;margin-top:4px;\">"+
-            "<div class=\"fval\" style=\"flex:1;\">"+(r.hrRecommendation||"—")+"</div>"+
-            "<button class=\"sbutton\" onclick=\"toggleStatusDropdown(\'dd-hrrec\',event)\">Change ▾</button>"+
+          "<div class=\"fval\" style=\"margin-bottom:4px;\">"+(r.hrRecommendation||"—")+"</div>"+
+          "<div class=\"fedit-actions\">"+
+            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown(\'dd-hrrec\',event)\">HR Recommendation ▾</button>"+
           "</div>"+
         "</div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative"+
@@ -852,6 +852,7 @@ function renderDetail(r) {
         "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(r.branch||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">District leader</div><div class=\"fval\">"+(r.district||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Primary contributor</div><div class=\"fval\">"+(r.primaryContributor||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Location</div><div class=\"fval\">"+(r.location||"—")+"</div></div>"+
         (r.specificLocation&&r.specificLocation!=="—"?"<div class=\"f\"><div class=\"flabel\">Specific location</div><div class=\"fval\">"+r.specificLocation+"</div></div>":"")+
         "<div class=\"f\"><div class=\"flabel\">Category</div><div class=\"fval\">"+(r.category||"—")+"</div></div>"+
