@@ -768,7 +768,7 @@ function renderDetail(r) {
         "<div class=\"vrf\"><div class=\"vrf-label\">Agency</div><div class=\"vrf-val\">"+(v.agency||"—")+"</div></div>"+
         "<div class=\"vrf\"><div class=\"vrf-label\">Assigned</div><div class=\"vrf-val\">"+(v.assigned||"—")+"</div></div>"+
         "<div class=\"vrf full\"><div class=\"vrf-label\">Request narrative</div><div class=\"vrf-val\">"+(v.requestNarrative||"—")+"</div></div>"+
-        "<div class=\"vrf full\"><div class=\"vrf-label\">SSC supplement</div><div class=\"vrf-val\">"+(v.sscSupplement||"—")+"</div></div>"+
+        "<div class=\"vrf full\"><div class=\"vrf-label\">SSC Supplement with AP Findings on Video Request</div><div class=\"vrf-val\">"+(v.sscSupplement||"—")+"</div></div>"+
         (v.oneDriveLink?"<div class=\"vrf full\"><div class=\"vrf-label\">Video link</div><div class=\"vrf-val\"><a href=\""+v.oneDriveLink+"\" target=\"_blank\" style=\"color:#7fb3d3;\">Open video</a></div></div>":"")+
       "</div></div>";
   }).join("") : "<div style=\"font-size:13px;color:#999;padding:6px 0\">No linked video requests.</div>";
@@ -806,15 +806,25 @@ function renderDetail(r) {
           "<textarea id=\"edit-apFindings\">"+stripPeriodSeparators(r.apFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown(\'dd-hr\',event)\">HR Review ▾</button>"+
             "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
-          "</div></div>"+
+          "</div>"+
+          "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in AP Findings and Interview Narrative completely before transferring to HR Review</div>"+
+        "</div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">HR findings</div>"+
           "<textarea id=\"edit-hrFindings\">"+stripPeriodSeparators(r.hrFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveHrFindings(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-hrFindings\" class=\"save-msg\"></span>"+
-          "</div></div>"+
-        "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div><div class=\"fval\">"+(r.hrRecommendation||"—")+"</div></div>"+
+          "</div>"+
+          "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in HR Finding Notes before selecting HR Recommendation</div>"+
+        "</div>"+
+        "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div>"+
+          "<div style=\"display:flex;align-items:center;gap:10px;margin-top:4px;\">"+
+            "<div class=\"fval\" style=\"flex:1;\">"+(r.hrRecommendation||"—")+"</div>"+
+            "<button class=\"sbutton\" onclick=\"toggleStatusDropdown(\'dd-hrrec\',event)\">Change ▾</button>"+
+          "</div>"+
+        "</div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative"+
           "<span style=\"font-size:10px;color:#aaa;font-weight:400;margin-left:8px;\">(auto-splits into 2 fields if over 2000 chars)</span></div>"+
           "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+
@@ -835,32 +845,25 @@ function renderDetail(r) {
       "<div class=\"sec\" id=\"sec-overview\"><div class=\"sec-title\">Overview</div><div class=\"fgrid\">"+
         "<div class=\"f\"><div class=\"flabel\">Case ID</div><div class=\"fval\">"+cid+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(r.date||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Incident time</div><div class=\"fval\">"+(r.incidentTime||"—")+"</div></div>"+
+        "<div class=\"f fedit\"><div class=\"flabel\">Incident time</div>"+
+          "<input type=\"text\" id=\"edit-incidentTime\" value=\""+(r.incidentTime||"")+"\" placeholder=\"e.g. 14:30\" style=\"width:100%;font-size:12px;\"/>"+
+          "<div class=\"fedit-actions\"><button class=\"btn-small\" onclick=\"saveIncidentTime(\'"+r.id+"\')\">Save</button><span id=\"msg-incidentTime\" class=\"save-msg\"></span></div>"+
+        "</div>"+
         "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(r.branch||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">District leader</div><div class=\"fval\">"+(r.district||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Submitted by email</div><div class=\"fval\">"+(r.submittedByEmail||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Primary contributor</div><div class=\"fval\">"+(r.primaryContributor||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Location</div><div class=\"fval\">"+(r.location||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Specific location</div><div class=\"fval\">"+(r.specificLocation||"—")+"</div></div>"+
+        (r.specificLocation&&r.specificLocation!=="—"?"<div class=\"f\"><div class=\"flabel\">Specific location</div><div class=\"fval\">"+r.specificLocation+"</div></div>":"")+
         "<div class=\"f\"><div class=\"flabel\">Category</div><div class=\"fval\">"+(r.category||"—")+"</div></div>"+
         "<div class=\"f half\"><div class=\"flabel\">Incident type</div><div class=\"fval\">"+getIncidentTypes(r)+"</div></div>"+
       "</div></div>",
     "sec-details":
       "<div class=\"sec\" id=\"sec-details\"><div class=\"sec-title\">Details</div><div class=\"fgrid\">"+
-        "<div class=\"f\"><div class=\"flabel\">AP follow-up</div><div class=\"fval\">"+(r.apFollowUp||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Deny service</div><div class=\"fval\">"+(r.denyService||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Retain video</div><div class=\"fval\">"+(r.retainVideo||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Rich handshake</div><div class=\"fval\">"+(r.richHandshake||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Current ownership</div><div class=\"fval\">"+(r.currentOwnership||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Injuries</div><div class=\"fval\">"+(r.injuries||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Police report #</div><div class=\"fval\">"+(r.policeReport||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(r.submittedBy||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Police name / badge</div><div class=\"fval\">"+(r.policeBadge||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Submitted by email</div><div class=\"fval\">"+(r.submittedByEmail||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Code red</div><div class=\"fval\">"+(r.codeRed||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Primary contributor</div><div class=\"fval\">"+(r.primaryContributor||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">Property damage</div><div class=\"fval\">"+(r.propertyDamage||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Police report #</div><div class=\"fval\">"+(r.policeReport||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Police name / badge</div><div class=\"fval\">"+(r.policeBadge||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Code red</div><div class=\"fval\">"+(r.codeRed||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">4473 #</div><div class=\"fval\">"+(r.form4473||"—")+"</div></div>"+
       "</div></div>",
     "sec-narrative":
@@ -961,6 +964,13 @@ function renderDetail(r) {
       updateCount();
     }
   }, 50);
+}
+
+async function saveIncidentTime(itemId) {
+  const val = document.getElementById("edit-incidentTime").value;
+  const ok = await updateColumn(itemId, IR_BOARD, "text19", val, "text");
+  showMsg("msg-incidentTime", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.incidentTime=val; }
 }
 
 async function saveApFindings(itemId) {
@@ -1103,7 +1113,7 @@ function openVRModal(idx, irId) {
     {k:"branch",l:"Branch"},{k:"incidentDate",l:"Incident date"},{k:"submittedDate",l:"Submitted date"},
     {k:"submittedBy",l:"Submitted by"},
     {k:"requestNarrative",l:"Request narrative",long:true},
-    {k:"sscSupplement",l:"SSC supplement",long:true},
+    {k:"sscSupplement",l:"SSC Supplement with AP Findings on Video Request",long:true},
     {k:"leContact",l:"LE contact"},{k:"leEmail",l:"LE email"},{k:"lePhone",l:"LE phone"},
     {k:"reviewDecision",l:"Review decision"},{k:"dateCompleted",l:"Date completed"},
     {k:"incidentCategory",l:"Incident category"},{k:"location",l:"Location"}
@@ -1281,7 +1291,7 @@ async function printCase(id) {
     }).join("")}</div>` : ""}
 
     ${vrs.length ? `<div class="section"><div class="sec-title">Video Requests (${vrs.length})</div>${vrs.map(function(v){
-      return `<div class="vr-box"><div class="vr-title">${v.agency||"Video Request"} · ${v.status||""} · ${v.branch||""}</div><div>${v.requestNarrative||""}</div>${v.sscSupplement?`<div style="margin-top:4px;color:#555;">SSC: ${v.sscSupplement}</div>`:""}</div>`;
+      return `<div class="vr-box"><div class="vr-title">${v.agency||"Video Request"} · ${v.status||""} · ${v.branch||""}</div><div>${v.requestNarrative||""}</div>${v.sscSupplement?`<div style="margin-top:4px;color:#555;">SSC Supplement with AP Findings: ${v.sscSupplement}</div>`:""}</div>`;
     }).join("")}</div>` : ""}
 
     ${imageHtml}
