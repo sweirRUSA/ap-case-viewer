@@ -292,7 +292,7 @@ const IR_COLS = {
   date:"date4", incidentTime:"text19",
   branch:"dropdown0", district:"status1",
   submittedBy:"primary_contributor", submittedByEmail:"short_text_mkm8dpnn",
-  primaryContributor:"dup__of_submitted_by",
+  primaryContributor:"secondary_contributor",
   location:"incident_category", specificLocation:"text8",
   category:"color_mknf4hd3",
   incidentType1:"dropdown_mkqakpqf", incidentType2:"dropdown_mkq4h3my",
@@ -768,7 +768,7 @@ function renderDetail(r) {
         "<div class=\"vrf\"><div class=\"vrf-label\">Agency</div><div class=\"vrf-val\">"+(v.agency||"—")+"</div></div>"+
         "<div class=\"vrf\"><div class=\"vrf-label\">Assigned</div><div class=\"vrf-val\">"+(v.assigned||"—")+"</div></div>"+
         "<div class=\"vrf full\"><div class=\"vrf-label\">Request narrative</div><div class=\"vrf-val\">"+(v.requestNarrative||"—")+"</div></div>"+
-        "<div class=\"vrf full\"><div class=\"vrf-label\">SSC Supplement with AP Findings on Video Request</div><div class=\"vrf-val\">"+(v.sscSupplement||"—")+"</div></div>"+
+        "<div class=\"vrf full\"><div class=\"vrf-label\">AP Findings on Video Request</div><div class=\"vrf-val\">"+(v.sscSupplement||"—")+"</div></div>"+
         (v.oneDriveLink?"<div class=\"vrf full\"><div class=\"vrf-label\">Video link</div><div class=\"vrf-val\"><a href=\""+v.oneDriveLink+"\" target=\"_blank\" style=\"color:#7fb3d3;\">Open video</a></div></div>":"")+
       "</div></div>";
   }).join("") : "<div style=\"font-size:13px;color:#999;padding:6px 0\">No linked video requests.</div>";
@@ -821,8 +821,9 @@ function renderDetail(r) {
         "</div>"+
         "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div>"+
           "<div class=\"fval\" style=\"margin-bottom:4px;\">"+(r.hrRecommendation||"—")+"</div>"+
-          "<div class=\"fedit-actions\">"+
-            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown(\'dd-hrrec\',event)\">HR Recommendation ▾</button>"+
+          "<div class=\"fedit-actions\" style=\"position:relative;\">"+
+            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown(\'dd-hrrec-local\',event)\">HR Recommendation ▾</button>"+
+            "<div class=\"status-dropdown-menu\" id=\"dd-hrrec-local\" style=\"position:absolute;top:100%;left:0;z-index:300;\"></div>"+
           "</div>"+
         "</div>"+
         "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative"+
@@ -1114,7 +1115,7 @@ function openVRModal(idx, irId) {
     {k:"branch",l:"Branch"},{k:"incidentDate",l:"Incident date"},{k:"submittedDate",l:"Submitted date"},
     {k:"submittedBy",l:"Submitted by"},
     {k:"requestNarrative",l:"Request narrative",long:true},
-    {k:"sscSupplement",l:"SSC Supplement with AP Findings on Video Request",long:true},
+    {k:"sscSupplement",l:"AP Findings on Video Request",long:true},
     {k:"leContact",l:"LE contact"},{k:"leEmail",l:"LE email"},{k:"lePhone",l:"LE phone"},
     {k:"reviewDecision",l:"Review decision"},{k:"dateCompleted",l:"Date completed"},
     {k:"incidentCategory",l:"Incident category"},{k:"location",l:"Location"}
@@ -1292,7 +1293,7 @@ async function printCase(id) {
     }).join("")}</div>` : ""}
 
     ${vrs.length ? `<div class="section"><div class="sec-title">Video Requests (${vrs.length})</div>${vrs.map(function(v){
-      return `<div class="vr-box"><div class="vr-title">${v.agency||"Video Request"} · ${v.status||""} · ${v.branch||""}</div><div>${v.requestNarrative||""}</div>${v.sscSupplement?`<div style="margin-top:4px;color:#555;">SSC Supplement with AP Findings: ${v.sscSupplement}</div>`:""}</div>`;
+      return `<div class="vr-box"><div class="vr-title">${v.agency||"Video Request"} · ${v.status||""} · ${v.branch||""}</div><div>${v.requestNarrative||""}</div>${v.sscSupplement?`<div style="margin-top:4px;color:#555;">AP Findings on VR: ${v.sscSupplement}</div>`:""}</div>`;
     }).join("")}</div>` : ""}
 
     ${imageHtml}
@@ -1483,14 +1484,15 @@ async function populateDropdown(ddId) {
   dd.innerHTML = "<div class='status-saving'>Loading options...</div>";
 
   const MAP = {
-    "dd-ap":        {colId:"dup__of_hr_decision____1", prop:"apFollowUp"},
-    "dd-category":  {colId:"color_mknf4hd3",           prop:"category"},
-    "dd-video":     {colId:"deny_service__",            prop:"retainVideo"},
-    "dd-deny":      {colId:"district_leader",           prop:"denyService"},
-    "dd-hr":        {colId:"status_1__1",               prop:"hrRec"},
-    "dd-hrrec":     {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
-    "dd-handshake": {colId:"color_mm0rs4kc",            prop:"richHandshake"},
-    "dd-ownership": {colId:"color_mm0q8n2x",            prop:"currentOwnership"}
+    "dd-ap":          {colId:"dup__of_hr_decision____1", prop:"apFollowUp"},
+    "dd-category":    {colId:"color_mknf4hd3",           prop:"category"},
+    "dd-video":       {colId:"deny_service__",            prop:"retainVideo"},
+    "dd-deny":        {colId:"district_leader",           prop:"denyService"},
+    "dd-hr":          {colId:"status_1__1",               prop:"hrRec"},
+    "dd-hrrec":       {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
+    "dd-hrrec-local": {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
+    "dd-handshake":   {colId:"color_mm0rs4kc",            prop:"richHandshake"},
+    "dd-ownership":   {colId:"color_mm0q8n2x",            prop:"currentOwnership"}
   };
 
   const entry = MAP[ddId];
@@ -1500,9 +1502,30 @@ async function populateDropdown(ddId) {
   if (!options.length) { dd.innerHTML = "<div class='status-saving'>No options found</div>"; return; }
 
   const current = r[entry.prop];
+
+  // Color coding by keyword
+  function optionColor(opt) {
+    const l = opt.toLowerCase();
+    if (l.includes("terminat") || l.includes("action needed") || l.includes("deny") || l.includes("no")) return "#3a1a1a";
+    if (l.includes("complet") || l.includes("approved") || l.includes("done") || l.includes("yes")) return "#1a3a2a";
+    if (l.includes("progress") || l.includes("pending") || l.includes("review")) return "#2a2010";
+    if (l.includes("written") || l.includes("warning") || l.includes("final")) return "#2a1a3a";
+    return "";
+  }
+  function optionTextColor(opt) {
+    const l = opt.toLowerCase();
+    if (l.includes("terminat") || l.includes("action needed") || l.includes("deny") || l.includes("no")) return "#e05050";
+    if (l.includes("complet") || l.includes("approved") || l.includes("done") || l.includes("yes")) return "#4caf80";
+    if (l.includes("progress") || l.includes("pending") || l.includes("review")) return "#e0a030";
+    if (l.includes("written") || l.includes("warning") || l.includes("final")) return "#a07ad5";
+    return "#c0d4e8";
+  }
+
   dd.innerHTML = options.map(function(opt){
     const isCurrent = opt === current;
-    return "<div class='status-option"+(isCurrent?" current":"")+"' onclick='selectStatus(\""+ddId+"\",\""+entry.colId+"\",\""+entry.prop+"\",\""+opt.replace(/"/g,"&quot;")+"\")'>"+
+    const bg = optionColor(opt);
+    const fg = optionTextColor(opt);
+    return "<div class='status-option"+(isCurrent?" current":"")+"' style='"+(bg?"background:"+bg+";":"")+"color:"+fg+";' onclick='selectStatus(\""+ddId+"\",\""+entry.colId+"\",\""+entry.prop+"\",\""+opt.replace(/"/g,"&quot;")+"\")'>"+
       (isCurrent?"✓ ":"")+opt+
     "</div>";
   }).join("");
