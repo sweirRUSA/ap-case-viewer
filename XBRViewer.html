@@ -360,9 +360,9 @@ function renderGCTable() {
       if (c.money && val !== '—') val = '$' + parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       if (c.badge) {
         const cls = val==='Activation'||val==='Y'||val==='Yes'||val==='Active'?'badge-green':val==='Redemption'||val==='N'||val==='No'?'badge-red':val==='JT'?'badge-blue':val==='Alex'?'badge-orange':'badge-gray';
-        val = `<span class="badge ${cls}">${val}</span>`;
+        val = '<span class="badge ' + cls + '">' + val + '</span>';
       }
-      return `<td class="${c.num?'num':''}${c.wrap?' style="max-width:250px;white-space:normal;"':''}">` + val + '</td>';
+      return '<td class="' + (c.num?'num':'') + '"' + (c.wrap?' style="max-width:250px;white-space:normal;"':'') + '>' + val + '</td>';
     }).join('')) + '</tr>').join('')}</tbody>
   </table>`;
 }
@@ -485,9 +485,9 @@ function renderRetTable() {
       if (c.money && val !== '—') val = '$' + parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       if (c.badge && val !== '—') {
         const cls = val==='Y'||val==='Yes'?'badge-green':val==='N'||val==='No'?'badge-red':'badge-gray';
-        val = `<span class="badge ${cls}">${val}</span>`;
+        val = '<span class="badge ' + cls + '">' + val + '</span>';
       }
-      return `<td class="${c.num?'num':''}${c.wrap?' style="max-width:200px;white-space:normal;"':''}">` + val + '</td>';
+      return '<td class="' + (c.num?'num':'') + '"' + (c.wrap?' style="max-width:200px;white-space:normal;"':'') + '>' + val + '</td>';
     }).join('')) + '</tr>').join('')}</tbody>
   </table>`;
 }
