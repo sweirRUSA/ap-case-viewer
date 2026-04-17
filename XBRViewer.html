@@ -352,19 +352,25 @@ function renderGCTable() {
     const av=a[gcSortCol]||'', bv=b[gcSortCol]||'';
     return gcSortDir * (av<bv?-1:av>bv?1:0);
   });
-  wrap.innerHTML = `<table id="gc-table">
-    <thead><tr>${GC_COLS.map(c=>`<th onclick="sortGC('${c.key}')" class="${gcSortCol===c.key?(gcSortDir===1?'sort-asc':'sort-desc'):''}">` + c.label + '</th>').join('')}</tr></thead>
-    <tbody>${sorted.map(r => '<tr>' + GC_COLS.map(c => {
+  const thead = '<thead><tr>' + GC_COLS.map(c => {
+    const cls = gcSortCol===c.key ? (gcSortDir===1?'sort-asc':'sort-desc') : '';
+    return '<th onclick="sortGC(\'' + c.key.replace(/'/g,"\\'") + '\')" class="' + cls + '">' + c.label + '</th>';
+  }).join('') + '</tr></thead>';
+  const tbody = '<tbody>' + sorted.map(r => {
+    return '<tr>' + GC_COLS.map(c => {
       let val = r[c.key];
-      if (val === null || val === undefined) val = '—';
+      if (val === null || val === undefined || val === '') val = '—';
       if (c.money && val !== '—') val = '$' + parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-      if (c.badge) {
+      if (c.badge && val !== '—') {
         const cls = val==='Activation'||val==='Y'||val==='Yes'||val==='Active'?'badge-green':val==='Redemption'||val==='N'||val==='No'?'badge-red':val==='JT'?'badge-blue':val==='Alex'?'badge-orange':'badge-gray';
         val = '<span class="badge ' + cls + '">' + val + '</span>';
       }
-      return '<td class="' + (c.num?'num':'') + '"' + (c.wrap?' style="max-width:250px;white-space:normal;"':'') + '>' + val + '</td>';
-    }).join('')) + '</tr>').join('')}</tbody>
-  </table>`;
+      const tdCls = c.num ? ' class="num"' : '';
+      const tdStyle = c.wrap ? ' style="max-width:250px;white-space:normal;"' : '';
+      return '<td' + tdCls + tdStyle + '>' + val + '</td>';
+    }).join('') + '</tr>';
+  }).join('') + '</tbody>';
+  wrap.innerHTML = '<table id="gc-table">' + thead + tbody + '</table>';
 }
 
 function sortGC(col) {
@@ -477,19 +483,25 @@ function renderRetTable() {
     const av=a[retSortCol]||'', bv=b[retSortCol]||'';
     return retSortDir * (av<bv?-1:av>bv?1:0);
   });
-  wrap.innerHTML = `<table id="ret-table">
-    <thead><tr>${RET_COLS.map(c=>`<th onclick="sortRet('${c.key}')" class="${retSortCol===c.key?(retSortDir===1?'sort-asc':'sort-desc'):''}">` + c.label + '</th>').join('')}</tr></thead>
-    <tbody>${sorted.map(r => '<tr>' + RET_COLS.map(c => {
+  const thead = '<thead><tr>' + RET_COLS.map(c => {
+    const cls = retSortCol===c.key ? (retSortDir===1?'sort-asc':'sort-desc') : '';
+    return '<th onclick="sortRet(\'' + c.key.replace(/'/g,"\\'") + '\')" class="' + cls + '">' + c.label + '</th>';
+  }).join('') + '</tr></thead>';
+  const tbody = '<tbody>' + sorted.map(r => {
+    return '<tr>' + RET_COLS.map(c => {
       let val = r[c.key];
-      if (val === null || val === undefined) val = '—';
+      if (val === null || val === undefined || val === '') val = '—';
       if (c.money && val !== '—') val = '$' + parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
       if (c.badge && val !== '—') {
         const cls = val==='Y'||val==='Yes'?'badge-green':val==='N'||val==='No'?'badge-red':'badge-gray';
         val = '<span class="badge ' + cls + '">' + val + '</span>';
       }
-      return '<td class="' + (c.num?'num':'') + '"' + (c.wrap?' style="max-width:200px;white-space:normal;"':'') + '>' + val + '</td>';
-    }).join('')) + '</tr>').join('')}</tbody>
-  </table>`;
+      const tdCls = c.num ? ' class="num"' : '';
+      const tdStyle = c.wrap ? ' style="max-width:200px;white-space:normal;"' : '';
+      return '<td' + tdCls + tdStyle + '>' + val + '</td>';
+    }).join('') + '</tr>';
+  }).join('') + '</tbody>';
+  wrap.innerHTML = '<table id="ret-table">' + thead + tbody + '</table>';
 }
 
 function sortRet(col) {
