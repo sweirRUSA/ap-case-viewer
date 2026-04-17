@@ -184,6 +184,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='gift-card')||(i===1&&tab==='returns')));
   document.getElementById('tab-gift-card').style.display = tab==='gift-card'?'flex':'none';
   document.getElementById('tab-returns').style.display = tab==='returns'?'flex':'none';
+  if (tab==='returns' && !retData.length) loadRetData();
 }
 
 // ── CONNECTION ─────────────────────────────────────────────
@@ -283,7 +284,7 @@ async function loadGCData() {
   const wrap = document.getElementById('gc-table-wrap');
   wrap.innerHTML = '<div class="empty-state"><div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div><div class="empty-title">Loading Gift Card Data...</div></div>';
   try {
-    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/WeeklyGCReport.csv');
+    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/Weekly%20GC%20Report.csv');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const text = await r.text();
     gcData = parseCSV(text);
@@ -413,11 +414,9 @@ async function loadRetData() {
   const wrap = document.getElementById('ret-table-wrap');
   wrap.innerHTML = '<div class="empty-state"><div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div><div class="empty-title">Loading Returns Data...</div></div>';
   try {
-    const headers = {'Content-Type':'application/json'};
-    if (apiKey) headers['X-API-Key'] = apiKey;
-    const r = await fetch(apiUrl + '/api/returns', {headers});
-    const data = await r.json();
-    retData = Array.isArray(data) ? data : data.data || [];
+    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/Returns%20Report.csv');
+    const text = await r.text();
+    retData = parseCSV(text);
     populateRetFilters();
     applyRetFilters();
     document.getElementById('ret-summary').style.display = 'flex';
