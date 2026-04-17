@@ -317,7 +317,10 @@ const IR_COLS = {
   oneDriveLink:"one_drive_link",
   documents:"files", pictures:"files9",
   richHandshake:"color_mm0rs4kc", currentOwnership:"color_mm0q8n2x",
-  vrNotes:"text_mm2fvpmd"
+  vrNotes:"text_mm2fvpmd",
+  interviewStatus:"color_mm2gyjyr",
+  interviewReason:"text_mm2g2kmt",
+  interviewDate:"date_mm2gkwpy"
 };
 
 const VR_COLS = {
@@ -929,6 +932,31 @@ function renderDetail(r) {
         "<div style=\"font-size:10px;color:#4a6a8a;margin-top:6px;\">Notes will prepend to the narrative on the video request</div>"+
       "</div>"+
       "</div>",
+    "sec-interview":
+      "<div class=\"sec\" id=\"sec-interview\"><div class=\"sec-title\">Schedule Interview</div>"+
+        "<div class=\"fgrid\">"+
+          "<div class=\"f full\"><div class=\"flabel\">Interview Notify Status</div>"+
+            "<div style=\"display:flex;align-items:center;gap:10px;margin-top:4px;\">"+
+              "<div class=\"fval\" style=\"flex:1;\">"+(r.interviewStatus||"—")+"</div>"+
+              "<div class=\"status-dropdown\" style=\"position:relative;\">"+
+                "<button class=\"sbutton\" onclick=\"toggleStatusDropdown(\'dd-interview\',event)\">Set Status ▾</button>"+
+                "<div class=\"status-dropdown-menu\" id=\"dd-interview\"></div>"+
+              "</div>"+
+            "</div>"+
+          "</div>"+
+          "<div class=\"f full fedit\"><div class=\"flabel\">Interview Reason</div>"+
+            "<textarea id=\"edit-interviewReason\" style=\"min-height:60px;\">"+stripPeriodSeparators(r.interviewReason)+"</textarea>"+
+            "<div class=\"fedit-actions\">"+
+              "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewReason(\'"+r.id+"\')\">Save to Monday</button>"+
+              "<span id=\"msg-interviewReason\" class=\"save-msg\"></span>"+
+            "</div>"+
+          "</div>"+
+          "<div class=\"f fedit\"><div class=\"flabel\">Tentative Interview Date</div>"+
+            "<input type=\"date\" id=\"edit-interviewDate\" value=\""+(r.interviewDate||"")+"\" style=\"width:100%;font-size:12px;\"/>"+
+            "<div class=\"fedit-actions\"><button class=\"btn-small\" onclick=\"saveInterviewDate(\'"+r.id+"\')\">Save</button><span id=\"msg-interviewDate\" class=\"save-msg\"></span></div>"+
+          "</div>"+
+        "</div>"+
+      "</div>",
   };
 
   const sectionsHTML = sectionOrder
@@ -967,6 +995,26 @@ function renderDetail(r) {
       updateCount();
     }
   }, 50);
+}
+
+async function saveInterviewReason(itemId) {
+  const raw = document.getElementById("edit-interviewReason").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const ok = await updateColumn(itemId, IR_BOARD, "text_mm2g2kmt", val, "text");
+  showMsg("msg-interviewReason", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.interviewReason=val; }
+}
+
+async function saveInterviewDate(itemId) {
+  const val = document.getElementById("edit-interviewDate").value;
+  const colVal = JSON.stringify({date: val});
+  const mut = "mutation{change_column_value(board_id:"+IR_BOARD+",item_id:"+itemId+",column_id:\"date_mm2gkwpy\",value:"+JSON.stringify(colVal)+"){id}}";
+  try {
+    const res = await gql(mut);
+    const ok = !!(res&&res.data&&res.data.change_column_value);
+    showMsg("msg-interviewDate", ok);
+    if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.interviewDate=val; }
+  } catch(e) { showMsg("msg-interviewDate", false); }
 }
 
 async function saveIncidentTime(itemId) {
@@ -1070,6 +1118,7 @@ async function saveAll(itemId) {
   await tryField("edit-interviewNarrative","long_text__1",        "longtext");
   await tryField("edit-oneDriveLink",      "one_drive_link",      "text");
   await tryField("edit-vrNotes",           "text_mm2fvpmd",       "text");
+  await tryField("edit-interviewReason",   "text_mm2g2kmt",       "text");
 
   const failed = results.filter(function(r){return !r.ok;}).length;
   const saved  = results.filter(function(r){return r.ok;}).length;
@@ -1328,6 +1377,7 @@ const SECTION_DEFS = [
   {id:"sec-details",label:"Details"},
   {id:"sec-narrative",label:"Original Narrative"},
   {id:"sec-subject",label:"Subject"},
+  {id:"sec-interview",label:"Schedule Interview"},
   {id:"sec-witness",label:"Witness"},
   {id:"sec-rental",label:"Rental Firearm / Ammo Details"},
   {id:"sec-documents",label:"Documents & Media"},
@@ -1492,6 +1542,7 @@ async function populateDropdown(ddId) {
     "dd-hr":          {colId:"status_1__1",               prop:"hrRec"},
     "dd-hrrec":       {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
     "dd-hrrec-local": {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
+    "dd-interview":   {colId:"color_mm2gyjyr",            prop:"interviewStatus"},
     "dd-handshake":   {colId:"color_mm0rs4kc",            prop:"richHandshake"},
     "dd-ownership":   {colId:"color_mm0q8n2x",            prop:"currentOwnership"}
   };
