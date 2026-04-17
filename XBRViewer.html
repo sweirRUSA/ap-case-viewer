@@ -283,7 +283,7 @@ async function loadGCData() {
   const wrap = document.getElementById('gc-table-wrap');
   wrap.innerHTML = '<div class="empty-state"><div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div><div class="empty-title">Loading Gift Card Data...</div></div>';
   try {
-    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/Weekly%20GC%20Report.csv');
+    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/WeeklyGCReport.csv');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const text = await r.text();
     gcData = parseCSV(text);
