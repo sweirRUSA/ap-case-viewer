@@ -1071,7 +1071,7 @@ async function loadBBDetail(irId) {
   container.innerHTML = "<div style='font-size:11px;color:#4a6a8a;'>Loading Black Book record...</div>";
   try {
     // Use linked_items query — correct way to read board relations via API
-    const q = "{items(ids:["+irId+"]){linked_items(link_to_item_column_id:\"board_relation_mm2kcgyg\"){id name column_values{id text value} subitems{id name column_values{id text value}}}}}";
+    const q = "{items(ids:["+irId+"]){linked_items(link_to_item_column_id:\"board_relation_mm2kcgyg\",linked_board_id:"+BB_BOARD+"){id name column_values{id text value} subitems{id name column_values{id text value}}}}}";
     const data = await gql(q);
     console.log("linked_items result:", JSON.stringify(data).substring(0,500));
     const linkedItems = data?.data?.items?.[0]?.linked_items || [];
