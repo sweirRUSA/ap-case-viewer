@@ -367,6 +367,8 @@ function getVal(cols, id) {
   if (!c) return "";
   // File columns — return raw JSON string for later parsing
   if (id === "files" || id === "files9") return c.value || "";
+  // Board relation columns — return raw value for linked ID extraction
+  if (id === "board_relation_mm2kcgyg") return c.value || "";
   try {
     const v = JSON.parse(c.value);
     if (v === null) return "";
@@ -992,10 +994,19 @@ function renderDetail(r) {
           "</div>"+
         "</div>"+
         "<div id=\"bb-detail-"+r.id+"\" style=\"margin-top:12px;\">"+
-          (r.bbRelation&&r.bbRelation!=="—"?
-            "<button class=\"btn-small\" onclick=\"loadBBDetail(\'"+r.id+"\')\" style=\"font-size:11px;\">🔍 Load Black Book Record</button>":
-            "<div style=\"font-size:11px;color:#2d3f55;font-style:italic;\">No Black Book record linked yet — set AP Follow-up to Open Investigation to create one</div>"
-          )+
+          (function(){
+            try {
+              var rel = JSON.parse(r.bbRelation||"{}");
+              var hasLink = rel.linkedPulseIds && rel.linkedPulseIds.length > 0;
+              return hasLink ?
+                "<button class=\"btn-small\" onclick=\"loadBBDetail('"+r.id+"')\" style=\"font-size:11px;\">🔍 Load Black Book Record</button>" :
+                "<div style=\"font-size:11px;color:#2d3f55;font-style:italic;\">No Black Book record linked yet — set AP Follow-up to Open Investigation to create one</div>";
+            } catch(e) {
+              return r.bbRelation && r.bbRelation.length > 5 ?
+                "<button class=\"btn-small\" onclick=\"loadBBDetail('"+r.id+"')\" style=\"font-size:11px;\">🔍 Load Black Book Record</button>" :
+                "<div style=\"font-size:11px;color:#2d3f55;font-style:italic;\">No Black Book record linked yet</div>";
+            }
+          })()+
         "</div>"+
       "</div>",
   };
@@ -1051,13 +1062,23 @@ async function loadBBDetail(irId) {
   if (!container) return;
   container.innerHTML = "<div style='font-size:11px;color:#4a6a8a;'>Loading Black Book record...</div>";
   try {
-    // Get linked item ID from relation column
-    const q = "{items(ids:["+irId+"]){column_values(ids:[\"board_relation_mm2kcgyg\"]){id value}}}";
-    const data = await gql(q);
-    const relVal = data?.data?.items?.[0]?.column_values?.[0]?.value;
+    // Try to get linked IDs from cached bbRelation first, then re-fetch
     let linkedIds = [];
-    try { const parsed = JSON.parse(relVal); linkedIds = parsed.linkedPulseIds?.map(function(x){return x.linkedPulseId;}) || []; } catch(e){}
-    if (!linkedIds.length) { container.innerHTML = "<div style='font-size:11px;color:#4a6a8a;'>No linked Black Book record found.</div>"; return; }
+    const cached = irItems.find(function(x){return x.id===irId;});
+    if (cached && cached.bbRelation) {
+      try {
+        const rel = JSON.parse(cached.bbRelation);
+        linkedIds = (rel.linkedPulseIds||[]).map(function(x){return x.linkedPulseId;});
+      } catch(e){}
+    }
+    // If not in cache, fetch from Monday
+    if (!linkedIds.length) {
+      const q = "{items(ids:["+irId+"]){column_values(ids:[\"board_relation_mm2kcgyg\"]){id value}}}";
+      const data = await gql(q);
+      const relVal = data?.data?.items?.[0]?.column_values?.[0]?.value;
+      try { const parsed = JSON.parse(relVal||"{}"); linkedIds = (parsed.linkedPulseIds||[]).map(function(x){return x.linkedPulseId;}); } catch(e){}
+    }
+    if (!linkedIds.length) { container.innerHTML = "<div style='font-size:11px;color:#4a6a8a;'>No linked Black Book record found. Make sure the automation has run after setting AP Follow-up to Open Investigation.</div>"; return; }
 
     // Fetch BB item details
     const bbQ = "{items(ids:["+linkedIds[0]+"]){id name column_values{id text value} subitems{id name column_values{id text value}}}}";
