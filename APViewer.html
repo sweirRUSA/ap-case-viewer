@@ -1274,8 +1274,9 @@ function hideActivityLog() {
 }
 
 // Close modal on backdrop click
-document.getElementById("activity-modal").addEventListener("click", function(e) {
-  if (e.target === this) hideActivityLog();
+document.addEventListener("click", function(e) {
+  const modal = document.getElementById("activity-modal");
+  if (modal && e.target === modal) hideActivityLog();
 });
 
 async function loadInterviewActivity(itemId) {
