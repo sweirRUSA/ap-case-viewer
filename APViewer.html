@@ -982,10 +982,10 @@ function renderDetail(r) {
             "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please save Interview Reason and Date before changing status</div>"+
           "</div>"+
           "<div class=\"f full fedit\"><div class=\"flabel\">Interview Reason</div>"+
-            "<textarea id=\"edit-interviewReason\" style=\"min-height:60px;\">"+stripPeriodSeparators(r.interviewReason)+"</textarea>"+
+            "<textarea id=\"edit-interviewReason\" style=\"min-height:60px;\" placeholder=\"Enter interview reason...\"></textarea>"+
           "</div>"+
           "<div class=\"f fedit\"><div class=\"flabel\">Tentative Interview Date</div>"+
-            "<input type=\"date\" id=\"edit-interviewDate\" value=\""+(r.interviewDate||"")+"\" style=\"width:100%;font-size:12px;\"/>"+
+            "<input type=\"date\" id=\"edit-interviewDate\" style=\"width:100%;font-size:12px;\"/>"+
           "</div>"+
           "<div class=\"f full\">"+
             "<div class=\"fedit-actions\">"+
