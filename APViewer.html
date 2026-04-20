@@ -582,7 +582,15 @@ async function selectItem(id) {
   document.getElementById("preview-body").innerHTML = "<div class='preview-empty'>Loading files...</div>";
   // Fetch full detail if not cached
   const detail = await fetchItemDetail(id);
-  if (detail) { renderDetail(detail); updateStatusBar(detail); renderPreview(detail); }
+  if (detail) {
+    renderDetail(detail);
+    updateStatusBar(detail);
+    renderPreview(detail);
+    // Auto-load BB detail if section is visible
+    if (isSectionVisible("sec-bb")) {
+      setTimeout(function(){ loadBBDetail(id); }, 300);
+    }
+  }
 }
 
 async function refreshCase(id) {
@@ -590,7 +598,15 @@ async function refreshCase(id) {
   const r = irItems.find(function(x){return x.id===id;});
   if (!r) return;
   const detail = await fetchItemDetail(id);
-  if (detail) { renderDetail(detail); updateStatusBar(detail); renderPreview(detail); renderList(); }
+  if (detail) {
+    renderDetail(detail);
+    updateStatusBar(detail);
+    renderPreview(detail);
+    renderList();
+    if (isSectionVisible("sec-bb")) {
+      setTimeout(function(){ loadBBDetail(id); }, 300);
+    }
+  }
 }
 
 async function renderPreview(r) {
@@ -998,7 +1014,7 @@ function renderDetail(r) {
           "</div>"+
         "</div>"+
         "<div id=\"bb-detail-"+r.id+"\" style=\"margin-top:12px;\">"+
-          "<button class=\"btn-small\" onclick=\"loadBBDetail('"+r.id+"')\" style=\"font-size:11px;\">🔍 Load Black Book Record</button>"+
+          "<button class=\"btn-small\" onclick=\"loadBBDetail('"+r.id+"')\" style=\"font-size:11px;\">↺ Reload Black Book Record</button>"+
         "</div>"+
       "</div>",
   };
