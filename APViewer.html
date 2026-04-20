@@ -271,6 +271,7 @@ const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY0NTkzMzIyMywiYWFpIjoxMSwidWlkIjo1
 const IR_BOARD = "309348813";
 const VR_BOARD = "992178387";
 const DS_BOARD = "1053253179";
+const BB_BOARD = "4714502022";
 const PROXY = "https://corsproxy.io/?";
 let irItems=[], vrItems=[], dsItems=[], selectedId=null;
 let irDetailCache = {}; // cache full detail per item id
@@ -320,7 +321,9 @@ const IR_COLS = {
   vrNotes:"text_mm2fvpmd",
   interviewStatus:"color_mm2gyjyr",
   interviewReason:"text_mm2g2kmt",
-  interviewDate:"date_mm2gkwpy"
+  interviewDate:"date_mm2gkwpy",
+  bbNotes:"text_mm2k49q8",
+  bbRelation:"board_relation_mm2kcgyg"
 };
 
 const VR_COLS = {
@@ -916,6 +919,14 @@ function renderDetail(r) {
       "<div class=\"sec\" id=\"sec-dns\"><div class=\"sec-title\">Deny service records ("+ds.length+")</div>"+dsHTML+"</div>",
     "sec-vr":
       "<div class=\"sec\" id=\"sec-vr\"><div class=\"sec-title\">Video requests ("+vrs.length+")</div>"+
+      "<div style=\"display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 12px;background:#0d1520;border-radius:6px;border:1px solid #1e2e40;\">"+
+        "<div class=\"flabel\" style=\"margin:0;\">Retain Video:</div>"+
+        "<div class=\"fval\" style=\"flex:1;\">"+(r.retainVideo||"—")+"</div>"+
+        "<div class=\"status-dropdown\" style=\"position:relative;\">"+
+          "<button class=\"sbutton "+(r.retainVideo&&r.retainVideo.includes("Yes")?"active-blue":"")+"\" onclick=\"toggleStatusDropdown(\'dd-video-local\',event)\">Change ▾</button>"+
+          "<div class=\"status-dropdown-menu\" id=\"dd-video-local\" style=\"position:absolute;top:100%;right:0;z-index:300;\"></div>"+
+        "</div>"+
+      "</div>"+
       vrHTML+
       "<div style=\"margin-top:14px;padding:14px;background:#0d1520;border-radius:8px;border:1px solid #1e3a5f;\">"+
         "<div class=\"flabel\" style=\"margin-bottom:6px;\">"+
@@ -943,18 +954,48 @@ function renderDetail(r) {
                 "<div class=\"status-dropdown-menu\" id=\"dd-interview\"></div>"+
               "</div>"+
             "</div>"+
+            "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please save Interview Reason and Date before changing status</div>"+
           "</div>"+
           "<div class=\"f full fedit\"><div class=\"flabel\">Interview Reason</div>"+
             "<textarea id=\"edit-interviewReason\" style=\"min-height:60px;\">"+stripPeriodSeparators(r.interviewReason)+"</textarea>"+
-            "<div class=\"fedit-actions\">"+
-              "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewReason(\'"+r.id+"\')\">Save to Monday</button>"+
-              "<span id=\"msg-interviewReason\" class=\"save-msg\"></span>"+
-            "</div>"+
           "</div>"+
           "<div class=\"f fedit\"><div class=\"flabel\">Tentative Interview Date</div>"+
             "<input type=\"date\" id=\"edit-interviewDate\" value=\""+(r.interviewDate||"")+"\" style=\"width:100%;font-size:12px;\"/>"+
-            "<div class=\"fedit-actions\"><button class=\"btn-small\" onclick=\"saveInterviewDate(\'"+r.id+"\')\">Save</button><span id=\"msg-interviewDate\" class=\"save-msg\"></span></div>"+
           "</div>"+
+          "<div class=\"f full\">"+
+            "<div class=\"fedit-actions\">"+
+              "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewFields(\'"+r.id+"\')\">Save Reason &amp; Date to Monday</button>"+
+              "<span id=\"msg-interviewReason\" class=\"save-msg\"></span>"+
+            "</div>"+
+          "</div>"+
+        "</div>"+
+      "</div>",
+    "sec-bb":
+      "<div class=\"sec\" id=\"sec-bb\"><div class=\"sec-title\">AP Investigation File</div>"+
+        "<div style=\"padding:10px 12px;background:#0d1520;border-radius:6px;border:1px solid #1e2e40;margin-bottom:12px;\">"+
+          "<div class=\"flabel\" style=\"margin-bottom:4px;\">AP Follow-up Status</div>"+
+          "<div style=\"display:flex;align-items:center;gap:10px;\">"+
+            "<div class=\"fval\" style=\"flex:1;\">"+(r.apFollowUp||"—")+"</div>"+
+            "<div class=\"status-dropdown\" style=\"position:relative;\">"+
+              "<button class=\"sbutton\" onclick=\"toggleStatusDropdown(\'dd-ap\',event)\">Change ▾</button>"+
+            "</div>"+
+          "</div>"+
+          "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Save AP Blackbook Notes before setting to Open Investigation — this triggers the automation</div>"+
+        "</div>"+
+        "<div class=\"fgrid\">"+
+          "<div class=\"f full fedit\"><div class=\"flabel\">AP Blackbook Notes</div>"+
+            "<textarea id=\"edit-bbNotes\" style=\"min-height:80px;\">"+stripPeriodSeparators(r.bbNotes)+"</textarea>"+
+            "<div class=\"fedit-actions\">"+
+              "<button class=\"btn-primary btn-small\" onclick=\"saveBBNotes(\'"+r.id+"\')\">Save to Monday</button>"+
+              "<span id=\"msg-bbNotes\" class=\"save-msg\"></span>"+
+            "</div>"+
+          "</div>"+
+        "</div>"+
+        "<div id=\"bb-detail-"+r.id+"\" style=\"margin-top:12px;\">"+
+          (r.bbRelation&&r.bbRelation!=="—"?
+            "<button class=\"btn-small\" onclick=\"loadBBDetail(\'"+r.id+"\')\" style=\"font-size:11px;\">🔍 Load Black Book Record</button>":
+            "<div style=\"font-size:11px;color:#2d3f55;font-style:italic;\">No Black Book record linked yet — set AP Follow-up to Open Investigation to create one</div>"
+          )+
         "</div>"+
       "</div>",
   };
@@ -995,6 +1036,97 @@ function renderDetail(r) {
       updateCount();
     }
   }, 50);
+}
+
+async function saveBBNotes(itemId) {
+  const raw = document.getElementById("edit-bbNotes").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const ok = await updateColumn(itemId, IR_BOARD, "text_mm2k49q8", val, "text");
+  showMsg("msg-bbNotes", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.bbNotes=val; }
+}
+
+async function loadBBDetail(irId) {
+  const container = document.getElementById("bb-detail-"+irId);
+  if (!container) return;
+  container.innerHTML = "<div style='font-size:11px;color:#4a6a8a;'>Loading Black Book record...</div>";
+  try {
+    // Get linked item ID from relation column
+    const q = "{items(ids:["+irId+"]){column_values(ids:[\"board_relation_mm2kcgyg\"]){id value}}}";
+    const data = await gql(q);
+    const relVal = data?.data?.items?.[0]?.column_values?.[0]?.value;
+    let linkedIds = [];
+    try { const parsed = JSON.parse(relVal); linkedIds = parsed.linkedPulseIds?.map(function(x){return x.linkedPulseId;}) || []; } catch(e){}
+    if (!linkedIds.length) { container.innerHTML = "<div style='font-size:11px;color:#4a6a8a;'>No linked Black Book record found.</div>"; return; }
+
+    // Fetch BB item details
+    const bbQ = "{items(ids:["+linkedIds[0]+"]){id name column_values{id text value} subitems{id name column_values{id text value}}}}";
+    const bbData = await gql(bbQ);
+    const bbItem = bbData?.data?.items?.[0];
+    if (!bbItem) { container.innerHTML = "<div style='font-size:11px;color:#e05050;'>Could not load Black Book record.</div>"; return; }
+
+    function bbVal(cols, id) {
+      const c = cols.find(function(x){return x.id===id;});
+      if (!c) return "—";
+      try { const v=JSON.parse(c.value); if(v===null) return "—"; if(v.text) return v.text; if(v.name) return v.name; return c.text||"—"; } catch(e){ return c.text||"—"; }
+    }
+
+    const cols = bbItem.column_values;
+    const narrative = [bbVal(cols,"long_text01"), bbVal(cols,"dup__of_long_text")].filter(function(v){return v&&v!=="—";}).join("\n\n") || "—";
+
+    // Build subitems log
+    const subitems = bbItem.subitems || [];
+    const subHTML = subitems.length ? subitems.map(function(s){
+      const note = [bbVal(s.column_values,"long_text_mkwt46jk"), bbVal(s.column_values,"long_text_mkwte0m4")].filter(function(v){return v&&v!=="—";}).join(" — ") || "—";
+      return "<div style='border-bottom:1px solid #1e2e40;padding:8px 0;'>"+
+        "<div style='display:flex;gap:12px;margin-bottom:4px;'>"+
+          "<span style='font-size:10px;color:#4a6a8a;'>"+bbVal(s.column_values,"date0")+"</span>"+
+          "<span style='font-size:10px;color:#5a9fd4;'>"+bbVal(s.column_values,"status")+"</span>"+
+        "</div>"+
+        "<div style='font-size:12px;color:#c0d4e8;white-space:pre-wrap;'>"+note+"</div>"+
+      "</div>";
+    }).join("") : "<div style='font-size:11px;color:#4a6a8a;'>No investigation log entries yet.</div>";
+
+    container.innerHTML =
+      "<div style='background:#0d1520;border:1px solid #1e3a5f;border-radius:8px;padding:14px;margin-top:8px;'>"+
+        "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'>"+
+          "<div style='font-size:13px;font-weight:600;color:#e0eaf5;'>"+bbItem.name+"</div>"+
+          "<div style='display:flex;gap:6px;'>"+
+            "<span class='badge bg-gray'>"+bbVal(cols,"status")+"</span>"+
+            "<span class='badge bg-blue'>"+bbVal(cols,"status_1")+"</span>"+
+          "</div>"+
+        "</div>"+
+        "<div class='fgrid' style='margin-bottom:10px;'>"+
+          "<div class='f'><div class='flabel'>Assigned</div><div class='fval'>"+bbVal(cols,"people")+"</div></div>"+
+          "<div class='f'><div class='flabel'>Text field</div><div class='fval'>"+bbVal(cols,"text67")+"</div></div>"+
+        "</div>"+
+        "<div style='margin-bottom:10px;'><div class='flabel'>Narrative</div>"+
+          "<div style='background:#131f2e;padding:8px 10px;border-radius:6px;font-size:12px;color:#c0d4e8;white-space:pre-wrap;margin-top:4px;'>"+narrative+"</div>"+
+        "</div>"+
+        "<div><div class='sec-title' style='margin-bottom:8px;'>Investigation Log</div>"+subHTML+"</div>"+
+      "</div>";
+  } catch(e) {
+    container.innerHTML = "<div style='font-size:11px;color:#e05050;'>Error loading record: "+e.message+"</div>";
+  }
+}
+
+async function saveInterviewFields(itemId) {
+  const reason = document.getElementById("edit-interviewReason").value;
+  const date = document.getElementById("edit-interviewDate").value;
+  const reasonVal = reason.replace(/\n\s*\n/g, "\n.\n");
+  const ok1 = await updateColumn(itemId, IR_BOARD, "text_mm2g2kmt", reasonVal, "text");
+  let ok2 = true;
+  if (date) {
+    const colVal = JSON.stringify({date: date});
+    const mut = "mutation{change_column_value(board_id:"+IR_BOARD+",item_id:"+itemId+",column_id:\"date_mm2gkwpy\",value:"+JSON.stringify(colVal)+"){id}}";
+    try { const res=await gql(mut); ok2=!!(res&&res.data&&res.data.change_column_value); } catch(e){ok2=false;}
+  }
+  const ok = ok1 && ok2;
+  showMsg("msg-interviewReason", ok);
+  if (ok) {
+    const item=irItems.find(function(x){return x.id===itemId;});
+    if(item){ item.interviewReason=reasonVal; item.interviewDate=date; }
+  }
 }
 
 async function saveInterviewReason(itemId) {
@@ -1118,6 +1250,7 @@ async function saveAll(itemId) {
   await tryField("edit-interviewNarrative","long_text__1",        "longtext");
   await tryField("edit-oneDriveLink",      "one_drive_link",      "text");
   await tryField("edit-vrNotes",           "text_mm2fvpmd",       "text");
+  await tryField("edit-bbNotes",           "text_mm2k49q8",       "text");
   await tryField("edit-interviewReason",   "text_mm2g2kmt",       "text");
 
   const failed = results.filter(function(r){return !r.ok;}).length;
@@ -1377,6 +1510,7 @@ const SECTION_DEFS = [
   {id:"sec-details",label:"Details"},
   {id:"sec-narrative",label:"Original Narrative"},
   {id:"sec-subject",label:"Subject"},
+  {id:"sec-bb",label:"AP Investigation File"},
   {id:"sec-interview",label:"Schedule Interview"},
   {id:"sec-witness",label:"Witness"},
   {id:"sec-rental",label:"Rental Firearm / Ammo Details"},
@@ -1538,6 +1672,7 @@ async function populateDropdown(ddId) {
     "dd-ap":          {colId:"dup__of_hr_decision____1", prop:"apFollowUp"},
     "dd-category":    {colId:"color_mknf4hd3",           prop:"category"},
     "dd-video":       {colId:"deny_service__",            prop:"retainVideo"},
+    "dd-video-local": {colId:"deny_service__",            prop:"retainVideo"},
     "dd-deny":        {colId:"district_leader",           prop:"denyService"},
     "dd-hr":          {colId:"status_1__1",               prop:"hrRec"},
     "dd-hrrec":       {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
