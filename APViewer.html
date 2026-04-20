@@ -1226,7 +1226,12 @@ async function showActivityLog(itemId, boardId, name) {
       try { parsed = JSON.parse(log.data||"{}"); } catch(e){}
 
       const date = log.created_at
-        ? new Date(parseInt(log.created_at)).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"})
+        ? (function(){
+            const d = new Date(parseInt(log.created_at));
+            return isNaN(d.getTime()) ? "—" :
+              d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) +
+              " " + d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+          })()
         : "—";
 
       // Parse event type
@@ -1283,31 +1288,39 @@ async function loadInterviewActivity(itemId) {
       let parsed = {};
       try { parsed = JSON.parse(log.data||"{}"); } catch(e){}
 
-      // Monday created_at is in microseconds or milliseconds — handle both
+      // Monday created_at is Unix timestamp in milliseconds
       let date = "—";
       if (log.created_at) {
         const ts = parseInt(log.created_at);
-        // If > 1e12 it's microseconds, convert to ms
-        const ms = ts > 1e12 ? Math.floor(ts / 1000) : ts;
-        const d = new Date(ms);
+        const d = new Date(ts);
         if (!isNaN(d.getTime())) {
           date = d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) +
                  " " + d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
         }
       }
 
-      // Extract value safely
+      // Extract value safely - handles status labels and plain text
       function extractVal(v) {
         if (!v || v === null) return "";
         if (typeof v === "string") return v;
-        if (v.label && v.label.text) return v.label.text;
-        if (v.name) return v.name;
-        if (v.text) return v.text;
-        return "";
+        if (typeof v === "object") {
+          if (v.label && v.label.text) return v.label.text;
+          if (v.name) return v.name;
+          if (v.text) return v.text;
+          if (v.value) return String(v.value);
+        }
+        return String(v);
       }
 
-      const newVal = extractVal(parsed.value) || extractVal(parsed.to) || "—";
-      const prevVal = extractVal(parsed.previous_value) || extractVal(parsed.from) || "";
+      // For text columns, value may be nested under changed_at or just be the string
+      let newVal = extractVal(parsed.value) || extractVal(parsed.to);
+      let prevVal = extractVal(parsed.previous_value) || extractVal(parsed.from);
+      
+      // If still empty, try column_title based approach
+      if (!newVal && parsed.column_title) newVal = extractVal(parsed.value);
+      
+      newVal = newVal || "—";
+      
       const colName = (log.data||"").includes("color_mm2gyjyr") ? "Status" : "Reason";
 
       return "<div style='padding:6px 0;border-bottom:1px solid #1a2535;display:flex;gap:10px;align-items:flex-start;'>"+
