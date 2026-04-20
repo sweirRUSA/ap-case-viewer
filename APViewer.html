@@ -1086,6 +1086,14 @@ async function loadBBDetail(irId) {
     const bbItem = bbData?.data?.items?.[0];
     if (!bbItem) { container.innerHTML = "<div style='font-size:11px;color:#e05050;'>Could not load Black Book record.</div>"; return; }
 
+    // Debug — log all column IDs and values
+    console.log("BB Item:", bbItem.name, bbItem.id);
+    console.log("BB Columns:", JSON.stringify(bbItem.column_values.map(function(c){return {id:c.id,text:c.text,value:(c.value||"").substring(0,80)};})));
+    if (bbItem.subitems && bbItem.subitems.length) {
+      console.log("BB Subitems:", bbItem.subitems.length);
+      bbItem.subitems.forEach(function(s){ console.log("Subitem cols:", JSON.stringify(s.column_values.map(function(c){return {id:c.id,text:c.text};}))); });
+    }
+
     function bbVal(cols, id) {
       const c = cols.find(function(x){return x.id===id;});
       if (!c) return "—";
@@ -1176,13 +1184,13 @@ async function addBBSubitem(bbItemId, irId) {
     // Create subitem
     const itemName = date ? date + " — Investigation Note" : "Investigation Note";
     const escapedName = itemName.replace(/"/g, '\\"');
-    const colVals = JSON.stringify({
-      "date0": date ? {date: date} : undefined,
-      "status": {label: status},
-      "long_text_mkwt46jk": {text: note}
-    });
-    const mut = "mutation{create_subitem(parent_item_id:"+bbItemId+",item_name:\""+escapedName+"\",column_values:"+JSON.stringify(colVals)+"){id}}";
+    const colObj = {"status": {label: status}, "long_text_mkwt46jk": note};
+    if (date) colObj["date0"] = {date: date};
+    const colVals = JSON.stringify(JSON.stringify(colObj));
+    const mut = "mutation{create_subitem(parent_item_id:"+bbItemId+",item_name:\""+escapedName+"\",column_values:"+colVals+"){id}}";
+    console.log("Subitem mutation:", mut);
     const res = await gql(mut);
+    console.log("Subitem result:", JSON.stringify(res));
     const ok = !!res?.data?.create_subitem?.id;
 
     if (ok) {
