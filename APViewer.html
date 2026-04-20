@@ -994,7 +994,7 @@ function renderDetail(r) {
             "</div>"+
           "</div>"+
           "<div class=\"f full\">"+
-            "<div class=\"flabel\" style=\"margin-bottom:6px;\">Interview Status History</div>"+
+            "<div class=\"flabel\" style=\"margin-bottom:6px;\">Last Notify History</div>"+
             "<div id=\"interview-activity-"+r.id+"\" style=\"font-size:11px;color:#4a6a8a;\"></div>"+
           "</div>"+
         "</div>"+
@@ -1294,21 +1294,18 @@ async function loadInterviewActivity(itemId) {
       let parsed = {};
       try { parsed = JSON.parse(log.data||"{}"); } catch(e){}
 
-      // Monday created_at can be ISO string or numeric timestamp
+      // Date only - no time
       let date = "—";
       if (log.created_at) {
         let d;
         if (typeof log.created_at === "string" && log.created_at.includes("-")) {
-          // ISO string format: "2026-04-20T09:20:00Z"
           d = new Date(log.created_at);
         } else {
-          // Numeric - try as ms, then seconds
           const ts = parseInt(log.created_at);
           d = new Date(ts > 1e12 ? ts : ts * 1000);
         }
         if (d && !isNaN(d.getTime())) {
-          date = d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) +
-                 " " + d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+          date = d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
         }
       }
 
