@@ -21,6 +21,8 @@ button:hover{background:#243447;}
 .btn-primary:hover{background:#2d6abf;}
 .btn-small{font-size:11px;padding:3px 10px;}
 .main{display:flex;height:calc(100vh - 108px);}
+.resizer{width:5px;background:#1e2e40;cursor:col-resize;flex-shrink:0;transition:background .15s;}
+.resizer:hover,.resizer.dragging{background:#3a7bd5;}
 .list{width:310px;min-width:310px;overflow-y:auto;border-right:1px solid #1e2e40;background:#111c2a;}
 .list-item{padding:10px 14px;border-bottom:1px solid #1a2535;cursor:pointer;}
 .list-item:hover{background:#1a2d42;}
@@ -241,9 +243,11 @@ button:hover{background:#243447;}
   <div class="list" id="list-panel">
     <div class="loading"><div class="spinner"></div><span>Loading cases...</span></div>
   </div>
+  <div class="resizer" id="resizer-left" title="Drag to resize · Double-click to reset"></div>
   <div class="detail" id="detail-panel">
     <div class="empty">Select a case from the list</div>
   </div>
+  <div class="resizer" id="resizer-right" title="Drag to resize · Double-click to reset"></div>
   <div class="preview-panel" id="preview-panel">
     <div class="preview-header">
       <span>Files &amp; Media</span>
@@ -2171,6 +2175,62 @@ async function refreshInBackground() {
     document.getElementById("live-badge").textContent = "● Live (bg refresh failed)";
   }
 }
+
+// ── PANEL RESIZING ─────────────────────────────────────────
+(function() {
+  const STORAGE_KEY_LEFT = "rusa_panel_list_width";
+  const STORAGE_KEY_RIGHT = "rusa_panel_preview_width";
+  const DEFAULT_LEFT = 310;
+  const DEFAULT_RIGHT = 500;
+
+  function initPanels() {
+    const listW = parseInt(localStorage.getItem(STORAGE_KEY_LEFT)) || DEFAULT_LEFT;
+    const previewW = parseInt(localStorage.getItem(STORAGE_KEY_RIGHT)) || DEFAULT_RIGHT;
+    const list = document.getElementById("list-panel");
+    const preview = document.getElementById("preview-panel");
+    if (list) { list.style.width = listW+"px"; list.style.minWidth = "150px"; }
+    if (preview) { preview.style.width = previewW+"px"; preview.style.minWidth = "150px"; }
+  }
+
+  function makeResizer(resizerId, panelId, storageKey, side) {
+    const resizer = document.getElementById(resizerId);
+    const panel = document.getElementById(panelId);
+    if (!resizer || !panel) return;
+    let startX, startW;
+    resizer.addEventListener("mousedown", function(e) {
+      startX = e.clientX;
+      startW = panel.offsetWidth;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      function onMove(e) {
+        const dx = side === "left" ? e.clientX - startX : startX - e.clientX;
+        const newW = Math.max(150, Math.min(700, startW + dx));
+        panel.style.width = newW+"px";
+      }
+      function onUp() {
+        resizer.classList.remove("dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        localStorage.setItem(storageKey, panel.offsetWidth);
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+      }
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+      e.preventDefault();
+    });
+    resizer.addEventListener("dblclick", function() {
+      const def = side === "left" ? DEFAULT_LEFT : DEFAULT_RIGHT;
+      panel.style.width = def+"px";
+      localStorage.setItem(storageKey, def);
+    });
+  }
+
+  initPanels();
+  makeResizer("resizer-left", "list-panel", STORAGE_KEY_LEFT, "left");
+  makeResizer("resizer-right", "preview-panel", STORAGE_KEY_RIGHT, "right");
+})();
 
 init();
 </script>
