@@ -592,6 +592,7 @@ function renderList() {
         "<span><span class=\"lbl\">AP </span>"+(r.apFollowUp||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Review </span>"+(r.hrRec||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Rec </span>"+(r.hrRecommendation||"—")+"</span>"+
+        "<span><span class=\"lbl\">VR Status </span>"+(r._vrStatus||"—")+"</span>"+
       "</div></div>";
   }).join("");
 }
@@ -829,7 +830,11 @@ function renderDetail(r) {
   const SECTIONS = {
     "sec-findings":
       "<div class=\"sec\" id=\"sec-findings\"><div class=\"sec-title\">Findings</div><div class=\"fgrid\">"+
-        "<div class=\"f full fedit\"><div class=\"flabel\">AP findings</div>"+
+        // AP Findings — current value shown above edit field
+        "<div class=\"f full\"><div class=\"flabel\">AP findings — current value in Monday</div>"+
+          "<div class=\"fval\" style=\"background:#0a1520;padding:8px 10px;border-radius:6px;border:1px solid #1a3040;min-height:40px;font-size:12px;white-space:pre-wrap;\">"+stripPeriodSeparators(r.apFindings||"")+"</div>"+
+        "</div>"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">AP findings — update</div>"+
           "<textarea id=\"edit-apFindings\">"+stripPeriodSeparators(r.apFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings('"+r.id+"')\">Save to Monday</button>"+
@@ -838,7 +843,11 @@ function renderDetail(r) {
           "</div>"+
           "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in AP Findings and Interview Narrative completely before transferring to HR Review (save first, then click HR Review)</div>"+
         "</div>"+
-        "<div class=\"f full fedit\"><div class=\"flabel\">HR findings</div>"+
+        // HR Findings — current value shown above edit field
+        "<div class=\"f full\"><div class=\"flabel\">HR findings — current value in Monday</div>"+
+          "<div class=\"fval\" style=\"background:#0a1520;padding:8px 10px;border-radius:6px;border:1px solid #1a3040;min-height:40px;font-size:12px;white-space:pre-wrap;\">"+stripPeriodSeparators(r.hrFindings||"")+"</div>"+
+        "</div>"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">HR findings — update</div>"+
           "<textarea id=\"edit-hrFindings\">"+stripPeriodSeparators(r.hrFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
             "<button class=\"btn-primary btn-small\" onclick=\"saveHrFindings('"+r.id+"')\">Save to Monday</button>"+
@@ -846,13 +855,17 @@ function renderDetail(r) {
           "</div>"+
           "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in HR Finding Notes before selecting HR Recommendation</div>"+
         "</div>"+
+        // HR Recommendation — current shown + dropdown to change
         "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div>"+
-          "<div class=\"fval\" style=\"margin-bottom:4px;\">"+(r.hrRecommendation||"—")+"</div>"+
-          "<div class=\"fedit-actions\" style=\"position:relative;\">"+
-            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown('dd-hrrec-local',event)\">HR Recommendation ▾</button>"+
-            "<div class=\"status-dropdown-menu\" id=\"dd-hrrec-local\" style=\"position:absolute;top:100%;left:0;z-index:300;\"></div>"+
+          "<div style=\"display:flex;align-items:center;gap:12px;margin-top:4px;\">"+
+            "<div class=\"fval\" style=\"flex:1;background:#0a1520;padding:6px 10px;border-radius:6px;border:1px solid #1a3040;font-size:12px;\">"+(r.hrRecommendation||"— not set —")+"</div>"+
+            "<div class=\"fedit-actions\" style=\"position:relative;\">"+
+              "<button class=\"btn-small\" onclick=\"toggleStatusDropdown('dd-hrrec-local',event)\">Change ▾</button>"+
+              "<div class=\"status-dropdown-menu\" id=\"dd-hrrec-local\" style=\"position:absolute;top:100%;left:0;z-index:300;\"></div>"+
+            "</div>"+
           "</div>"+
         "</div>"+
+        // Interview Narrative
         "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative<span style=\"font-size:10px;color:#aaa;font-weight:400;margin-left:8px;\">(auto-splits into 2 fields if over 2000 chars)</span></div>"+
           "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+
             stripPeriodSeparators([r.interviewNarrative1, r.interviewNarrative2].filter(Boolean).map(function(p){ return p.replace(/^\s*\.\s*\n?/,"").replace(/\n\s*\.\s*$/,"").trim(); }).join("\n\n"))+
@@ -890,7 +903,7 @@ function renderDetail(r) {
         "<div class=\"f\"><div class=\"flabel\">4473 #</div><div class=\"fval\">"+(r.form4473||"—")+"</div></div>"+
       "</div></div>",
     "sec-narrative":
-      "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative</div>"+
+      "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative — current value in Monday</div>"+
         "<div class=\"fval\" style=\"background:#0d1520;padding:10px 12px;border-radius:6px;border:1px solid #1e2e40;\">"+getIRValue(r,"narrative")+"</div>"+
       "</div>",
     "sec-subject":
@@ -993,7 +1006,10 @@ function renderDetail(r) {
           "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Save AP Blackbook Notes before setting to Open Investigation — this triggers the automation</div>"+
         "</div>"+
         "<div class=\"fgrid\">"+
-          "<div class=\"f full fedit\"><div class=\"flabel\">AP Blackbook Notes</div>"+
+          "<div class=\"f full\"><div class=\"flabel\">AP Blackbook Notes — current value in Monday</div>"+
+            "<div class=\"fval\" style=\"background:#0a1520;padding:8px 10px;border-radius:6px;border:1px solid #1a3040;min-height:40px;font-size:12px;white-space:pre-wrap;\">"+stripPeriodSeparators(r.bbNotes||"")+"</div>"+
+          "</div>"+
+          "<div class=\"f full fedit\"><div class=\"flabel\">AP Blackbook Notes — update</div>"+
             "<textarea id=\"edit-bbNotes\" style=\"min-height:80px;\">"+stripPeriodSeparators(r.bbNotes)+"</textarea>"+
             "<div class=\"fedit-actions\">"+
               "<button class=\"btn-primary btn-small\" onclick=\"saveBBNotes('"+r.id+"')\">Save to Monday</button>"+
@@ -1131,24 +1147,40 @@ async function showActivityLog(itemId, boardId, name) {
   modal.style.display="flex"; sub.textContent=name;
   body.innerHTML="<div style='color:#4a6a8a;font-size:12px;'>Loading activity log...</div>";
   try {
-    const q="{boards(ids:"+boardId+"){activity_logs(item_ids:["+itemId+"],limit:50){id event data created_at user_id}}}";
+    // Use item-level activity log query
+    const q="{items(ids:["+itemId+"]){activity_logs(limit:50){id event data created_at user_id}}}";
     const data=await gql(q);
-    const logs=data?.data?.boards?.[0]?.activity_logs||[];
-    if (!logs.length){body.innerHTML="<div style='color:#4a6a8a;font-size:12px;font-style:italic;'>No activity found.</div>";return;}
-    body.innerHTML=logs.map(function(log){
-      let parsed={},eventDesc="";
-      try{parsed=JSON.parse(log.data||"{}");}catch(e){}
-      const date=log.created_at?(function(){let d;if(typeof log.created_at==="string"&&log.created_at.includes("-")){d=new Date(log.created_at);}else{const ts=parseInt(log.created_at);d=new Date(ts>1e12?ts:ts*1000);}return(!d||isNaN(d.getTime()))?"—":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" "+d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});})():"—";
-      const evt=(log.event||"").toLowerCase();
-      if(evt.includes("update_column")||evt.includes("change_column")){const newVal=parsed.value?.label?.text||parsed.value?.name||(typeof parsed.value==="string"?parsed.value:"")||"—";const prevVal=parsed.previous_value?.label?.text||parsed.previous_value?.name||(typeof parsed.previous_value==="string"?parsed.previous_value:"")||"";const col=parsed.column_title||parsed.column_id||"field";eventDesc="<strong>"+col+"</strong> changed to <span style='color:#4caf80;'>"+newVal+"</span>"+(prevVal?" <span style='color:#4a6a8a;'>(was: "+prevVal+")</span>":"");}
-      else if(evt.includes("create_item")||evt.includes("create_pulse")){eventDesc="<span style='color:#5a9fd4;'>Item created</span>";}
-      else if(evt.includes("create_subitem")){eventDesc="<span style='color:#5a9fd4;'>Subitem added: </span>"+(parsed.pulse_name||"");}
-      else if(evt.includes("add_file")){eventDesc="<span style='color:#e0a030;'>File attached</span>";}
-      else if(evt.includes("add_update")||evt.includes("create_update")){eventDesc="<span style='color:#c0d4e8;'>Update/comment added</span>";}
-      else{eventDesc="<span style='color:#6a8aaa;'>"+log.event+"</span>";}
-      return "<div style='padding:8px 0;border-bottom:1px solid #1a2535;display:flex;gap:12px;align-items:flex-start;'><span style='color:#4a6a8a;white-space:nowrap;font-size:10px;min-width:140px;margin-top:1px;'>"+date+"</span><span style='flex:1;font-size:12px;color:#c0d4e8;'>"+eventDesc+"</span></div>";
-    }).join("");
+    const logs=data?.data?.items?.[0]?.activity_logs||[];
+    if (!logs.length){
+      // Fallback: try board-level query
+      const q2="{boards(ids:"+boardId+"){activity_logs(item_ids:["+itemId+"],limit:50){id event data created_at user_id}}}";
+      const data2=await gql(q2);
+      const logs2=data2?.data?.boards?.[0]?.activity_logs||[];
+      if(!logs2.length){
+        body.innerHTML="<div style='color:#4a6a8a;font-size:12px;font-style:italic;'>No activity found. Note: Activity logs may require additional Monday.com permissions.</div>";
+        return;
+      }
+      renderLogs(logs2, body);
+      return;
+    }
+    renderLogs(logs, body);
   } catch(e){body.innerHTML="<div style='color:#e05050;font-size:12px;'>Error: "+e.message+"</div>";}
+}
+
+function renderLogs(logs, body) {
+  body.innerHTML=logs.map(function(log){
+    let parsed={},eventDesc="";
+    try{parsed=JSON.parse(log.data||"{}");}catch(e){}
+    const date=log.created_at?(function(){let d;if(typeof log.created_at==="string"&&log.created_at.includes("-")){d=new Date(log.created_at);}else{const ts=parseInt(log.created_at);d=new Date(ts>1e12?ts:ts*1000);}return(!d||isNaN(d.getTime()))?"—":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" "+d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});})():"—";
+    const evt=(log.event||"").toLowerCase();
+    if(evt.includes("update_column")||evt.includes("change_column")){const newVal=parsed.value?.label?.text||parsed.value?.name||(typeof parsed.value==="string"?parsed.value:"")||"—";const prevVal=parsed.previous_value?.label?.text||parsed.previous_value?.name||(typeof parsed.previous_value==="string"?parsed.previous_value:"")||"";const col=parsed.column_title||parsed.column_id||"field";eventDesc="<strong>"+col+"</strong> → <span style='color:#4caf80;'>"+newVal+"</span>"+(prevVal?" <span style='color:#4a6a8a;'>(was: "+prevVal+")</span>":"");}
+    else if(evt.includes("create_item")||evt.includes("create_pulse")){eventDesc="<span style='color:#5a9fd4;'>Item created</span>";}
+    else if(evt.includes("create_subitem")){eventDesc="<span style='color:#5a9fd4;'>Subitem added</span>"+(parsed.pulse_name?" — "+parsed.pulse_name:"");}
+    else if(evt.includes("add_file")){eventDesc="<span style='color:#e0a030;'>File attached</span>";}
+    else if(evt.includes("add_update")||evt.includes("create_update")){eventDesc="<span style='color:#c0d4e8;'>Comment/update added</span>";}
+    else{eventDesc="<span style='color:#6a8aaa;'>"+log.event+"</span>";}
+    return "<div style='padding:8px 0;border-bottom:1px solid #1a2535;display:flex;gap:12px;align-items:flex-start;'><span style='color:#4a6a8a;white-space:nowrap;font-size:10px;min-width:140px;margin-top:1px;'>"+date+"</span><span style='flex:1;font-size:12px;color:#c0d4e8;'>"+eventDesc+"</span></div>";
+  }).join("");
 }
 
 function hideActivityLog() { document.getElementById("activity-modal").style.display="none"; }
@@ -1493,6 +1525,9 @@ async function init(){
       fetchBoard(DS_BOARD,DS_COLS,dateFilter)
     ]);
     vrItems=vr; dsItems=ds;
+    // Stamp VR status onto IR/HR items for sidebar display
+    irItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
+    hrItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
     saveCache(irItems,vrItems,dsItems,hrItems);
     showCacheBadge(0);
   }catch(e){
@@ -1511,6 +1546,8 @@ async function refreshInBackground(){
       fetchBoard(HR_BOARD,HR_LIST_COLS,dateFilter)
     ]);
     irItems=ir; vrItems=vr; dsItems=ds; hrItems=hr;
+    irItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
+    hrItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
     irDetailCache={}; hrDetailCache={};
     saveCache(irItems,vrItems,dsItems,hrItems);
     document.getElementById("live-badge").textContent="● Live — "+(irItems.length+hrItems.length)+" cases";
