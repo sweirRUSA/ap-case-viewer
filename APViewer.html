@@ -144,15 +144,13 @@ button:hover{background:#243447;}
 </head>
 <body>
 <div class="header">
-  <div style="display:flex;flex-direction:column;align-items:center;">
-    <img src="RUSALogo.png" alt="Range USA" style="height:60px;object-fit:contain;"/>
-    <span style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#ffffff;font-weight:800;font-family:"Barlow",sans-serif;margin-top:4px;padding-left:2px;">Asset Protection</span>
+  <div style="display:flex;align-items:center;">
+    <img src="RUSALogo.png" alt="Range USA" style="height:120px;object-fit:contain;"/>
   </div>
   <div class="header-right">
     <span class="live-badge" id="live-badge">● Loading…</span>
     <a href="index.html" style="font-size:11px;padding:4px 12px;background:transparent;border:1px solid #2d3f55;color:#8fa8c0;border-radius:6px;cursor:pointer;text-decoration:none;">🏠 Home</a>
     <button onclick="refreshAll()" style="font-size:10px;padding:3px 8px;background:transparent;border:1px solid #4a6a8a;color:#8fa8c0;border-radius:4px;cursor:pointer;">↺ Sync</button>
-    
   </div>
 </div>
 <div class="toolbar">
@@ -537,6 +535,7 @@ function renderList() {
         "<span><span class=\"lbl\">AP </span>"+(r.apFollowUp||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Review </span>"+(r.hrRec||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Rec </span>"+(r.hrRecommendation||"—")+"</span>"+
+        "<span><span class=\"lbl\">Video </span>"+(r.retainVideo||"—")+"</span>"+
       "</div></div>";
   }).join("");
 }
@@ -911,11 +910,23 @@ function renderDetail(r) {
       "</div>",
     "sec-subject":
       "<div class=\"sec\" id=\"sec-subject\"><div class=\"sec-title\">Subject</div><div class=\"fgrid\">"+
-        "<div class=\"f\"><div class=\"flabel\">Subject name</div><div class=\"fval\">"+(r.subjectName||"—")+"</div></div>"+
+        "<div class=\"f fedit\"><div class=\"flabel\">Subject name</div>"+
+          "<input type=\"text\" id=\"edit-subjectName\" value=\""+(r.subjectName||"")+"\" style=\"width:100%;font-size:12px;\"/>"+
+          "<div class=\"fedit-actions\"><button class=\"btn-small btn-primary\" onclick=\"saveSubjectField(\'"+r.id+"\',\'text61\',\'subjectName\',\'edit-subjectName\')\">Save</button><span id=\"msg-subjectName\" class=\"save-msg\"></span></div>"+
+        "</div>"+
+        "<div class=\"f fedit\"><div class=\"flabel\">Subject phone #</div>"+
+          "<input type=\"text\" id=\"edit-subjectPhone\" value=\""+(r.subjectPhone||"")+"\" style=\"width:100%;font-size:12px;\"/>"+
+          "<div class=\"fedit-actions\"><button class=\"btn-small btn-primary\" onclick=\"saveSubjectField(\'"+r.id+"\',\'text96\',\'subjectPhone\',\'edit-subjectPhone\')\">Save</button><span id=\"msg-subjectPhone\" class=\"save-msg\"></span></div>"+
+        "</div>"+
+        "<div class=\"f fedit\"><div class=\"flabel\">Customer ID #</div>"+
+          "<input type=\"text\" id=\"edit-customerId\" value=\""+(r.customerId||"")+"\" style=\"width:100%;font-size:12px;\"/>"+
+          "<div class=\"fedit-actions\"><button class=\"btn-small btn-primary\" onclick=\"saveSubjectField(\'"+r.id+"\',\'dup__of_id__\',\'customerId\',\'edit-customerId\')\">Save</button><span id=\"msg-customerId\" class=\"save-msg\"></span></div>"+
+        "</div>"+
+        "<div class=\"f fedit\"><div class=\"flabel\">DOB</div>"+
+          "<input type=\"text\" id=\"edit-dob\" value=\""+(r.dob||"")+"\" style=\"width:100%;font-size:12px;\" placeholder=\"MM/DD/YYYY\"/>"+
+          "<div class=\"fedit-actions\"><button class=\"btn-small btn-primary\" onclick=\"saveSubjectField(\'"+r.id+"\',\'text39\',\'dob\',\'edit-dob\')\">Save</button><span id=\"msg-dob\" class=\"save-msg\"></span></div>"+
+        "</div>"+
         "<div class=\"f\"><div class=\"flabel\">Subject type</div><div class=\"fval\">"+(r.subjectType||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Customer ID #</div><div class=\"fval\">"+(r.customerId||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">Subject phone #</div><div class=\"fval\">"+(r.subjectPhone||"—")+"</div></div>"+
-        "<div class=\"f\"><div class=\"flabel\">DOB</div><div class=\"fval\">"+(r.dob||"—")+"</div></div>"+
       "</div></div>",
     "sec-witness":
       "<div class=\"sec\" id=\"sec-witness\"><div class=\"sec-title\">Witness</div><div class=\"fgrid\">"+
@@ -1348,6 +1359,13 @@ async function loadInterviewActivity(itemId) {
   } catch(e) {
     container.innerHTML = "<span style='color:#4a6a8a;'>Could not load history</span>";
   }
+}
+
+async function saveSubjectField(itemId, colId, prop, elId) {
+  const val = document.getElementById(elId).value;
+  const ok = await updateColumn(itemId, IR_BOARD, colId, val, "text");
+  showMsg("msg-"+prop, ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item[prop]=val; }
 }
 
 async function saveInterviewFields(itemId) {
