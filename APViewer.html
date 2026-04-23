@@ -289,7 +289,7 @@ const IR_LIST_COLS = {
   apFollowUp:"dup__of_hr_decision____1",
   hrRec:"status_1__1", hrRecommendation:"color_mm0fehr4",
   currentOwnership:"color_mm0q8n2x",
-  subjectName:"text61", retainVideo:"deny_service__", denyService:"district_leader"
+  subjectName:"text61", retainVideo:"deny_service__", denyService:"district_leader", vrStatus:"color_mm0qbcwa"
 };
 
 const IR_COLS = {
@@ -321,7 +321,7 @@ const IR_COLS = {
   oneDriveLink:"one_drive_link",
   documents:"files", pictures:"files9",
   richHandshake:"color_mm0rs4kc", currentOwnership:"color_mm0q8n2x",
-  vrNotes:"text_mm2fvpmd",
+  vrStatus:"color_mm0qbcwa", vrNotes:"text_mm2fvpmd",
   interviewStatus:"color_mm2gyjyr",
   interviewReason:"text_mm2g2kmt",
   interviewDate:"date_mm2gkwpy",
@@ -535,7 +535,7 @@ function renderList() {
         "<span><span class=\"lbl\">AP </span>"+(r.apFollowUp||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Review </span>"+(r.hrRec||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Rec </span>"+(r.hrRecommendation||"—")+"</span>"+
-        "<span><span class=\"lbl\">Video </span>"+(r.retainVideo||"—")+"</span>"+
+        "<span><span class=\"lbl\">VR Status </span>"+(r.vrStatus||"—")+"</span>"+
       "</div></div>";
   }).join("");
 }
