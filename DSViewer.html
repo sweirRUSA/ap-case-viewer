@@ -1,3 +1,4 @@
+<!-- v20260423204100 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,7 +81,6 @@ button:hover{background:#243447;}
 <div class="header">
   <div class="header-left">
     <img src="RUSALogo.png" alt="Range USA" style="height:120px;object-fit:contain;"/>
-    <span class="ap-sub">Asset Protection</span>
   </div>
   <div class="header-right">
     <span class="live-badge" id="live-badge">● Loading…</span>
@@ -162,7 +162,7 @@ async function loadData() {
   for(let p=0;p<20;p++) {
     let q;
     if(cursor) q=`{next_items_page(limit:100,cursor:"${cursor}"){cursor items{id name column_values{id text value}}}}`;
-    else q=`{boards(ids:${DS_BOARD}){items_page(limit:100,query_params:{rules:[{column_id:"date4",compare_value:[""],operator:greater_than_or_equals}]}){cursor items{id name column_values{id text value}}}}}`;
+    else q=`{boards(ids:${DS_BOARD}){items_page(limit:100,query_params:{rules:[{column_id:"date4",compare_value:["${dateFilter}"],operator:greater_than_or_equals}]}){cursor items{id name column_values{id text value}}}}}`;
     const data=await gql(q);
     const pd=cursor?data?.data?.next_items_page:data?.data?.boards?.[0]?.items_page;
     if(!pd||!pd.items||!pd.items.length) break;
