@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;800&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Range USA - AP Case Viewer v3</title>
 <style>
@@ -27,17 +28,11 @@ button:hover{background:#243447;}
 .list-item{padding:10px 14px;border-bottom:1px solid #1a2535;cursor:pointer;}
 .list-item:hover{background:#1a2d42;}
 .list-item.active{background:#1e3a5f;border-left:3px solid #3a7bd5;}
-.list-item.hr-item{border-left:3px solid #7b3ab5;}
-.list-item.hr-item.active{background:#2a1e5f;border-left:3px solid #9b5de5;}
 .item-name{font-size:12px;font-weight:500;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e0eaf5;}
 .item-caseid{font-size:11px;color:#5a9fd4;font-weight:500;margin-bottom:5px;}
-.item-caseid.hr-caseid{color:#9b5de5;}
 .item-meta{display:grid;grid-template-columns:1fr 1fr;gap:2px 6px;}
 .item-meta span{font-size:10px;color:#7a9ab8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .item-meta .lbl{color:#4a6a8a;}
-.board-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:4px;vertical-align:middle;}
-.board-badge.ir{background:#1a3a5f;color:#5a9fd4;}
-.board-badge.hr{background:#2a1a5f;color:#9b5de5;}
 .detail{flex:1;overflow-y:auto;padding:14px;min-width:0;background:#0f1923;}
 .card{background:#131f2e;border-radius:10px;border:1px solid #1e2e40;padding:16px 18px;}
 .card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
@@ -51,7 +46,6 @@ button:hover{background:#243447;}
 .bg-red{background:#3a1a1a;color:#e05050;}
 .bg-gray{background:#1e2e40;color:#8fa8c0;}
 .bg-blue{background:#1a2a4a;color:#5a9fd4;}
-.bg-purple{background:#2a1a4a;color:#9b5de5;}
 .sec{margin-bottom:16px;}
 .sec-title{font-size:10px;font-weight:700;color:#5a9fd4;text-transform:uppercase;letter-spacing:.09em;padding-bottom:4px;border-bottom:2px solid #1e3a5f;margin-bottom:8px;}
 .fgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 16px;}
@@ -146,26 +140,19 @@ button:hover{background:#243447;}
 .lightbox-btn:hover{background:rgba(255,255,255,.3);}
 .lightbox-counter{color:#aaa;font-size:12px;min-width:60px;text-align:center;}
 .lightbox-close{position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;}
-/* Board type filter tabs */
-.board-filter{display:flex;gap:4px;align-items:center;}
-.bftab{font-size:11px;padding:3px 10px;border-radius:12px;border:1px solid #2d3f55;background:#1a2535;cursor:pointer;font-family:inherit;color:#c0d4e8;transition:all .15s;}
-.bftab.active-ir{background:#1a3a5f;color:#5a9fd4;border-color:#3a7bd5;}
-.bftab.active-hr{background:#2a1a5f;color:#9b5de5;border-color:#7b3ab5;}
-.bftab.active-all{background:#1e3a4a;color:#c0d4e8;border-color:#4a6a8a;}
-/* HR case detail header accent */
-.card.hr-card{border-left:3px solid #7b3ab5;}
 </style>
 </head>
 <body>
 <div class="header">
-  <div style="display:flex;align-items:center;gap:16px;">
-    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEVAlUDASIAAhEBAxEB/8QAHQABAAEEAwEAAAAAAAAAAAAAAAgBAwQHAgYJBf/EAEoQAAEDBAAEAwMICAEKBQUAAAABAgMEBQYRBxIhMQgTQVFxkRQiMjZSYXJzFRYjMzVTgbEXGDQ3Q1RVYnSSsiQlQqHBY4KTotH/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAgMEAQX/xAAoEQEAAwABAwQCAgIDAAAAAAAAAQIRAxIhMQQFQVETMiRhFCIjcZH/2gAMAwEAAhEDEQA/ANIgA2qQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOcbdrtTkzka7WJmcViZ6qhdAM0zs611rFYwABxIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvVNAAWJG8q/ccTIciKmlLDmq1dF9L72lm5KZ3hQAFioAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVqbXRfamk0cYm6TZzM97bLTx0yNAAQWgAAAAAAAAAAAAAAUVUTuoFQWnS+w4Oc5fUnHHMqrcsQvK9qepxWVPYWgTjij5VzzW+FxZV9EKea44Al0V+kPyW+3PzXDzHHAHeiv0ddvtcSX2ockkRfuLIIzx1SjlsyEc1eylTGOTXuT1ITxT8LI5o+V8HBsiKulOaKi9iExMeVsWifAADjoAAAAAAAAAAAAAHGRvMhyAiccmNjGMC49nzugNEXiYZZ45iVsAE0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADlE3bt+hxL8aaaV8lshZx12XIAFDUAAAAAAAAAAAAAAVddyiqiJtSy96u9xKtZshe8Vc3ya6NLSqq9wC+tYhmtebeQAEkQAAAAAAAAAAAAAKtcrexQHJjSJxfZIjvuU5GMXI5PRxTbjzw0U5d7SugArXAAAAAAAAAAAAAAAAMYAGthAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAByibtxfOESaaczNedlq465UABFYAAAAAAAAAAAUc5GptQ5URNqWHu5l2SpXqV3v0wOcrl6lADREYyzO+QAHQAAAAAAAAAAAAAAAAAAAAAc4366L2LyLsxjnE/S6UqvT5hdx8mdpXgAUtAAAAAAAAAAAAAAxgAa2EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKtTbkQoXIU67I2nISpGzi6nRAAZmwAAAAAAAAAAAA4Su0mkERs45acjVuR21OIBqiMjGOZ2dAAdcAAAAAAAAAAAAAAAAAAAAAAAAAABdif6KXDGRdKZDF5k2Uclc7tHFfYyVQAVrgAAAAAAAAAAYwANbCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF+JNNLCdzIb2Qq5Z+F3DHfVQAUtAAAAAAAAAAACrpDHcu3KpcmdpNFou4q/LPzW2cAAWqQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOcTtLo4A5aNjHazk6yQUYu2lTK2ROwAAOgAAAAAAAMYAo76K69hrYVeVy9mqv9CvK77LvgSi8N+HYdlGKNfcbak1TGmnO36m2P8H8B/3K3/qKp5YicSiuoC8rvsu+A5XfYd8Cd9Vwx4ZUsnlz0FPG72OkL8HCfh1M1HQ2uGRF7K2TY/LB0IDqqIul6KCdV04EcPKyN/Ja3QyuTo9r+y+4jhxv4P1uEVC1tE51Rb3rtFRPona8kS5NZhqUAFjgAGtVz2sTu5dIByZFK/8AdxPf+Fuy/Hb7jJ+7t9U/8MaqS98PfDayfqNDU3e3tmqZV5uZyehtq3YtYKDXya107de1iKVTy4lFXnDNFLC9Y5onxPTu16aVDibm8VeOts+Z/K44WxsqfnJyppDTJZWdjUZjAIir2RV9wNjeHm32a6Z22jvlP59O9mkbv1EzkaQ1yqKibVFRPvQoi77dSe0/Brh7VwI19lTkXr0fo+Ze+BeCusFVTW62LBOrFVj1ftUUr/LCXRKDoPr5fZaiwX6pt1RG5ixvVG79UPkFiIUVUTv0OTHcj2u1vS70Sw4KcM+H2X4VTXKvtTn1bk/aal0ctbpIjUTUVF9SpKHxAcNsHxDE/ldqtT46h66Ryyb0ReXuorbqJjFY/pIZBap2OfIjWNVzlXSIidzcfDDgbf8AKUZWXFVoKNdKiub1chTyT3aOLtXWomorl5Worl9iF9tDXuTbaGpcntSNSa+McD8Hs0DHT0S1NQneR7unwPs1jeHthb5FQ2hi5fRdKV6n1oIfo+4/7vqv/wAalqWnqIv3tPLH+JuifFnquH92k5KFLfK72aQv3bh3h12Ry1Vpheju6s6DXOt5+IqL6gkhx/4U4njFjW52xVpXuXoxy72R3t74o7hA+ZvPEj05k9qbCcTqxyu+y74Dld9l3wJqcP8Ahxgt7xSiuL7OivljRVXmPvrwiwJO9mb/ANQ1HrhAzld9l3wHK77LvgTok4acNI5fKfQ07X+xZTIZwn4fPT5lqidv2SbGnXCBEiOVy/Nd8DgSu8RWG4Ti+FPlt9tbFWOd8xeb0Io731NNJ2GW3kABNwAMq0Qtnr4o5I3OY52l0hG9opWbT8JUpN7RWPlibKnZcztdJQeV8jge3mTa+p1oq9N6ivqOOOSviV3q/TW9LyzxX8wAAvZwryu+y74FG/STfbZLvgXgmEZLhsFXV2pJZ0TTnK4ja3S7EaiHtN631Kk6a/gjw4jimqv0K7na1XdJFId8TKSkocurKahi8qBj1RrfYhyt4sTGOtAAm4oqondRzJ7UN6eGTEcQyyKppshoXVE6O+YqP0buunBHhrQ22pqv0Q5qxxOcirKq6XRXPJETjsV1B4H08qiggyCshpk5YWSKjE9ibO08I+G10zu6MbEixUbXftJNdNE9iI1zHRYYpZncsMT5XexjdmUlovDk2lprlT2pCpOjD+EWF4vSMelCySZibkllXaKp9GoyvAKKp+RSVNvZI1dcvI0q/L9Ql0oCyWu6xpzSWusYntdEqGI5Fa7lc1WuT0Xuejzbfjl9oEcylo6mB6dFaxCNXimxnDbBDElqofIuEi7eqO6a9x2vJs4TXEdgAWonuLraWqfrkpZnb7aYp3bgdjLMlzemgqIVlpo1RZG+0mnQ8PsSpmxrHaIUVqJraFduTpdiuvP5tBcIo/MloKqOP7To1RC2Tx4t4pRV+BVlLRUVPGsbFenKxEXohBWvhWnrZoV7seqFMzs608fjFhVRO6g4PZzKi7OaJpNHE+4AA6AAAAAMYoVBrYUqPBZUvltFdE5E0x+kJHzfun6+ypGnwTfw+5fmKSWm/cv/AAqZb/ssr4QV493S6x8QKtsdzq2NR3RrZVREPmcNeJGS4tkFNMy51M9O6RGyMlerk5f6mR4gP9INX+JTodvjdNXwQxpt75ERqe1S+IiaoT5ej+K3iK+2OmuUKabKxFPg8ZbdHc8AuNO9jXL5aqiqnYu8I6SejwW3w1DFY9I02i+4w+N98prJgVdLNI1sj2KjGqvVTPndZ8IDXCH5PWzQ/YeqFgvV061NZLOvTncqlk1qg7JwysL8izSgtqMVzHSIrlT00daXoSR8H2JumrJ75VxKjWp+xdruRtOQRGykRNVUOH4gySpeyOGmiRPZs+lYLnDd7VBcIF3HM3maaR8XuSNo8bgtFPMiSyO29qL6H3PCzkTr1gscL37Wn+ZpV9hn6f8AXVu98YviuxeO6Yb+lms5pqVdJpOuiGKoqKqKmlQ9JMutsN1x2topmI9HxO0n36PPTNbXNaMlraKZnIrJF0n3bLOKe2IXh8Y71wMqWUvEGic9F05yIh0U7Zwj+vtu/NQtt4Rh6EUio6liVOysQunzqiodSY5JVMTboqdXon3oh1PhLxBpMyo52K9rayB6tfHv2KZMXNf+J7hey9W92SWqHVXCm5WtT6SERZY3xSOjkarXtXSop6aTxRzwuilYj2PTTmqnRUIe+Jjha/Hrq+/WmJXUM68z0RPoqW8d/iULR8tFKS48H1ek+PzUu1Xy1IkEpfBh/mVd70J8n6o18vseMqV7MSo2tXSK/qRBJd+M36qUX4yM/DeySX/L6ChaznjWRFkT7tjj7Vdt5bu8NHCNla2PJr5Aj4t80DHJ0UlGiU9FSdEZFDE3snRERDExq3QWqyUtDTMRkcUaIiJ7jpfiByFbFgNX5MisqJW8rFQotOzqysfDTnHfjZXzVs9jx2dYoGqrZJW9FVfeaCqrlcqt6vqa+pmc5drzyKpYqJXzzvmkXme9yqqls4viMZNNcLhSvR9NXVMLkXaKyRUN5cD+N1xttbDZskqVmpHKjWSvXat96mhAnfYJjUkPFhlVBdaKjo6CrjnjROb5i77kb07t96F2eonn150rn6TSbXsWvVPegIjIT14EPa7htbNOR2o02fezyqlo8Vrp4XK17Y10qenQ6j4dFVeHtHtd/NQ7PxMVEwyv3/LX+xxTPlA+/wB8vT7zUvW712/MXX7ZenUzcZ4h5VjtdHVU93qpkau1ZLIrkU+DenIt1qNL/rF/ufPnchOsbKy85VsjjBxUqM9pqSN0boViaiSJ6OU1mURdlTTEZ4ZAq1rnORrWq5yrpET1OJuDw2YHDkd/W7XVn/l1J8/mVOiqntEzkaRGs7hJwPlvtEl7ymX5Ba0TenryqqHeLrcODuH0r7PaaaO4VTk5UlT52l9503xC8U6uvr3Y1YpPk1upf2a+WukdroaasSq67xOcu1VybVTNzxNuK0z9NHp5iOaufcJC47kuAU8jqLKLe1zJvoyOb9FC/lXBTEsqtsl24e3KGSRE5nRJJv8Apo0txET9z+ExuHmbXjDbvFV0FTIkCORZIt9FQxe01n/ErMN/vc/zb6+PkFmr7FcpbfcIHxTRu0qOTWz55KPizZLXxI4dxZlaYmpXxsRZWsT47IvSMdHI6N6ac1dKerW2w8mYxwXsTH8H9RLPgrkkVF5XaQhwvYmF4N/qK/8AGQ5f1K+W6r+90dlrHt7ticqfA89OIVRJU5ZXSy65lld2956E5H/Aa38l39jzwzj6z1v5rv7keJK74oAL0G7/AAjSPbmbo0cvKqdiWOaq1uL16uVETynf2Il+Ej67r7iU3FFzm4TcFaul8tTPyfssr4QFvMDqvLJ6eJOZX1Cp095OrgxjVHjuFUUVPC1kkkaOeuuqrohBZpWR55HJK7TUqOqr7z0BxJzX47RPZ9FYm6+B3lntDlGnPFjltxtFkjtlDJLB53V0jF0vxIhyVVVJIsslTM96rvmV3Un3xhwOmzjG5KPTWVTU3E9fb7CFOc4BkmJXB9NcKGRzGqupGJtuiXFMZjlo7vt8IeKd6wq9Rumq5qm3OX9rE93N0+44ccs6gzrJUuNIx8cKN0jXGvfXXqCfTG6joUXsVPoY3bprrfKShgYr3SSIip9xISc8H+JrS2ya/wArEXz+ibTsbrZllukyt2PxyNdUMbtdL2MTEaGjxTAYmqiQsig5n+ml0RcxbN5k46Pq1l+ZPUeWjt9NbM2dczKzwmVW07KqklppPoyNVq/1IIccLAthzqsgZHywueqtXXcnlTvSSBkiKio5qLtCOni8xh01PT3mlhREampV0VrKT3RdABJcAAAAAAAAxgAa2FKHwTfw+5fmKSVnXUEi/wDCv9iNXgm/h9y/MUktN+5f+FTLyfssr4RfyXg+uf5VW10V2+TyI9UWNNbQ7Rw58Olpx+6xXK61rq+SJyOYxydEU1zfc4rcK41y1TKhzaOSTUzd9NEsMdu1Le7RT3Gjej4pmI5FRSVptEEREuucRM9sWA2xrq9yo/k/YxonRfuId8YOKF2z26Oc9ywULF/ZQtXoiEwuMWG02Y4jU0b2M+UMar43q3qip6ECb9bKiz3aot9VG5kkL1bpyHeKIctrBABegvUNO6srYKRiKrpnoxET71J+cHsfbi2B0tK9qIrYud3w2RO8NuMfp/PIJZ4eelgXbl16k3a2jWW1vooXeWjmciL7EKOWfhOkIP8AiQyWPIeIFQ6CRVihXk1vptDtHhFyRaHKH2iWVGQyptOvdTY1y8OFqrq+asmrdvlcrl7+pn4jwCt2O3uG501Z8+JyLrr1E2r04ZO63amnJ7UUh34tsW/RmVpeGN5WVXXohMOJvJG1vsTRqnxN43HesElq+TnlpE21NdSFJyXbRsIPHbOEX19t35qHVHtVj3McmlRdaO18Ivr7bvzUNM+FceU9rr9Uan/lHf8AaQYwvNK7CuIMtfTvd8nWoVJo/RybJz3X6o1P/KO/7TzqyD+OVn5zv7lPFG6nd6I4XkVFk9igudFI1zZGorkReyl/KLJRZBZp7ZXRtfHKxW7VPor7SHnhz4nTYpfGWq4zOW3TuRE2vRik0aGqgraSOqppGyRSNRzXNXoqELV6ZSidQC4v4PWYTk81JLG75M9yrE9U6Khu/wAGH+ZV3vQ2txpwKkzbF54uRqVsTVdE/XXp6Gt/CfaqyyVV1ttfC6KaKTWnJ3JzfqojmSv+M36qUX4zU3hLpY6niM7zEReSLaG2fGb9VKL8Zqzwgua3iPJzLrcPQ7X9HJ/ZNJE0mkI+eMSs8mzUcG1+eSDNAeMCkWaxUsyRK7k/9XsKF1fKJxsPhrwrumc2mWvt83Ksa65faa8Ns+HviHBhlymjuMjko3JtERfU6tnc7Lz/AA+5wjlRtOip7Tj/AJPuc/7MhuWDxF4xNcYaOOjnVZZEYjvTqbnoKllZRxVMf0ZGo5AhNrQhdV8Bc0paaSomgRscabcv3Gr7hSyUVa+ml+nG7S/E9AuKVStJgd0nRVTlhXseftymWor5Zl386TfX3hKszKbnhz/0e0f4UNhXWhp7jQyUdS3mikTTkNe+HP8A0e0f4UO4Z3WVFvxisq6V3LLGxVapxVPl0qbgdgc0z5X29qucu1+cXKTgdw7icqy2aOb2I5ykarnxlzyG4TxtuSo1r1REMX/G7iBDK17Lmu0JViZns7aJiNl9fxNWfELFe4bfjVujpHMTUvKvqabPp5LfbjkV0kuV0mWWokXblPmGmsZDPLMoLXXV7d0sKvT7iSPD2upcV4O1tvhkRblUsVOT1TZHW0X24WpqtpHo1F77QkPhlsoMl4TVd+pWqtzpmK5y+nQ831M+u6/+OK9P969X09fbuiPyzbq/qIxoKtsF7qauWd9M9Ve5V2pds+P3aG4xSPpnI1HJtdF2pzG/Q1EkSzInK5U6oXrVl97qa+OGSZqtcul6FHNb3L8c7Fcz7lq4K+1fkr02vu/UPpZtaa+t8r5PCr9J10dX/Vq8/wCyu+B2/L7/AHK2+X8lkRvMm16HXP12vv8AOb8DL7bb1/8Aj1/HFc/vWz3Wvts+qt+WbdX9RDdfh2un6Gxe7We+uWNs8Tkja/ttTS2V49XxXermigVYFkVUciehujgFa/1sx65XbIGucymjc6NU6djUeX5VXLdKuipZESla9WtTXobaW9x6u8V/9l5t6+1dPa19/wCodOeitVWr3QmD4N/qK/8AGQ+kcrnOcvde5MHwb/UV/wCM9Pk/V5EeW6Mj/gNb+S7+x54Zx9Z638139z0PyP8AgNb+S7+x54Zx9Z638139yPE7d8UAF6DdnhI+u6+4lLxS+pFw/LUi14SPruvuJS8UvqRcPy1M/J+yyvh593V6x3qaRq6Vsu0+JMfw48SqDJMfgtFTMyKup2o3kcutohDa9fxWp/GpWz3OutFfHW2+ofBNGu0c1dFtq9UIROPS0wLzZrZeKZ1PcqOKojcmlR7SNfDDxHuhbDbspgfIvRPlCdk95InF8psWS0iVNnuENS1U6o13VDPNZqsiYlo7iv4dqGsbNcsVctPKiK5KZOykYb/ZrhYrjJQXKB8MzF0qOTR6Umi/FNgdLdsfW+UsDW1kP03IndCdOSfEo2qh0bs8KGJ/pjK/0u9Nx0voqdDSyQyPn+TsTciu5UT7ycPhtxaOw4RBNJD5dTO1HP6FnJbIRrHdz8SGRwWHApqZz+R9U3lZpdEIqGuko7pFXsdt7JEci7+8nZxX4aw575TKyq8uOL6LTXv+TLZf9sT/ANyFLVrCVomZbW4RXpl7wmhqklR71jTmTfZdHLi1Yf1hwqtoU+lyK5F9yDhphseG2n9Hwz+axOx2qeNJYXxO7PaqKVT5Th5t3WmdR3Geldvcb1b/AO5jGy/ENja2DOqlsbP2UjlcjkTp1NaBojuAA6AAAAADGAKGthSi8E38PuX5iklpv3L/AMKkcfBZTOis9dKq9Hv2hI6b9y/8KmW/7LK+ECvEB14g1f4jafhK4guZKuL3Gfad4nPXt9yGrfECipxCq9oqfO9TpVhudRZ7xTXGme5r4JEd0Xvou6driG5L0q6OT2opGTxX8Odu/Wm2Qd03OjU7G7uE+VQZZiVLXskasvIiSNReynYr3baW7WyegrImyQzMVqoqFETNZWTGw80vuUp19O5sHjXgNbheTTsWJ3yOV6ujfrppfQ+Bw5sc2Q5dRW+KNXtWRFkRE9NmrYzVWJU+FDEVsuIpdJWpz1nz02nVC94heLNywR9NT2OKmmqH/vEl66NqY9QQWTHqekhbyxwRJ09yEJPERe33niDVv518tjlRrd9CisdVu6ye0Pu1niRz6p1+xoYkT7CKW6XxG59TPV6R0Uv3PRdGnShd0V+kNl6C8HswlzLE4LjVJE2qVP2jY+yKdpvdDDcbVUUk7EeySNU1/QjX4Nb/AOWlXaZpFcrl2xFXsSgM1oyVkTsPOriVZZrHl9dSSM5GpK5Wpr02ZHCL6+2781DcXjAxF0FxjyOFvzJfmuRqepqLg3BJPn1vSJNq2RFU0RO11XmSnjdfqjU/8o7/ALTzqyD+OVn5zv7noxco1di1RH6rSuT/APU87stpn0uRVsT0XaSu7+8r4flK75aKqORyKqKi7RSUfhd4qefGzGL1OiPb0he5e6ewi4X7dWVFvroq2lerJonI5qopbavVCETj0yRUVNp1RTBpbVRU1bLWQQtZNL9NyJ3NceH3iPTZjj0dLUTp+kIGo17VXqptUyzExOLY7tAeM36qUX4yP/Au+tsWf0crncrZnIxVJAeM1FXFKLSKvzyI8EskEzJonK2RiorVT0L+ONqhby9MaKVs9JFK1yORzUXaHROPdgkvuAVsdPHz1EbeZqaOteG3iRSZJjsVpq52trqZOT5y9XG5Jo2yxPjeiK16Kip9ylExk4sifl5rVUL6eokglTT2OVFQtG+/EFwgrrbcZb5Y6Z01JIque1ibVF9xoiaGaB6smhkicndHtVFC+J1fsqo280SqukSZq7/qehGBSNlxaic16PTym9f6Hn7jdDU3C+UdPTQSSudM1F5W79T0CwS3utuMUdM9NObGm09nQShyPi8cKltPw3uqORVV8SohAeT96v4//kndx+/0dV/4FIIu/e//AH//ACIdp4Tj8OaL/h7SbT/0odo4l/Uyv/LX+x8fgOxjOG1sVrURVjTZ23Ibe26Weponf62NUT36OK58vOq9fxWo/MU+dN3O78R8LyCw5JVQT2ypexz1Vjo41cip/Q6tJaLu5Ua2016qvb9g7/8AhZTysv3q+aDa/DbghkmTzNqLjDJQW7W3yO6O+B0ziNYKLGsmntVBUuqYol1zu9S/qiZxkx1o3f4YM2prVdJccu0jW0FWnKiL2VVNInKKSSGVksT3RyMXbXIvVFO2jYwicbj8QfDCtsN6kvNrgWe21P7RHRptG7NUWHpdoUXvzIb14Vcc6SO2Mx3N4G1VDrkSR6cy6O03nhzwvyKB9+x+7QUTkTnSJr0Ta+zRm57THFaJ+mj08bzVz7hoTiJ/qV/4T5+CYjdcuvEVBb6d7mOciPkROjUN7Y3w2xa/yLV369RwxU6/QdIicyIfbv8AxO4ecN7Y+24dSU8tejeVXNb3X27MXtNv4lYh6Hvcfzb6rxEuNu4VcMGY3QvjW5Txcsmu677kT55XTzPlf9J67U+zmmUXTK7xLcrlO97nu21qr0ansPhnq1rkPImdUXsTB8G6p+o0ib685D4kf4PcmhgrZbFLMjFcm2oq62R5I2pXylDdo/NtlTGib5o1TR59cVqT5Hm1fCrFYqSL0X3noeRo8SfB+vuNfLk1ijdM93zpo07p7irjtkp2jsi6DMqbVdKeZ0U1tq2vaulTyVPp4xhuRZFXMpLfbKnmcuuZ8aoiGjVbbvg/tks2RS17WqrGdFX0JK8U1RMIuCquk8tT4XA3h8zBcaZBKifK5U5pfuU+D4oMxprHh0lqbKiVVUnTS9UQzzPVbssjtCGl5/itTr7amHtC4iumqW8yq5z3p/XqSQr+B0Nx4X01ztUCJcliSRyerk0XzaK+VcRqNZ2LCMxveJXSKstlW9rGuRXRq75qofKutruFrq5KWtpJoZGLpeZiocLfbq241UdLSU00skio1OVir3O9pHoJwry2PMMVproxunOanP7zlxY8r9Qbp5uteSut+0+NwCxisxfBKWirUVJXNRyovodW8U+YQ2fFv0VTzt+VT9HM31RDNn+2Qt+Ea+E+OPybiLDSRptsc/O73IpOiuqIMdxh8zka1tND0T02iGh/CLiD4aObIK6DlllduNyp6HevEzff0Xw/qKaNytln6Iqewleeq2I17RrS198SmbQXOpp6Sjt3kteqMcqLvR8N/iHz1zld/wCFTf3Kaikc573Ocu1VdqpQt6K/SOykzwd495LfcrgtN9io200iaR7E+dsk9E9skbXtXaOTaHm3ila+35HQ1bHK3y5UVfds9DMIuTLrjVHWM7OjT+xVyViJ7J1nWm/FtjPyyyx3ani2+P8AeORCJp6J57ZWX/Fa22uRNyRrrftIAZVbH2i+1VA9FRYpFTqhXC+k9nywAdTAAAAAGMUd2UqDWwpR+GLKsVx3GFbcrrHTzv6q1yG4l4o4Kqa/TsHU8+0e9v0XuT3KV8yX+a//AKiqeOJnUotjZviRrbVcc9kq7PVsqqd7UXnb7TWBVXOd9Jyr71KFkRkYjLdvhaz6PHL8+0XCfy6So687l6IpJ6q4k4XTP5Jr5TtX3nnqx72O5mOVrk9UXqc31FRIu3zyOX2q4hbjiZ1KLYmrxOvnDXN8dmt1Xe6ZsyNVYpNdWqa08PEGD4rdK65XO9wrUxyKyJVb3b7SOfmy/wA1/wAR5knpI9P6iOPIzXOpP2u4nYNLRTxpfoE5o1Tp7iEXEaWmnyuslpKhJ4nSKrX+06/5kv8ANf8AE4qqr3XZ2tOkmdAATcbJ8Ol/o7BxChqLlV/JqRWLzOXtsl5/ilg3+/oDz6RVTsqocvMl/mv+JXbji067FsTY4q5XgGU4dW0DrzTum8tVh6dUcRp4MyW21cRmyXCvZBTRO6SqnRepr3zZf5r/AIlOZ298y79uzsUyMJtr0AXiZgj6X5O6/QaVnKvwIY8ZX22TN6yS1VDginc1V69R0/zJf5r/AIkaVVcu3Kqr94rTpJtoACbjsfDnKazEsnprnSyOa1HIkiIvRW+pOPGeIuNXSw01e+5wxrIxOZHL1RTz5L8dbWxxpHHVzMYnZqO6EL0izsWxLfxNXmx3vC0ZQ3KGWSNd8qLsiCvdS9JWVkjeWSqme32K4sna16YwmdfTxq8XCxXJlfbZ3QzsXaKikneFviGoaiCKgyli08jURq1HdF/oRRi+mhf7lPJHdfxxE1eiNoyzGb7EnyO5U07XJ0Ryp1+J8q88PsHvFQ6orKCle93dWuRCBtNcrlS6+S19TBrtyPVD6lHmeU0rFZHe6tUX7UiqV4l0fScWO4NhePVCVFuoqWKROyq5FPt3HIbJbmqtVcaeNGp1+ehAGszDKKtU8291jdfZkVD5893u8+/PudXLv7UiqMOhLjjNxPwetw24WunubKmrkYrWNanZSIECMfWsR/RiydfdssuVXO5nKqr7VUBOIxNjhjnuGWnDKCimvEMckcaI5q+h2b/ABQwf/fsBAPzJP5j/iPMl/mv+IxHoT3k4j4BIu5LtRvX2uZs50udYDVSckNwoXOT/gQgL5kv81/xOTJ6iNVWOeRq+1HDDoT8vGa4vFZaxYLnTI5sLtNauuuiBuY3B1yyKsqlXaOkXS/1MB9dXrtq1k6ovdOcx1VVXartTRSnSy2nQAFjihn2eqfBXxOfUysjReunLowShG9eus1n5S47zS0Wj4drzO7Q1fl/Ia2R2k0qI5UOquVXLtyq5faqlCpT6X09fT8ccdZ7Qu9X6m3quWeW0ZMgANDOGfj93rLHdYLlQyujmicjk0vcwABMjhTx8x+8UEVJf5fkNY1EbzO6o9TcVDdrVcadJaatp5Y3J9tDzVRVa5HNVUVOyofSpcgv1Jr5Nea2JE7I2VdFM8UfCUXeiVTa7DUyeZNTUT3L66acmrZLXAr2rR07G9VVOVDz+TPsuRNJeqn/AK1MCsyfI6tyrPe61yL3TzV0c/FP271pl8R+OGK41RSsoaltfXIiokbPRSIOfZhc8xvUlxuEjlRyqrGb6NQ67I+SV6vle57l7q5dqULK0iqMzr62H/IUyOjW5SpFSpIiveqb0T3wTI8ZrrJTU1rukEzGRo3Sqieh54mXSXO50aapLhU06f8A03qgvTqInHoRkWJYnkCo+5UdLK72oqIYtnxLCMYV1XSU1HTq3qrnORdEGoM6y2GNI2XuqVE7bepiV+VZJXKq1F6rHIvdqSLoh+KftLqhMPiZxyxjHKKWC11Da2uRFRGM7NUincsinzfOIKq/1Ssgll+cqr0Y3Z1GR75Hq+R7nuXurl2qlEVU7dCdaRVGZ1O/Ec44fWDH6S2U98p0bFGidjWviay7G7/jbGWq6R1Eje7WkXPMl/mv+IWSRU0sjlT71Ixx5OuzZxABaiN2jkVOiouyZnAziJi9BgNHR3K7xxVMbdOa4hrEnzjJR707PcnuUo5e8r+Kuwn2vE/B1TS3yDqRk8SSYzXXpt2x+vim8z6bGp6mn/Ml/mv+IV71TTnuVPvUqxbFccQAdSAAAAAGMADWwgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKtXTjITsYxkMXbSnlj5X8M/CoAKl4AAAAAAAAAALMyaXftOBfkTbSwX8c7DLy1yQAFisAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACrU2ujk9iO67EmmnMImkBlmdnW2sZGAADoAAAAAAADGABrYQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAuwr00WjlEunELxsJ8c5ZfABnawAAAAAAAAAACzK3Tt+heKPbzJolW3TKF69UMcBU0ugaWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC7C3ptTgxvMpfRNJoq5LfC7ip30ABS0AAAAAAAAAAAxgAa2EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACdF2ABkNXbSpbhd6Fwy2jJxspOxoADiQAAAAAAAAAAOErN9ULJklqRnqhZx3ztKnl497wtgAvZwAAAAAAAAAAAAAAAAAAAAAAAAIiqukCIqrpC9GzSEL26U6Um0qsbyocgDP5aojAAB0AAAAAAAAAAGMADWwgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAq1dO2ZCLtNmMXYXdNFXJX5XcVsnFwAFLQAAAAAAAAAAAAALUkfqhbMk4PYjuvqWU5M7Spvxb3hZBVzVReqFC7dZ5jAAHQAAAAAAAAAAAAAAAACIqr0OTGK706F5rUb2K7XiFlOObKMYjfecgCiZ1piIiMgAAdAAAAAAAAAAAAAGMADWwgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFWrpdlAcPDIau02VLUTtLpS6ZrVyWyluqAAHEgAAAAAAAAAAAAAVEXuWnR+qF0HYtMeEbVi3ljKip3QGQqIvdDgsSL2LY5Y+VFuGfhaByWNyfecVRU9CcWiVc1mAFAScVAKbAqAVRrl9Dm4REyoDmkSr6nNsbUITyRCyOK0rTWqvZC4yNE6qXAV25JldXiiAAEFgAAAAAAAAAAAAAABV0mwKK5E7qCw923bBbHH2UTzd+ygALlAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF6J2016lkq1VRdoQvXqhKlumWQCjXcybKmdsidAAAAAAAAAAAAAAAAAAAAAFFa32Dkb7CoGy5kOPI3fYryt9hUDZOmPpTlb7CoAdAAAAAAAAAAAAAAAAAAAAAAtSu9EOUr9JpO5ZLOOm95U8t/iAAF7OAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADlGqo7oX0AKOXy0cM9gAFa4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACjl0mwBHlyfDHVdrsAGqGIAB0f/9k=" alt="Range USA" style="height:70px;object-fit:contain;"/>
-    <span style="font-size:22px;letter-spacing:4px;text-transform:uppercase;color:#ffffff;font-weight:700;padding-left:16px;border-left:2px solid #3a7bd5;white-space:nowrap;">ASSET PROTECTION</span>
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <img src="RUSALogo.png" alt="Range USA" style="height:60px;object-fit:contain;"/>
+    <span style="font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#ffffff;font-weight:800;font-family:"Barlow",sans-serif;margin-top:4px;padding-left:2px;">Asset Protection</span>
   </div>
   <div class="header-right">
     <span class="live-badge" id="live-badge">● Loading…</span>
     <a href="index.html" style="font-size:11px;padding:4px 12px;background:transparent;border:1px solid #2d3f55;color:#8fa8c0;border-radius:6px;cursor:pointer;text-decoration:none;">🏠 Home</a>
     <button onclick="refreshAll()" style="font-size:10px;padding:3px 8px;background:transparent;border:1px solid #4a6a8a;color:#8fa8c0;border-radius:4px;cursor:pointer;">↺ Sync</button>
+    
   </div>
 </div>
 <div class="toolbar">
@@ -187,12 +174,6 @@ button:hover{background:#243447;}
   </div>
 </div>
 <div class="filter-row">
-  <div class="board-filter">
-    <span style="font-size:11px;color:#4a6a8a;margin-right:4px;">Board:</span>
-    <button class="bftab active-all" id="bf-all" onclick="setBoardFilter('all')">All</button>
-    <button class="bftab" id="bf-ir" onclick="setBoardFilter('ir')">IR only</button>
-    <button class="bftab" id="bf-hr" onclick="setBoardFilter('hr')">HR only</button>
-  </div>
   <select id="f-branch" onchange="renderList()"><option value="">All branches</option></select>
   <select id="f-category" onchange="renderList()"><option value="">All categories</option></select>
   <select id="f-type" onchange="renderList()"><option value="">All types</option></select>
@@ -296,26 +277,12 @@ const IR_BOARD = "309348813";
 const VR_BOARD = "992178387";
 const DS_BOARD = "1053253179";
 const BB_BOARD = "4714502022";
-const HR_BOARD = "18409509776";
 const PROXY = "https://corsproxy.io/?";
-let irItems=[], vrItems=[], dsItems=[], hrItems=[], selectedId=null, selectedBoard="ir";
-let irDetailCache={}, hrDetailCache={};
-let boardFilter = "all"; // "all", "ir", "hr"
+let irItems=[], vrItems=[], dsItems=[], selectedId=null;
+let irDetailCache = {}; // cache full detail per item id
 
+// Columns needed just for the list view (fast initial load)
 const IR_LIST_COLS = {
-  caseId:"formula_mm0q4bmm", pushableCaseId:"text_mm0q5kyg",
-  date:"date4", branch:"dropdown0",
-  category:"color_mknf4hd3",
-  incidentType1:"dropdown_mkqakpqf", incidentType2:"dropdown_mkq4h3my",
-  incidentType3:"dropdown_mkq4d5sf", incidentType4:"dropdown_mkq4w1hv",
-  apFollowUp:"dup__of_hr_decision____1",
-  hrRec:"status_1__1", hrRecommendation:"color_mm0fehr4",
-  currentOwnership:"color_mm0q8n2x",
-  subjectName:"text61", retainVideo:"deny_service__", denyService:"district_leader"
-};
-
-// HR board uses same column IDs (it's a copy of IR board) but Case ID formula outputs HR
-const HR_LIST_COLS = {
   caseId:"formula_mm0q4bmm", pushableCaseId:"text_mm0q5kyg",
   date:"date4", branch:"dropdown0",
   category:"color_mknf4hd3",
@@ -364,9 +331,6 @@ const IR_COLS = {
   bbRelation:"board_relation_mm2kcgyg"
 };
 
-// HR detail columns — same as IR (copied board)
-const HR_COLS = Object.assign({}, IR_COLS);
-
 const VR_COLS = {
   agency:"status6", status:"status", assigned:"person",
   branch:"dropdown0", incidentDate:"date4", incidentTime:"text19",
@@ -394,15 +358,6 @@ const DS_COLS = {
   phone:"phone_mkr6t0vm", subjectType:"dropdown6", audit:"color_mkq4smae"
 };
 
-// Board filter UI
-function setBoardFilter(val) {
-  boardFilter = val;
-  document.getElementById("bf-all").className = "bftab" + (val==="all"?" active-all":"");
-  document.getElementById("bf-ir").className = "bftab" + (val==="ir"?" active-ir":"");
-  document.getElementById("bf-hr").className = "bftab" + (val==="hr"?" active-hr":"");
-  renderList();
-}
-
 async function gql(query) {
   const r = await fetch(PROXY + encodeURIComponent("https://api.monday.com/v2"), {
     method:"POST",
@@ -415,7 +370,9 @@ async function gql(query) {
 function getVal(cols, id) {
   const c = cols.find(x => x.id === id);
   if (!c) return "";
+  // File columns — return raw JSON string for later parsing
   if (id === "files" || id === "files9") return c.value || "";
+  // Board relation columns — return raw value for linked ID extraction
   if (id === "board_relation_mm2kcgyg") return c.value || "";
   try {
     const v = JSON.parse(c.value);
@@ -468,9 +425,9 @@ function getIncidentTypes(r) {
 function stripPeriodSeparators(text) {
   if (!text || text === "—") return "";
   return text
-    .replace(/\n\.\n/g, "\n\n")
-    .replace(/^\s*\.\s*\n/g, "")
-    .replace(/\n\s*\.\s*$/g, "")
+    .replace(/\n\.\n/g, "\n\n")   // replace .\n between paragraphs with blank line
+    .replace(/^\s*\.\s*\n/g, "")  // strip leading standalone period line
+    .replace(/\n\s*\.\s*$/g, "")  // strip trailing standalone period line
     .trim();
 }
 
@@ -521,14 +478,11 @@ function displayName(r) {
 }
 
 function populateFilters() {
-  const allItems = irItems.concat(hrItems);
-  const branches = Array.from(new Set(allItems.map(r=>r.branch).filter(Boolean))).sort();
-  const categories = Array.from(new Set(allItems.map(r=>r.category).filter(Boolean))).sort();
-  const types = Array.from(new Set(allItems.reduce(function(a,r){return a.concat([r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4]);},[]).filter(Boolean))).sort();
+  const branches = Array.from(new Set(irItems.map(r=>r.branch).filter(Boolean))).sort();
+  const categories = Array.from(new Set(irItems.map(r=>r.category).filter(Boolean))).sort();
+  const types = Array.from(new Set(irItems.reduce(function(a,r){return a.concat([r.incidentType1,r.incidentType2,r.incidentType3,r.incidentType4]);},[]).filter(Boolean))).sort();
   function addOpts(elId, arr) {
     const el=document.getElementById(elId);
-    // Clear existing options except first
-    while(el.options.length > 1) el.remove(1);
     arr.forEach(function(v){ const o=document.createElement("option"); o.value=v; o.textContent=v; el.appendChild(o); });
   }
   addOpts("f-branch",branches); addOpts("f-category",categories); addOpts("f-type",types);
@@ -551,14 +505,7 @@ function renderList() {
   const fdeny=document.getElementById("f-deny").value;
   const fdfrom=document.getElementById("f-date-from").value;
   const fdto=document.getElementById("f-date-to").value;
-
-  // Determine which items to show based on board filter
-  let sourceItems = [];
-  if (boardFilter === "all") sourceItems = irItems.map(r=>Object.assign({},r,{_board:"ir"})).concat(hrItems.map(r=>Object.assign({},r,{_board:"hr"})));
-  else if (boardFilter === "ir") sourceItems = irItems.map(r=>Object.assign({},r,{_board:"ir"}));
-  else if (boardFilter === "hr") sourceItems = hrItems.map(r=>Object.assign({},r,{_board:"hr"}));
-
-  const filtered = sourceItems.filter(function(r) {
+  const filtered = irItems.filter(function(r) {
     if ((r.category||"").toLowerCase()==="background check denial") return false;
     if (q && ![(r.caseId||""),(r.branch||""),(r.subjectName||""),displayName(r)].some(function(s){return s.toLowerCase().includes(q);})) return false;
     if (fb && r.branch!==fb) return false;
@@ -568,22 +515,20 @@ function renderList() {
     if (fhr && r.hrRec!==fhr) return false;
     if (fret==="yes" && !(r.retainVideo||"").toLowerCase().includes("yes")) return false;
     if (fret==="no" && (r.retainVideo||"").toLowerCase().includes("yes")) return false;
-    if (fdeny==="has" && r._board==="ir" && !getLinkedDS(r).length) return false;
-    if (fdeny==="none" && r._board==="ir" && getLinkedDS(r).length) return false;
+    if (fdeny==="has" && !getLinkedDS(r).length) return false;
+    if (fdeny==="none" && getLinkedDS(r).length) return false;
     if (fdfrom && r.date && r.date < fdfrom) return false;
     if (fdto && r.date && r.date > fdto) return false;
     return true;
   });
   const panel = document.getElementById("list-panel");
   if (!filtered.length) { panel.innerHTML="<div class=\"empty\">No cases match your filters.</div>"; return; }
+  // Sort most recent first
   filtered.sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
   panel.innerHTML = filtered.map(function(r) {
-    const isHR = r._board === "hr";
-    const activeClass = selectedId===r.id && selectedBoard===(isHR?"hr":"ir") ? "active" : "";
-    const boardBadge = "<span class=\"board-badge "+(isHR?"hr":"ir")+"\">"+(isHR?"HR":"IR")+"</span>";
-    return "<div class=\"list-item "+(isHR?"hr-item ":"")+activeClass+"\" onclick=\"selectItem('"+r.id+"','"+r._board+"')\">"+
-      "<div class=\"item-name\">"+boardBadge+displayName(r)+"</div>"+
-      "<div class=\"item-caseid"+(isHR?" hr-caseid":"")+"\">"+(r.caseId||r.pushableCaseId||r.id)+"</div>"+
+    return "<div class=\"list-item " + (selectedId===r.id?"active":"") + "\" onclick=\"selectItem(\'"+r.id+"\')\">"+
+      "<div class=\"item-name\">"+displayName(r)+"</div>"+
+      "<div class=\"item-caseid\">"+(r.caseId||r.pushableCaseId||r.id)+"</div>"+
       "<div class=\"item-meta\">"+
         "<span><span class=\"lbl\">Date </span>"+(r.date||"—")+"</span>"+
         "<span><span class=\"lbl\">Category </span>"+(r.category||"—")+"</span>"+
@@ -592,168 +537,234 @@ function renderList() {
         "<span><span class=\"lbl\">AP </span>"+(r.apFollowUp||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Review </span>"+(r.hrRec||"—")+"</span>"+
         "<span><span class=\"lbl\">HR Rec </span>"+(r.hrRecommendation||"—")+"</span>"+
-        "<span><span class=\"lbl\">VR Status </span>"+(r._vrStatus||"—")+"</span>"+
       "</div></div>";
   }).join("");
 }
 
-async function fetchItemDetail(id, board) {
-  const cache = board==="hr" ? hrDetailCache : irDetailCache;
-  const boardId = board==="hr" ? HR_BOARD : IR_BOARD;
-  const colMap = board==="hr" ? HR_COLS : IR_COLS;
-  const items = board==="hr" ? hrItems : irItems;
-
-  if (cache[id]) {
-    const cached = Object.assign({}, cache[id]);
-    delete cached.documents; delete cached.pictures;
-    if (cache[id].documents || cache[id].pictures) {
+async function fetchItemDetail(id) {
+  if (irDetailCache[id]) {
+    // Always clear file data from cache so we get fresh signed URLs
+    const cached = Object.assign({}, irDetailCache[id]);
+    delete cached.documents;
+    delete cached.pictures;
+    // Re-fetch just for fresh asset URLs if we have file data
+    if (irDetailCache[id].documents || irDetailCache[id].pictures) {
       const q = "{items(ids:["+id+"]){id name column_values{id text value}}}";
       const data = await gql(q);
       const item = data?.data?.items?.[0];
-      if (item) { cached.documents=getVal(item.column_values,"files"); cached.pictures=getVal(item.column_values,"files9"); }
+      if (item) {
+        cached.documents = getVal(item.column_values, "files");
+        cached.pictures = getVal(item.column_values, "files9");
+      }
     }
     return cached;
   }
+  // Fetch full detail columns for a single item
   const q = "{items(ids:["+id+"]){id name column_values{id text value}}}";
   const data = await gql(q);
   const item = data?.data?.items?.[0];
   if (!item) return null;
-  const detail = {id:item.id, name:item.name, _board:board};
-  Object.entries(colMap).forEach(function(e){ detail[e[0]]=getVal(item.column_values,e[1]); });
-  const existing = items.find(function(x){return x.id===id;});
+  const detail = {id:item.id, name:item.name};
+  Object.entries(IR_COLS).forEach(function(e){ detail[e[0]]=getVal(item.column_values,e[1]); });
+  // Merge into irItems entry
+  const existing = irItems.find(function(x){return x.id===id;});
   if (existing) Object.assign(existing, detail);
-  cache[id] = detail;
+  irDetailCache[id] = detail;
   return detail;
 }
 
-async function selectItem(id, board) {
+async function selectItem(id) {
   selectedId=id;
-  selectedBoard=board||"ir";
   renderList();
-  const items = selectedBoard==="hr" ? hrItems : irItems;
-  const r = items.find(function(x){return x.id===id;});
+  const r = irItems.find(function(x){return x.id===id;});
   if (!r) return;
+  // Show skeleton while loading detail
   document.getElementById("detail-panel").innerHTML = "<div class='loading'><div class='spinner'></div><span>Loading case...</span></div>";
   document.getElementById("preview-body").innerHTML = "<div class='preview-empty'>Loading files...</div>";
-  const detail = await fetchItemDetail(id, selectedBoard);
+  // Fetch full detail if not cached
+  const detail = await fetchItemDetail(id);
   if (detail) {
     renderDetail(detail);
     updateStatusBar(detail);
     renderPreview(detail);
-    if (selectedBoard==="ir") {
-      if (isSectionVisible("sec-bb") && detail.apFollowUp && detail.apFollowUp.toLowerCase().includes("open invest")) {
-        setTimeout(function(){ loadBBDetail(id); }, 300);
-      }
-      if (isSectionVisible("sec-interview") && detail.interviewStatus && detail.interviewStatus.trim() !== "" && detail.interviewStatus !== "—") {
-        setTimeout(function(){ loadInterviewActivity(id); }, 500);
-      }
+    // Auto-load BB detail only if Open Investigation
+    if (isSectionVisible("sec-bb") && detail.apFollowUp && detail.apFollowUp.toLowerCase().includes("open invest")) {
+      setTimeout(function(){ loadBBDetail(id); }, 300);
+    }
+    // Auto-load interview activity only if interview status is set
+    if (isSectionVisible("sec-interview") && detail.interviewStatus && detail.interviewStatus.trim() !== "" && detail.interviewStatus !== "—") {
+      setTimeout(function(){ loadInterviewActivity(id); }, 500);
     }
   }
 }
 
 async function refreshCase(id) {
-  const cache = selectedBoard==="hr" ? hrDetailCache : irDetailCache;
-  delete cache[id];
-  const items = selectedBoard==="hr" ? hrItems : irItems;
-  const r = items.find(function(x){return x.id===id;});
+  delete irDetailCache[id];
+  const r = irItems.find(function(x){return x.id===id;});
   if (!r) return;
-  const detail = await fetchItemDetail(id, selectedBoard);
+  const detail = await fetchItemDetail(id);
   if (detail) {
     renderDetail(detail);
     updateStatusBar(detail);
     renderPreview(detail);
     renderList();
-    if (selectedBoard==="ir") {
-      if (isSectionVisible("sec-bb") && detail.apFollowUp && detail.apFollowUp.toLowerCase().includes("open invest")) {
-        setTimeout(function(){ loadBBDetail(id); }, 300);
-      }
-      if (isSectionVisible("sec-interview") && detail.interviewStatus && detail.interviewStatus.trim() !== "" && detail.interviewStatus !== "—") {
-        setTimeout(function(){ loadInterviewActivity(id); }, 500);
-      }
+    if (isSectionVisible("sec-bb") && detail.apFollowUp && detail.apFollowUp.toLowerCase().includes("open invest")) {
+      setTimeout(function(){ loadBBDetail(id); }, 300);
+    }
+    if (isSectionVisible("sec-interview") && detail.interviewStatus && detail.interviewStatus.trim() !== "" && detail.interviewStatus !== "—") {
+      setTimeout(function(){ loadInterviewActivity(id); }, 500);
     }
   }
 }
+
 async function renderPreview(r) {
   const body = document.getElementById("preview-body");
   const count = document.getElementById("preview-count");
   if (!r) { body.innerHTML="<div class='preview-empty'>Select a case to preview files</div>"; count.textContent=""; return; }
+
   body.innerHTML="<div class='preview-empty'>Loading files...</div>";
+
   const files = [];
+
   function parseFiles(raw, defaultLabel) {
     if (!raw || raw==="—" || raw==="") return;
     try {
       const parsed = JSON.parse(raw);
       const arr = parsed.files || (Array.isArray(parsed) ? parsed : []);
-      arr.forEach(function(f){ files.push({assetId:f.assetId, name:f.name||defaultLabel, isImage:f.isImage==="true"||f.isImage===true||/\.jfif$/i.test(f.name||'')}); });
+      arr.forEach(function(f){
+        files.push({
+          assetId: f.assetId,
+          name: f.name || defaultLabel,
+          isImage: f.isImage==="true" || f.isImage===true || /\.jfif$/i.test(f.name||'')
+        });
+      });
     } catch(e) {}
   }
   parseFiles(r.documents, "Document");
   parseFiles(r.pictures, "Picture");
-  if (r.oneDriveLink && r.oneDriveLink!=="—") { files.push({url:r.oneDriveLink, name:"OneDrive Video", isImage:false, isSP:true}); }
+
+  if (r.oneDriveLink && r.oneDriveLink!=="—") {
+    files.push({url:r.oneDriveLink, name:"OneDrive Video", isImage:false, isSP:true});
+  }
+
   count.textContent = files.length ? files.length+" file"+(files.length>1?"s":"") : "";
-  if (!files.length) { body.innerHTML="<div class='preview-empty'>No files attached to this case</div>"; return; }
+
+  if (!files.length) {
+    body.innerHTML="<div class='preview-empty'>No files attached to this case</div>";
+    return;
+  }
+
+  // Fetch public URLs from Monday for asset IDs
   const assetIds = files.filter(function(f){return f.assetId;}).map(function(f){return f.assetId;});
   if (assetIds.length) {
     try {
       const q = "{assets(ids:["+assetIds.join(",")+"]){id public_url name}}";
       const data = await gql(q);
       const assets = data?.data?.assets || [];
+      // Fetch image blobs through proxy to get around CORS
       await Promise.all(assets.map(async function(a){
         const f = files.find(function(x){return String(x.assetId)===String(a.id);});
         if (!f || !a.public_url) return;
         f.directUrl = a.public_url;
-        if (f.isImage) { f.url = a.public_url; f._fetchUrl = a.public_url; }
-        else { f.url = a.public_url; }
+        f.directUrl = a.public_url;
+        if (f.isImage) {
+          // Fetch image through corsproxy as blob to bypass CORS
+          f.url = a.public_url; // fallback, will be replaced by blob below
+          f._fetchUrl = a.public_url;
+        } else {
+          // PDFs open via Google Docs viewer
+          f.url = a.public_url;
+        }
       }));
     } catch(e) {}
   }
+
+  // Use corsproxy as direct img src (not fetch) - this worked before
   files.filter(function(f){ return f.isImage && f._fetchUrl; }).forEach(function(f){
     f.url = "https://images.weserv.nl/?url=" + encodeURIComponent(f._fetchUrl.replace(/^https:\/\//,""));
   });
+
   const imageFiles = files.filter(function(f){ return f.url && f.isImage; });
   window.currentImageFiles = imageFiles;
-  body.innerHTML = files.map(function(f){
+
+  body.innerHTML = files.map(function(f, idx){
     if (!f.url) return "";
     const isPdf = /\.pdf$/i.test(f.name||"");
     const imgIdx = imageFiles.findIndex(function(x){ return x === f; });
     if (f.isSP) {
-      return "<a class='preview-doc' href='"+f.url+"' target='_blank'><div class='preview-doc-icon'>🎬</div><div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div><div class='preview-doc-sub'>Open in SharePoint</div></div></a>";
+      return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
+        "<div class='preview-doc-icon'>🎬</div>"+
+        "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
+        "<div class='preview-doc-sub'>Open in SharePoint</div></div></a>";
     } else if (f.isImage) {
       return "<div class='preview-thumb' onclick='openLightbox(window.currentImageFiles,"+imgIdx+")'>"+
         "<img src='"+f.url+"' alt='"+f.name+"' style='width:100%;max-height:400px;object-fit:contain;background:#0d1520;display:block;' onerror='this.style.display=\"none\";this.nextSibling.style.display=\"flex\"'/>"+
-        "<div style='display:none;height:200px;align-items:center;justify-content:center;color:#6a8aaa;font-size:11px;flex-direction:column;gap:6px;'><span style='font-size:24px;'>🖼</span><a href='"+f.url+"' target='_blank' style='color:#5a9fd4;font-size:11px;'>"+f.name+"</a></div>"+
+        "<div style='display:none;height:200px;align-items:center;justify-content:center;color:#6a8aaa;font-size:11px;flex-direction:column;gap:6px;'>"+
+          "<span style='font-size:24px;'>🖼</span><a href='"+f.url+"' target='_blank' style='color:#5a9fd4;font-size:11px;'>"+f.name+"</a></div>"+
         "<div class='preview-thumb-label'>"+f.name+"</div></div>";
     } else if (isPdf) {
-      return "<a class='preview-doc' href='https://docs.google.com/viewer?url="+encodeURIComponent(f.url)+"' target='_blank'><div class='preview-doc-icon'>📄</div><div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div><div class='preview-doc-sub'>Click to view PDF</div></div></a>";
+      const pdfViewer = "https://docs.google.com/viewer?url=" + encodeURIComponent(f.url);
+      return "<a class='preview-doc' href='" + pdfViewer + "' target='_blank'>"+
+        "<div class='preview-doc-icon'>📄</div>"+
+        "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
+        "<div class='preview-doc-sub'>Click to view PDF</div></div></a>";
     } else {
-      return "<a class='preview-doc' href='"+f.url+"' target='_blank'><div class='preview-doc-icon'>📎</div><div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div><div class='preview-doc-sub'>Click to open</div></div></a>";
+      return "<a class='preview-doc' href='"+f.url+"' target='_blank'>"+
+        "<div class='preview-doc-icon'>📎</div>"+
+        "<div class='preview-doc-info'><div class='preview-doc-name'>"+f.name+"</div>"+
+        "<div class='preview-doc-sub'>Click to open</div></div></a>";
     }
   }).join("");
 }
 
 let lightboxImages = [], lightboxIndex = 0;
-function openLightbox(images, startIndex) { lightboxImages=images; lightboxIndex=startIndex; showLightboxImage(); document.getElementById("lightbox").style.display="flex"; }
-function showLightboxImage() {
-  const f=lightboxImages[lightboxIndex];
-  const img=document.getElementById("lightbox-img");
-  img.src=f.url;
-  img.onerror=function(){ if(f.directUrl&&img.src!==f.directUrl) img.src=f.directUrl; };
-  document.getElementById("lightbox-counter").textContent=(lightboxIndex+1)+" / "+lightboxImages.length;
+
+function openLightbox(images, startIndex) {
+  lightboxImages = images;
+  lightboxIndex = startIndex;
+  showLightboxImage();
+  document.getElementById("lightbox").style.display = "flex";
 }
-function lightboxNav(dir) { lightboxIndex=(lightboxIndex+dir+lightboxImages.length)%lightboxImages.length; showLightboxImage(); }
-function closeLightbox() { document.getElementById("lightbox").style.display="none"; lightboxImages=[]; }
-document.addEventListener("click", function(e){ if(e.target.id==="lightbox") closeLightbox(); });
+
+function showLightboxImage() {
+  const f = lightboxImages[lightboxIndex];
+  const img = document.getElementById("lightbox-img");
+  img.src = f.url;
+  // If proxied image fails, try direct URL
+  img.onerror = function() {
+    if (f.directUrl && img.src !== f.directUrl) img.src = f.directUrl;
+  };
+  document.getElementById("lightbox-counter").textContent = (lightboxIndex+1)+" / "+lightboxImages.length;
+}
+
+function lightboxNav(dir) {
+  lightboxIndex = (lightboxIndex + dir + lightboxImages.length) % lightboxImages.length;
+  showLightboxImage();
+}
+
+function closeLightbox() {
+  document.getElementById("lightbox").style.display = "none";
+  lightboxImages = [];
+}
+
+// Close lightbox on background click
+document.addEventListener("click", function(e){
+  if (e.target.id==="lightbox") closeLightbox();
+});
+
+// Keyboard navigation
 document.addEventListener("keydown", function(e){
-  if(document.getElementById("lightbox").style.display==="flex"){
-    if(e.key==="ArrowRight") lightboxNav(1);
-    else if(e.key==="ArrowLeft") lightboxNav(-1);
-    else if(e.key==="Escape") closeLightbox();
+  if (document.getElementById("lightbox").style.display==="flex") {
+    if (e.key==="ArrowRight") lightboxNav(1);
+    else if (e.key==="ArrowLeft") lightboxNav(-1);
+    else if (e.key==="Escape") closeLightbox();
   }
 });
 
 async function updateColumn(itemId, boardId, columnId, value, type) {
   let mut;
   if (type==="longtext") {
+    // Use change_simple_column_value for long text — properly overwrites existing content
     const escaped = value.replace(/\\/g,"\\\\").replace(/"/g,"\\\"").replace(/\n/g,"\\n");
     mut = "mutation{change_simple_column_value(board_id:"+boardId+",item_id:"+itemId+",column_id:\""+columnId+"\",value:\""+escaped+"\"){id}}";
   } else {
@@ -774,11 +785,7 @@ function showMsg(elId, success) {
   setTimeout(function(){ el.textContent=""; },3000);
 }
 
-// Get active board ID for mutations
-function getActiveBoardId() { return selectedBoard==="hr" ? HR_BOARD : IR_BOARD; }
 function renderDetail(r) {
-  const isHR = r._board === "hr" || selectedBoard === "hr";
-  const activeBoardId = isHR ? HR_BOARD : IR_BOARD;
   const cid = r.caseId||r.pushableCaseId||r.id;
   const vrs = getLinkedVR(r);
   const ds = getLinkedDS(r);
@@ -786,16 +793,20 @@ function renderDetail(r) {
 
   let vrHTML = vrs.length ? vrs.map(function(v,i){
     return "<div class=\"vr-card\">"+
-      "<div class=\"vr-top\"><div><div class=\"vr-agency\">"+(v.agency||"Video Request")+"</div>"+
-      "<div class=\"vr-sub\">"+(v.branch||"")+" · "+(v.incidentDate||"")+"</div></div>"+
-      "<div class=\"vr-right\"><span class=\"vr-status\">"+(v.status||"")+"</span>"+
-      "<button class=\"vr-expand\" onclick=\"openVRModal("+i+",\'"+r.id+"\')\">Expand</button></div></div>"+
+      "<div class=\"vr-top\">"+
+        "<div><div class=\"vr-agency\">"+(v.agency||"Video Request")+"</div>"+
+        "<div class=\"vr-sub\">"+(v.branch||"")+" · "+(v.incidentDate||"")+"</div></div>"+
+        "<div class=\"vr-right\">"+
+          "<span class=\"vr-status\">"+(v.status||"")+"</span>"+
+          "<button class=\"vr-expand\" onclick=\"openVRModal("+i+",\'"+r.id+"\')\">Expand</button>"+
+        "</div>"+
+      "</div>"+
       "<div class=\"vr-fields\">"+
-      "<div class=\"vrf\"><div class=\"vrf-label\">Agency</div><div class=\"vrf-val\">"+(v.agency||"—")+"</div></div>"+
-      "<div class=\"vrf\"><div class=\"vrf-label\">Assigned</div><div class=\"vrf-val\">"+(v.assigned||"—")+"</div></div>"+
-      "<div class=\"vrf full\"><div class=\"vrf-label\">Request narrative</div><div class=\"vrf-val\">"+(v.requestNarrative||"—")+"</div></div>"+
-      "<div class=\"vrf full\"><div class=\"vrf-label\">AP Findings on Video Request</div><div class=\"vrf-val\">"+(v.sscSupplement||"—")+"</div></div>"+
-      (v.oneDriveLink?"<div class=\"vrf full\"><div class=\"vrf-label\">Video link</div><div class=\"vrf-val\"><a href=\""+v.oneDriveLink+"\" target=\"_blank\" style=\"color:#7fb3d3;\">Open video</a></div></div>":"")+
+        "<div class=\"vrf\"><div class=\"vrf-label\">Agency</div><div class=\"vrf-val\">"+(v.agency||"—")+"</div></div>"+
+        "<div class=\"vrf\"><div class=\"vrf-label\">Assigned</div><div class=\"vrf-val\">"+(v.assigned||"—")+"</div></div>"+
+        "<div class=\"vrf full\"><div class=\"vrf-label\">Request narrative</div><div class=\"vrf-val\">"+(v.requestNarrative||"—")+"</div></div>"+
+        "<div class=\"vrf full\"><div class=\"vrf-label\">AP Findings on Video Request</div><div class=\"vrf-val\">"+(v.sscSupplement||"—")+"</div></div>"+
+        (v.oneDriveLink?"<div class=\"vrf full\"><div class=\"vrf-label\">Video link</div><div class=\"vrf-val\"><a href=\""+v.oneDriveLink+"\" target=\"_blank\" style=\"color:#7fb3d3;\">Open video</a></div></div>":"")+
       "</div></div>";
   }).join("") : "<div style=\"font-size:13px;color:#999;padding:6px 0\">No linked video requests.</div>";
 
@@ -804,74 +815,66 @@ function renderDetail(r) {
     const dl=d.oneDriveLink&&d.oneDriveLink!=="—"?d.oneDriveLink:"";
     return "<div class=\"ds-card\">"+
       "<div style=\"display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;\">"+
-      "<div style=\"font-size:13px;font-weight:600;color:#c0392b;\">"+sn+"</div>"+
-      "<div style=\"display:flex;gap:5px;flex-wrap:wrap;\">"+
-      "<span class=\"badge bg-red\">"+(d.status||"—")+"</span>"+
-      (d.audit?"<span class=\"badge bg-orange\">"+d.audit+"</span>":"")+
-      (d.requestType?"<span class=\"badge bg-gray\">"+d.requestType+"</span>":"")+
-      "</div></div>"+
+        "<div style=\"font-size:13px;font-weight:600;color:#c0392b;\">"+sn+"</div>"+
+        "<div style=\"display:flex;gap:5px;flex-wrap:wrap;\">"+
+          "<span class=\"badge bg-red\">"+(d.status||"—")+"</span>"+
+          (d.audit?"<span class=\"badge bg-orange\">"+d.audit+"</span>":"")+
+          (d.requestType?"<span class=\"badge bg-gray\">"+d.requestType+"</span>":"")+
+        "</div>"+
+      "</div>"+
       "<div class=\"fgrid\">"+
-      "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(d.branch||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(d.date||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Last action date</div><div class=\"fval\">"+(d.lastActionDate||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Subject ID</div><div class=\"fval\">"+(d.subjectId||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">NICS #</div><div class=\"fval\">"+(d.nicsNumber||"—")+"</div></div>"+
-      "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(d.submittedBy||"—")+"</div></div>"+
-      (dl?"<div class=\"f full\"><div class=\"flabel\">OneDrive link</div><div class=\"fval\"><a href=\""+dl+"\" target=\"_blank\" style=\"color:#3a7bd5;\">Open video</a></div></div>":"")+
-      "<div class=\"f full\"><div class=\"flabel\">Narrative</div><div class=\"fval\">"+(d.narrative||"—")+"</div></div>"+
-      (d.apNarrative?"<div class=\"f full\"><div class=\"flabel\">AP narrative</div><div class=\"fval\">"+d.apNarrative+"</div></div>":"")+
-      (d.apNotes?"<div class=\"f full\"><div class=\"flabel\">AP notes</div><div class=\"fval\">"+d.apNotes+"</div></div>":"")+
+        "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(d.branch||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(d.date||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Last action date</div><div class=\"fval\">"+(d.lastActionDate||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Subject ID</div><div class=\"fval\">"+(d.subjectId||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">NICS #</div><div class=\"fval\">"+(d.nicsNumber||"—")+"</div></div>"+
+        "<div class=\"f\"><div class=\"flabel\">Submitted by</div><div class=\"fval\">"+(d.submittedBy||"—")+"</div></div>"+
+        (dl?"<div class=\"f full\"><div class=\"flabel\">OneDrive link</div><div class=\"fval\"><a href=\""+dl+"\" target=\"_blank\" style=\"color:#3a7bd5;\">Open video</a></div></div>":"")+
+        "<div class=\"f full\"><div class=\"flabel\">Narrative</div><div class=\"fval\">"+(d.narrative||"—")+"</div></div>"+
+        (d.apNarrative?"<div class=\"f full\"><div class=\"flabel\">AP narrative</div><div class=\"fval\">"+d.apNarrative+"</div></div>":"")+
+        (d.apNotes?"<div class=\"f full\"><div class=\"flabel\">AP notes</div><div class=\"fval\">"+d.apNotes+"</div></div>":"")+
       "</div></div>";
   }).join("") : "<div style=\"font-size:13px;color:#999;padding:6px 0\">No deny service records linked.</div>";
-
-  // HR board indicator banner (shown when viewing HR case)
-  const hrBanner = isHR ? "<div style=\"background:#2a1a5f;border:1px solid #7b3ab5;border-radius:6px;padding:8px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;\"><span style=\"font-size:13px;\">🔵</span><span style=\"font-size:12px;color:#9b5de5;font-weight:600;\">HR Investigation</span><span style=\"font-size:11px;color:#6a4a9a;margin-left:4px;\">This case is on the HR Investigations board</span></div>" : "";
 
   const SECTIONS = {
     "sec-findings":
       "<div class=\"sec\" id=\"sec-findings\"><div class=\"sec-title\">Findings</div><div class=\"fgrid\">"+
-        // AP Findings — current value shown above edit field
-        "<div class=\"f full\"><div class=\"flabel\">AP findings — current value in Monday</div>"+
-          "<div class=\"fval\" style=\"background:#0a1520;padding:8px 10px;border-radius:6px;border:1px solid #1a3040;min-height:40px;font-size:12px;white-space:pre-wrap;\">"+stripPeriodSeparators(r.apFindings||"")+"</div>"+
-        "</div>"+
-        "<div class=\"f full fedit\"><div class=\"flabel\">AP findings — update</div>"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">AP findings</div>"+
           "<textarea id=\"edit-apFindings\">"+stripPeriodSeparators(r.apFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
-            "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings('"+r.id+"')\">Save to Monday</button>"+
-            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown('dd-hr',event)\">HR Review ▾</button>"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveApFindings(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown(\'dd-hr\',event)\">HR Review ▾</button>"+
             "<span id=\"msg-apFindings\" class=\"save-msg\"></span>"+
           "</div>"+
           "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in AP Findings and Interview Narrative completely before transferring to HR Review (save first, then click HR Review)</div>"+
         "</div>"+
-        // HR Findings — current value shown above edit field
-        "<div class=\"f full\"><div class=\"flabel\">HR findings — current value in Monday</div>"+
-          "<div class=\"fval\" style=\"background:#0a1520;padding:8px 10px;border-radius:6px;border:1px solid #1a3040;min-height:40px;font-size:12px;white-space:pre-wrap;\">"+stripPeriodSeparators(r.hrFindings||"")+"</div>"+
-        "</div>"+
-        "<div class=\"f full fedit\"><div class=\"flabel\">HR findings — update</div>"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">HR findings</div>"+
           "<textarea id=\"edit-hrFindings\">"+stripPeriodSeparators(r.hrFindings)+"</textarea>"+
           "<div class=\"fedit-actions\">"+
-            "<button class=\"btn-primary btn-small\" onclick=\"saveHrFindings('"+r.id+"')\">Save to Monday</button>"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveHrFindings(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-hrFindings\" class=\"save-msg\"></span>"+
           "</div>"+
           "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Please fill in HR Finding Notes before selecting HR Recommendation</div>"+
         "</div>"+
-        // HR Recommendation — current shown + dropdown to change
         "<div class=\"f full\"><div class=\"flabel\">HR recommendation</div>"+
-          "<div style=\"display:flex;align-items:center;gap:12px;margin-top:4px;\">"+
-            "<div class=\"fval\" style=\"flex:1;background:#0a1520;padding:6px 10px;border-radius:6px;border:1px solid #1a3040;font-size:12px;\">"+(r.hrRecommendation||"— not set —")+"</div>"+
-            "<div class=\"fedit-actions\" style=\"position:relative;\">"+
-              "<button class=\"btn-small\" onclick=\"toggleStatusDropdown('dd-hrrec-local',event)\">Change ▾</button>"+
-              "<div class=\"status-dropdown-menu\" id=\"dd-hrrec-local\" style=\"position:absolute;top:100%;left:0;z-index:300;\"></div>"+
-            "</div>"+
+          "<div class=\"fval\" style=\"margin-bottom:4px;\">"+(r.hrRecommendation||"—")+"</div>"+
+          "<div class=\"fedit-actions\" style=\"position:relative;\">"+
+            "<button class=\"btn-small\" onclick=\"toggleStatusDropdown(\'dd-hrrec-local\',event)\">HR Recommendation ▾</button>"+
+            "<div class=\"status-dropdown-menu\" id=\"dd-hrrec-local\" style=\"position:absolute;top:100%;left:0;z-index:300;\"></div>"+
           "</div>"+
         "</div>"+
-        // Interview Narrative
-        "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative<span style=\"font-size:10px;color:#aaa;font-weight:400;margin-left:8px;\">(auto-splits into 2 fields if over 2000 chars)</span></div>"+
+        "<div class=\"f full fedit\"><div class=\"flabel\">Interview narrative"+
+          "<span style=\"font-size:10px;color:#aaa;font-weight:400;margin-left:8px;\">(auto-splits into 2 fields if over 2000 chars)</span></div>"+
           "<textarea id=\"edit-interviewNarrative\" style=\"min-height:120px;\">"+
-            stripPeriodSeparators([r.interviewNarrative1, r.interviewNarrative2].filter(Boolean).map(function(p){ return p.replace(/^\s*\.\s*\n?/,"").replace(/\n\s*\.\s*$/,"").trim(); }).join("\n\n"))+
+            stripPeriodSeparators(
+              [r.interviewNarrative1, r.interviewNarrative2]
+                .filter(Boolean)
+                .map(function(p){ return p.replace(/^\s*\.\s*\n?/,"").replace(/\n\s*\.\s*$/,"").trim(); })
+                .join("\n\n")
+            )+
           "</textarea>"+
           "<div class=\"fedit-actions\">"+
-            "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewNarrative('"+r.id+"')\">Save to Monday</button>"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewNarrative(\'"+r.id+"\')\">Save to Monday</button>"+
             "<span id=\"msg-interviewNarrative\" class=\"save-msg\"></span>"+
             "<span style=\"font-size:11px;color:#aaa;\" id=\"narrative-charcount\"></span>"+
           "</div></div>"+
@@ -882,7 +885,7 @@ function renderDetail(r) {
         "<div class=\"f\"><div class=\"flabel\">Incident date</div><div class=\"fval\">"+(r.date||"—")+"</div></div>"+
         "<div class=\"f fedit\"><div class=\"flabel\">Incident time</div>"+
           "<input type=\"text\" id=\"edit-incidentTime\" value=\""+(r.incidentTime||"")+"\" placeholder=\"e.g. 14:30\" style=\"width:100%;font-size:12px;\"/>"+
-          "<div class=\"fedit-actions\"><button class=\"btn-small\" onclick=\"saveIncidentTime('"+r.id+"')\">Save</button><span id=\"msg-incidentTime\" class=\"save-msg\"></span></div>"+
+          "<div class=\"fedit-actions\"><button class=\"btn-small\" onclick=\"saveIncidentTime(\'"+r.id+"\')\">Save</button><span id=\"msg-incidentTime\" class=\"save-msg\"></span></div>"+
         "</div>"+
         "<div class=\"f\"><div class=\"flabel\">Branch</div><div class=\"fval\">"+(r.branch||"—")+"</div></div>"+
         "<div class=\"f\"><div class=\"flabel\">District leader</div><div class=\"fval\">"+(r.district||"—")+"</div></div>"+
@@ -903,7 +906,7 @@ function renderDetail(r) {
         "<div class=\"f\"><div class=\"flabel\">4473 #</div><div class=\"fval\">"+(r.form4473||"—")+"</div></div>"+
       "</div></div>",
     "sec-narrative":
-      "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative — current value in Monday</div>"+
+      "<div class=\"sec\" id=\"sec-narrative\"><div class=\"sec-title\">Original narrative</div>"+
         "<div class=\"fval\" style=\"background:#0d1520;padding:10px 12px;border-radius:6px;border:1px solid #1e2e40;\">"+getIRValue(r,"narrative")+"</div>"+
       "</div>",
     "sec-subject":
@@ -936,8 +939,8 @@ function renderDetail(r) {
             (el?"<a href=\""+el+"\" target=\"_blank\" style=\"font-size:11px;color:#3a7bd5;\">Open</a>":"")+
           "</div>"+
           "<div class=\"fedit-actions\">"+
-            "<button class=\"btn-primary btn-small\" onclick=\"saveOneDriveLink('"+r.id+"')\">Save to Monday</button>"+
-            "<button class=\"btn-small\" onclick=\"document.getElementById('edit-oneDriveLink').value=''\">Clear</button>"+
+            "<button class=\"btn-primary btn-small\" onclick=\"saveOneDriveLink(\'"+r.id+"\')\">Save to Monday</button>"+
+            "<button class=\"btn-small\" onclick=\"document.getElementById(\'edit-oneDriveLink\').value=\'\'\">Clear</button>"+
             "<span id=\"msg-oneDriveLink\" class=\"save-msg\"></span>"+
           "</div>"+
         "</div>"+
@@ -950,21 +953,26 @@ function renderDetail(r) {
         "<div class=\"flabel\" style=\"margin:0;\">Retain Video:</div>"+
         "<div class=\"fval\" style=\"flex:1;\">"+(r.retainVideo||"—")+"</div>"+
         "<div class=\"status-dropdown\" style=\"position:relative;\">"+
-          "<button class=\"sbutton "+(r.retainVideo&&r.retainVideo.includes("Yes")?"active-blue":"")+"\" onclick=\"toggleStatusDropdown('dd-video-local',event)\">Change ▾</button>"+
+          "<button class=\"sbutton "+(r.retainVideo&&r.retainVideo.includes("Yes")?"active-blue":"")+"\" onclick=\"toggleStatusDropdown(\'dd-video-local\',event)\">Change ▾</button>"+
           "<div class=\"status-dropdown-menu\" id=\"dd-video-local\" style=\"position:absolute;top:100%;right:0;z-index:300;\"></div>"+
         "</div>"+
       "</div>"+
       vrHTML+
       "<div style=\"margin-top:14px;padding:14px;background:#0d1520;border-radius:8px;border:1px solid #1e3a5f;\">"+
-        "<div class=\"flabel\" style=\"margin-bottom:6px;\">"+(vrs.length?"Submit additional video request":"Start video request")+"</div>"+
+        "<div class=\"flabel\" style=\"margin-bottom:6px;\">"+
+          (vrs.length ? "Submit additional video request" : "Start video request")+
+        "</div>"+
         "<textarea id=\"edit-vrNotes\" style=\"width:100%;min-height:70px;font-size:13px;padding:6px 8px;border:1px solid #2d3f55;border-radius:6px;font-family:inherit;resize:vertical;background:#0f1923;color:#e0eaf5;\" placeholder=\"Enter video request notes...\">"+stripPeriodSeparators(r.vrNotes)+"</textarea>"+
         "<div style=\"display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;\">"+
-          "<button class=\"btn-primary btn-small\" onclick=\"saveAndSubmitVR('"+r.id+"')\">"+(vrs.length?"💾 Save Notes &amp; Submit New Request":"💾 Save Notes &amp; Submit Video Request")+"</button>"+
-          "<button class=\"btn-small\" onclick=\"saveVrNotes('"+r.id+"')\">Save notes only</button>"+
+          "<button class=\"btn-primary btn-small\" onclick=\"saveAndSubmitVR(\'"+r.id+"\')\">"+
+            (vrs.length ? "💾 Save Notes &amp; Submit New Request" : "💾 Save Notes &amp; Submit Video Request")+
+          "</button>"+
+          "<button class=\"btn-small\" onclick=\"saveVrNotes(\'"+r.id+"\')\">Save notes only</button>"+
           "<span id=\"msg-vrNotes\" class=\"save-msg\"></span>"+
         "</div>"+
         "<div style=\"font-size:10px;color:#4a6a8a;margin-top:6px;\">Notes will prepend to the narrative on the video request</div>"+
-      "</div></div>",
+      "</div>"+
+      "</div>",
     "sec-interview":
       "<div class=\"sec\" id=\"sec-interview\"><div class=\"sec-title\">Schedule Interview</div>"+
         "<div class=\"fgrid\">"+
@@ -972,7 +980,7 @@ function renderDetail(r) {
             "<div style=\"display:flex;align-items:center;gap:10px;margin-top:4px;\">"+
               "<div class=\"fval\" style=\"flex:1;\">"+(r.interviewStatus||"—")+"</div>"+
               "<div class=\"status-dropdown\" style=\"position:relative;\">"+
-                "<button class=\"sbutton\" onclick=\"toggleStatusDropdown('dd-interview',event)\">Set Status ▾</button>"+
+                "<button class=\"sbutton\" onclick=\"toggleStatusDropdown(\'dd-interview\',event)\">Set Status ▾</button>"+
                 "<div class=\"status-dropdown-menu\" id=\"dd-interview\"></div>"+
               "</div>"+
             "</div>"+
@@ -984,11 +992,14 @@ function renderDetail(r) {
           "<div class=\"f fedit\"><div class=\"flabel\">Tentative Interview Date</div>"+
             "<input type=\"date\" id=\"edit-interviewDate\" style=\"width:100%;font-size:12px;\"/>"+
           "</div>"+
-          "<div class=\"f full\"><div class=\"fedit-actions\">"+
-            "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewFields('"+r.id+"')\">Save Reason &amp; Date to Monday</button>"+
-            "<span id=\"msg-interviewReason\" class=\"save-msg\"></span>"+
-          "</div></div>"+
-          "<div class=\"f full\"><div class=\"flabel\" style=\"margin-bottom:6px;\">Last Notify History</div>"+
+          "<div class=\"f full\">"+
+            "<div class=\"fedit-actions\">"+
+              "<button class=\"btn-primary btn-small\" onclick=\"saveInterviewFields(\'"+r.id+"\')\">Save Reason &amp; Date to Monday</button>"+
+              "<span id=\"msg-interviewReason\" class=\"save-msg\"></span>"+
+            "</div>"+
+          "</div>"+
+          "<div class=\"f full\">"+
+            "<div class=\"flabel\" style=\"margin-bottom:6px;\">Last Notify History</div>"+
             "<div id=\"interview-activity-"+r.id+"\" style=\"font-size:11px;color:#4a6a8a;\"></div>"+
           "</div>"+
         "</div>"+
@@ -1000,19 +1011,16 @@ function renderDetail(r) {
           "<div style=\"display:flex;align-items:center;gap:10px;\">"+
             "<div class=\"fval\" style=\"flex:1;\">"+(r.apFollowUp||"—")+"</div>"+
             "<div class=\"status-dropdown\" style=\"position:relative;\">"+
-              "<button class=\"sbutton\" onclick=\"toggleStatusDropdown('dd-ap',event)\">Change ▾</button>"+
+              "<button class=\"sbutton\" onclick=\"toggleStatusDropdown(\'dd-ap\',event)\">Change ▾</button>"+
             "</div>"+
           "</div>"+
           "<div style=\"font-size:10px;color:#e0a030;margin-top:4px;\">⚠ Save AP Blackbook Notes before setting to Open Investigation — this triggers the automation</div>"+
         "</div>"+
         "<div class=\"fgrid\">"+
-          "<div class=\"f full\"><div class=\"flabel\">AP Blackbook Notes — current value in Monday</div>"+
-            "<div class=\"fval\" style=\"background:#0a1520;padding:8px 10px;border-radius:6px;border:1px solid #1a3040;min-height:40px;font-size:12px;white-space:pre-wrap;\">"+stripPeriodSeparators(r.bbNotes||"")+"</div>"+
-          "</div>"+
-          "<div class=\"f full fedit\"><div class=\"flabel\">AP Blackbook Notes — update</div>"+
+          "<div class=\"f full fedit\"><div class=\"flabel\">AP Blackbook Notes</div>"+
             "<textarea id=\"edit-bbNotes\" style=\"min-height:80px;\">"+stripPeriodSeparators(r.bbNotes)+"</textarea>"+
             "<div class=\"fedit-actions\">"+
-              "<button class=\"btn-primary btn-small\" onclick=\"saveBBNotes('"+r.id+"')\">Save to Monday</button>"+
+              "<button class=\"btn-primary btn-small\" onclick=\"saveBBNotes(\'"+r.id+"\')\">Save to Monday</button>"+
               "<span id=\"msg-bbNotes\" class=\"save-msg\"></span>"+
             "</div>"+
           "</div>"+
@@ -1029,14 +1037,13 @@ function renderDetail(r) {
     .join("");
 
   document.getElementById("detail-panel").innerHTML =
-    "<div class=\"card"+(isHR?" hr-card":"")+"\">"+ hrBanner +
+    "<div class=\"card\">"+
     "<div class=\"card-header\">"+
       "<div><div class=\"card-name\">"+displayName(r)+"</div>"+
-      "<div class=\"card-caseid\">"+cid+(isHR?" <span style='color:#9b5de5;font-size:10px;'>HR Investigation</span>":"")+"</div></div>"+
-      "<div class=\"card-actions\"><button class=\"btn-small\" onclick=\"refreshCase('"+r.id+"')\">↺ Refresh</button><button class=\"btn-small btn-primary\" onclick=\"saveAll('"+r.id+"')\">💾 Update All</button><button class=\"btn-small\" onclick=\"showActivityLog('"+r.id+"','"+activeBoardId+"','"+displayName(r)+"')\">📋 Activity Log</button><button class=\"btn-small\" onclick=\"printCase('"+r.id+"')\">Print</button></div>"+
+      "<div class=\"card-caseid\">"+cid+"</div></div>"+
+      "<div class=\"card-actions\"><button class=\"btn-small\" onclick=\"refreshCase(\'"+r.id+"\')\">↺ Refresh</button><button class=\"btn-small btn-primary\" onclick=\"saveAll(\'"+r.id+"\')\">💾 Update All</button><button class=\"btn-small\" onclick=\"showActivityLog(\'"+r.id+"\',\'"+IR_BOARD+"\',\'"+displayName(r)+"\')\">📋 Activity Log</button><button class=\"btn-small\" onclick=\"printCase(\'"+r.id+"\')\">Print</button></div>"+
     "</div>"+
     "<div class=\"badges\">"+
-      (isHR?"<span class=\"badge bg-purple\">HR Investigation</span>":"")+
       (r.apFollowUp?"<span class=\"badge "+badgeCls(r.apFollowUp)+"\">"+r.apFollowUp+"</span>":"")+
       (r.category?"<span class=\"badge bg-gray\">"+r.category+"</span>":"")+
       (r.hrRec&&r.hrRec!=="—"?"<span class=\"badge bg-red\">HR: "+r.hrRec+"</span>":"")+
@@ -1061,13 +1068,13 @@ function renderDetail(r) {
     }
   }, 50);
 }
-// All save functions — use getActiveBoardId() so they work for both IR and HR boards
+
 async function saveBBNotes(itemId) {
   const raw = document.getElementById("edit-bbNotes").value;
   const val = raw.replace(/\n\s*\n/g, "\n.\n");
-  const ok = await updateColumn(itemId, getActiveBoardId(), "text_mm2k49q8", val, "text");
+  const ok = await updateColumn(itemId, IR_BOARD, "text_mm2k49q8", val, "text");
   showMsg("msg-bbNotes", ok);
-  if (ok) { const items=selectedBoard==="hr"?hrItems:irItems; const item=items.find(function(x){return x.id===itemId;}); if(item) item.bbNotes=val; }
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.bbNotes=val; }
 }
 
 async function loadBBDetail(irId) {
@@ -1075,6 +1082,7 @@ async function loadBBDetail(irId) {
   if (!container) return;
   container.innerHTML = "<div style='font-size:11px;color:#4a6a8a;'>Loading Black Book record...</div>";
   try {
+    // Use linked_items query — correct way to read board relations via API
     const q = "{items(ids:["+irId+"]){linked_items(link_to_item_column_id:\"board_relation_mm2kcgyg\",linked_board_id:"+BB_BOARD+"){id name column_values{id text value} subitems{id name column_values{id text value}}}}}";
     const data = await gql(q);
     const linkedItems = data?.data?.items?.[0]?.linked_items || [];
@@ -1084,40 +1092,79 @@ async function loadBBDetail(irId) {
     }
     const bbItem = linkedItems[0];
     const bbItemId = bbItem.id;
+
+    // Debug — log all column IDs and values
+    if (bbItem.subitems && bbItem.subitems.length) {
+    }
+
     function bbVal(cols, id) {
       const c = cols.find(function(x){return x.id===id;});
       if (!c) return "—";
       try { const v=JSON.parse(c.value); if(v===null) return "—"; if(v.text) return v.text; if(v.name) return v.name; return c.text||"—"; } catch(e){ return c.text||"—"; }
     }
+
     const cols = bbItem.column_values;
     const narrative = [bbVal(cols,"long_text01"), bbVal(cols,"dup__of_long_text")].filter(function(v){return v&&v!=="—";}).join("\n\n") || "—";
+
+    // Build subitems log
     const subitems = bbItem.subitems || [];
     const subHTML = subitems.length ? subitems.map(function(s){
       const note = [bbVal(s.column_values,"long_text_mkwt46jk"), bbVal(s.column_values,"long_text_mkwte0m4")].filter(function(v){return v&&v!=="—";}).join(" — ") || "—";
-      return "<div style='border-bottom:1px solid #1e2e40;padding:8px 0;'><div style='display:flex;gap:12px;margin-bottom:4px;'><span style='font-size:10px;color:#4a6a8a;'>"+bbVal(s.column_values,"date0")+"</span><span style='font-size:10px;color:#5a9fd4;'>"+bbVal(s.column_values,"status")+"</span></div><div style='font-size:12px;color:#c0d4e8;white-space:pre-wrap;'>"+note+"</div></div>";
+      return "<div style='border-bottom:1px solid #1e2e40;padding:8px 0;'>"+
+        "<div style='display:flex;gap:12px;margin-bottom:4px;'>"+
+          "<span style='font-size:10px;color:#4a6a8a;'>"+bbVal(s.column_values,"date0")+"</span>"+
+          "<span style='font-size:10px;color:#5a9fd4;'>"+bbVal(s.column_values,"status")+"</span>"+
+        "</div>"+
+        "<div style='font-size:12px;color:#c0d4e8;white-space:pre-wrap;'>"+note+"</div>"+
+      "</div>";
     }).join("") : "<div style='font-size:11px;color:#4a6a8a;'>No investigation log entries yet.</div>";
+
+    // Add new log entry form
     const addEntryForm =
       "<div style='margin-top:14px;padding:12px;background:#131f2e;border-radius:8px;border:1px solid #2d3f55;'>"+
         "<div class='flabel' style='margin-bottom:8px;'>Add Investigation Log Entry</div>"+
         "<div class='fgrid' style='margin-bottom:8px;'>"+
-          "<div class='f fedit'><div class='flabel'>Date</div><input type='date' id='bb-new-date' value='"+new Date().toISOString().split('T')[0]+"' style='width:100%;font-size:12px;padding:5px 8px;border:1px solid #2d3f55;border-radius:6px;background:#0f1923;color:#e0eaf5;'/></div>"+
-          "<div class='f'><div class='flabel'>Status</div><select id='bb-new-status' style='width:100%;font-size:12px;padding:5px 8px;border:1px solid #2d3f55;border-radius:6px;background:#0f1923;color:#e0eaf5;'><option value='Not Completed'>Not Completed</option><option value='Completed'>Completed</option></select></div>"+
+          "<div class='f fedit'><div class='flabel'>Date</div>"+
+            "<input type='date' id='bb-new-date' value='"+new Date().toISOString().split('T')[0]+"' style='width:100%;font-size:12px;padding:5px 8px;border:1px solid #2d3f55;border-radius:6px;background:#0f1923;color:#e0eaf5;'/>"+
+          "</div>"+
+          "<div class='f'><div class='flabel'>Status</div>"+
+            "<select id='bb-new-status' style='width:100%;font-size:12px;padding:5px 8px;border:1px solid #2d3f55;border-radius:6px;background:#0f1923;color:#e0eaf5;'>"+
+              "<option value='Not Completed'>Not Completed</option>"+
+              "<option value='Completed'>Completed</option>"+
+            "</select>"+
+          "</div>"+
         "</div>"+
-        "<div class='fedit' style='margin-bottom:8px;'><div class='flabel'>Note</div><textarea id='bb-new-note' style='width:100%;min-height:70px;font-size:13px;padding:6px 8px;border:1px solid #2d3f55;border-radius:6px;font-family:inherit;resize:vertical;background:#0f1923;color:#e0eaf5;' placeholder='Enter investigation note...'></textarea></div>"+
-        "<div class='fedit-actions'><button class='btn-primary btn-small' onclick='addBBSubitem(\""+bbItemId+"\",\""+irId+"\")'>+ Add Log Entry</button><span id='msg-bb-subitem' class='save-msg'></span></div>"+
+        "<div class='fedit' style='margin-bottom:8px;'><div class='flabel'>Note</div>"+
+          "<textarea id='bb-new-note' style='width:100%;min-height:70px;font-size:13px;padding:6px 8px;border:1px solid #2d3f55;border-radius:6px;font-family:inherit;resize:vertical;background:#0f1923;color:#e0eaf5;' placeholder='Enter investigation note...'></textarea>"+
+        "</div>"+
+        "<div class='fedit-actions'>"+
+          "<button class='btn-primary btn-small' onclick='addBBSubitem(\""+bbItemId+"\",\""+irId+"\")'>+ Add Log Entry</button>"+
+          "<span id='msg-bb-subitem' class='save-msg'></span>"+
+        "</div>"+
       "</div>";
+
     container.innerHTML =
       "<div style='background:#0d1520;border:1px solid #1e3a5f;border-radius:8px;padding:14px;margin-top:8px;'>"+
         "<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;'>"+
           "<div style='font-size:13px;font-weight:600;color:#e0eaf5;'>"+bbItem.name+"</div>"+
-          "<div style='display:flex;gap:6px;'><span class='badge bg-gray'>"+bbVal(cols,"status")+"</span><span class='badge bg-blue'>"+bbVal(cols,"status_1")+"</span></div>"+
+          "<div style='display:flex;gap:6px;'>"+
+            "<span class='badge bg-gray'>"+bbVal(cols,"status")+"</span>"+
+            "<span class='badge bg-blue'>"+bbVal(cols,"status_1")+"</span>"+
+          "</div>"+
         "</div>"+
-        "<div class='fgrid' style='margin-bottom:10px;'><div class='f'><div class='flabel'>Assigned</div><div class='fval'>"+bbVal(cols,"people")+"</div></div><div class='f'><div class='flabel'>Text field</div><div class='fval'>"+bbVal(cols,"text67")+"</div></div></div>"+
-        "<div style='margin-bottom:10px;'><div class='flabel'>Narrative</div><div style='background:#131f2e;padding:8px 10px;border-radius:6px;font-size:12px;color:#c0d4e8;white-space:pre-wrap;margin-top:4px;'>"+narrative+"</div></div>"+
+        "<div class='fgrid' style='margin-bottom:10px;'>"+
+          "<div class='f'><div class='flabel'>Assigned</div><div class='fval'>"+bbVal(cols,"people")+"</div></div>"+
+          "<div class='f'><div class='flabel'>Text field</div><div class='fval'>"+bbVal(cols,"text67")+"</div></div>"+
+        "</div>"+
+        "<div style='margin-bottom:10px;'><div class='flabel'>Narrative</div>"+
+          "<div style='background:#131f2e;padding:8px 10px;border-radius:6px;font-size:12px;color:#c0d4e8;white-space:pre-wrap;margin-top:4px;'>"+narrative+"</div>"+
+        "</div>"+
         "<div><div class='sec-title' style='margin-bottom:8px;'>Investigation Log</div>"+subHTML+"</div>"+
         addEntryForm+
       "</div>";
-  } catch(e) { container.innerHTML = "<div style='font-size:11px;color:#e05050;'>Error loading record: "+e.message+"</div>"; }
+  } catch(e) {
+    container.innerHTML = "<div style='font-size:11px;color:#e05050;'>Error loading record: "+e.message+"</div>";
+  }
 }
 
 async function addBBSubitem(bbItemId, irId) {
@@ -1125,446 +1172,1065 @@ async function addBBSubitem(bbItemId, irId) {
   const date = document.getElementById("bb-new-date").value;
   const status = document.getElementById("bb-new-status").value;
   const msgEl = document.getElementById("msg-bb-subitem");
-  if (!note) { if(msgEl){msgEl.textContent="Please enter a note";msgEl.className="save-msg err";setTimeout(function(){msgEl.textContent="";},3000);} return; }
+
+  if (!note) {
+    if (msgEl) { msgEl.textContent = "Please enter a note"; msgEl.className = "save-msg err"; setTimeout(function(){msgEl.textContent="";},3000); }
+    return;
+  }
+
   const btn = document.querySelector("[onclick*='addBBSubitem']");
-  if (btn) { btn.textContent="Saving..."; btn.disabled=true; }
+  if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
+
   try {
-    const itemName = date ? date+" — Investigation Note" : "Investigation Note";
-    const colObj = {"status":{label:status},"long_text_mkwt46jk":note};
-    if (date) colObj["date0"]={date:date};
-    const mut = "mutation{create_subitem(parent_item_id:"+bbItemId+",item_name:\""+itemName.replace(/"/g,'\\"')+"\",column_values:"+JSON.stringify(JSON.stringify(colObj))+"){id}}";
+    // Create subitem
+    const itemName = date ? date + " — Investigation Note" : "Investigation Note";
+    const escapedName = itemName.replace(/"/g, '\\"');
+    const colObj = {"status": {label: status}, "long_text_mkwt46jk": note};
+    if (date) colObj["date0"] = {date: date};
+    const colVals = JSON.stringify(JSON.stringify(colObj));
+    const mut = "mutation{create_subitem(parent_item_id:"+bbItemId+",item_name:\""+escapedName+"\",column_values:"+colVals+"){id}}";
     const res = await gql(mut);
     const ok = !!res?.data?.create_subitem?.id;
-    if (ok) { if(msgEl){msgEl.textContent="Entry added!";msgEl.className="save-msg ok";} document.getElementById("bb-new-note").value=""; setTimeout(function(){loadBBDetail(irId);},1000); }
-    else throw new Error("No ID returned");
-  } catch(e) { if(msgEl){msgEl.textContent="Failed: "+e.message;msgEl.className="save-msg err";} }
-  if (btn) { btn.textContent="+ Add Log Entry"; btn.disabled=false; }
-  if (msgEl) setTimeout(function(){msgEl.textContent="";},4000);
+
+    if (ok) {
+      if (msgEl) { msgEl.textContent = "Entry added!"; msgEl.className = "save-msg ok"; }
+      document.getElementById("bb-new-note").value = "";
+      // Reload BB detail to show new entry
+      setTimeout(function(){ loadBBDetail(irId); }, 1000);
+    } else {
+      throw new Error("No ID returned");
+    }
+  } catch(e) {
+    if (msgEl) { msgEl.textContent = "Failed: "+e.message; msgEl.className = "save-msg err"; }
+  }
+
+  if (btn) { btn.textContent = "+ Add Log Entry"; btn.disabled = false; }
+  if (msgEl) setTimeout(function(){ msgEl.textContent = ""; }, 4000);
 }
 
 async function showActivityLog(itemId, boardId, name) {
-  const modal=document.getElementById("activity-modal"), body=document.getElementById("activity-modal-body"), sub=document.getElementById("activity-modal-sub");
-  modal.style.display="flex"; sub.textContent=name;
-  body.innerHTML="<div style='color:#4a6a8a;font-size:12px;'>Loading activity log...</div>";
+  const modal = document.getElementById("activity-modal");
+  const body = document.getElementById("activity-modal-body");
+  const sub = document.getElementById("activity-modal-sub");
+  modal.style.display = "flex";
+  sub.textContent = name;
+  body.innerHTML = "<div style='color:#4a6a8a;font-size:12px;'>Loading activity log...</div>";
+
   try {
-    // Use item-level activity log query
-    const q="{items(ids:["+itemId+"]){activity_logs(limit:50){id event data created_at user_id}}}";
-    const data=await gql(q);
-    const logs=data?.data?.items?.[0]?.activity_logs||[];
-    if (!logs.length){
-      // Fallback: try board-level query
-      const q2="{boards(ids:"+boardId+"){activity_logs(item_ids:["+itemId+"],limit:50){id event data created_at user_id}}}";
-      const data2=await gql(q2);
-      const logs2=data2?.data?.boards?.[0]?.activity_logs||[];
-      if(!logs2.length){
-        body.innerHTML="<div style='color:#4a6a8a;font-size:12px;font-style:italic;'>No activity found. Note: Activity logs may require additional Monday.com permissions.</div>";
-        return;
-      }
-      renderLogs(logs2, body);
+    const q = "{boards(ids:"+boardId+"){activity_logs(item_ids:["+itemId+"],limit:50){id event data created_at user_id}}}";
+    const data = await gql(q);
+    const logs = data?.data?.boards?.[0]?.activity_logs || [];
+
+    if (!logs.length) {
+      body.innerHTML = "<div style='color:#4a6a8a;font-size:12px;font-style:italic;'>No activity found for this record.</div>";
       return;
     }
-    renderLogs(logs, body);
-  } catch(e){body.innerHTML="<div style='color:#e05050;font-size:12px;'>Error: "+e.message+"</div>";}
+
+    body.innerHTML = logs.map(function(log) {
+      let parsed = {}, eventDesc = "";
+      try { parsed = JSON.parse(log.data||"{}"); } catch(e){}
+
+      const date = log.created_at
+        ? (function(){
+            let d;
+            if (typeof log.created_at === "string" && log.created_at.includes("-")) {
+              d = new Date(log.created_at);
+            } else {
+              const ts = parseInt(log.created_at);
+              d = new Date(ts > 1e12 ? ts : ts * 1000);
+            }
+            return (!d || isNaN(d.getTime())) ? "—" :
+              d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) +
+              " " + d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
+          })()
+        : "—";
+
+      // Parse event type
+      const evt = (log.event||"").toLowerCase();
+      if (evt.includes("update_column") || evt.includes("change_column")) {
+        const newVal = parsed.value?.label?.text || parsed.value?.name || (typeof parsed.value==="string"?parsed.value:"") || "—";
+        const prevVal = parsed.previous_value?.label?.text || parsed.previous_value?.name || (typeof parsed.previous_value==="string"?parsed.previous_value:"") || "";
+        const col = parsed.column_title || parsed.column_id || "field";
+        eventDesc = "<strong>"+col+"</strong> changed to <span style='color:#4caf80;'>"+newVal+"</span>"+(prevVal?" <span style='color:#4a6a8a;'>(was: "+prevVal+")</span>":"");
+      } else if (evt.includes("create_item") || evt.includes("create_pulse")) {
+        eventDesc = "<span style='color:#5a9fd4;'>Item created</span>";
+      } else if (evt.includes("create_subitem")) {
+        eventDesc = "<span style='color:#5a9fd4;'>Subitem added: </span>"+(parsed.pulse_name||"");
+      } else if (evt.includes("add_file")) {
+        eventDesc = "<span style='color:#e0a030;'>File attached</span>";
+      } else if (evt.includes("add_update") || evt.includes("create_update")) {
+        eventDesc = "<span style='color:#c0d4e8;'>Update/comment added</span>";
+      } else {
+        eventDesc = "<span style='color:#6a8aaa;'>"+log.event+"</span>";
+      }
+
+      return "<div style='padding:8px 0;border-bottom:1px solid #1a2535;display:flex;gap:12px;align-items:flex-start;'>"+
+        "<span style='color:#4a6a8a;white-space:nowrap;font-size:10px;min-width:140px;margin-top:1px;'>"+date+"</span>"+
+        "<span style='flex:1;font-size:12px;color:#c0d4e8;'>"+eventDesc+"</span>"+
+      "</div>";
+    }).join("");
+  } catch(e) {
+    body.innerHTML = "<div style='color:#e05050;font-size:12px;'>Error loading activity log: "+e.message+"</div>";
+  }
 }
 
-function renderLogs(logs, body) {
-  body.innerHTML=logs.map(function(log){
-    let parsed={},eventDesc="";
-    try{parsed=JSON.parse(log.data||"{}");}catch(e){}
-    const date=log.created_at?(function(){let d;if(typeof log.created_at==="string"&&log.created_at.includes("-")){d=new Date(log.created_at);}else{const ts=parseInt(log.created_at);d=new Date(ts>1e12?ts:ts*1000);}return(!d||isNaN(d.getTime()))?"—":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" "+d.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});})():"—";
-    const evt=(log.event||"").toLowerCase();
-    if(evt.includes("update_column")||evt.includes("change_column")){const newVal=parsed.value?.label?.text||parsed.value?.name||(typeof parsed.value==="string"?parsed.value:"")||"—";const prevVal=parsed.previous_value?.label?.text||parsed.previous_value?.name||(typeof parsed.previous_value==="string"?parsed.previous_value:"")||"";const col=parsed.column_title||parsed.column_id||"field";eventDesc="<strong>"+col+"</strong> → <span style='color:#4caf80;'>"+newVal+"</span>"+(prevVal?" <span style='color:#4a6a8a;'>(was: "+prevVal+")</span>":"");}
-    else if(evt.includes("create_item")||evt.includes("create_pulse")){eventDesc="<span style='color:#5a9fd4;'>Item created</span>";}
-    else if(evt.includes("create_subitem")){eventDesc="<span style='color:#5a9fd4;'>Subitem added</span>"+(parsed.pulse_name?" — "+parsed.pulse_name:"");}
-    else if(evt.includes("add_file")){eventDesc="<span style='color:#e0a030;'>File attached</span>";}
-    else if(evt.includes("add_update")||evt.includes("create_update")){eventDesc="<span style='color:#c0d4e8;'>Comment/update added</span>";}
-    else{eventDesc="<span style='color:#6a8aaa;'>"+log.event+"</span>";}
-    return "<div style='padding:8px 0;border-bottom:1px solid #1a2535;display:flex;gap:12px;align-items:flex-start;'><span style='color:#4a6a8a;white-space:nowrap;font-size:10px;min-width:140px;margin-top:1px;'>"+date+"</span><span style='flex:1;font-size:12px;color:#c0d4e8;'>"+eventDesc+"</span></div>";
-  }).join("");
+function hideActivityLog() {
+  document.getElementById("activity-modal").style.display = "none";
 }
 
-function hideActivityLog() { document.getElementById("activity-modal").style.display="none"; }
-document.addEventListener("click", function(e){ const modal=document.getElementById("activity-modal"); if(modal&&e.target===modal) hideActivityLog(); });
+// Close modal on backdrop click
+document.addEventListener("click", function(e) {
+  const modal = document.getElementById("activity-modal");
+  if (modal && e.target === modal) hideActivityLog();
+});
 
 async function loadInterviewActivity(itemId) {
-  const container=document.getElementById("interview-activity-"+itemId);
-  if(!container) return;
+  const container = document.getElementById("interview-activity-"+itemId);
+  if (!container) return;
   try {
-    const q="{boards(ids:"+IR_BOARD+"){activity_logs(item_ids:["+itemId+"],column_ids:[\"color_mm2gyjyr\",\"text_mm2g2kmt\"],limit:10){id event data created_at}}}";
-    const data=await gql(q);
-    const logs=data?.data?.boards?.[0]?.activity_logs||[];
-    if(!logs.length){container.innerHTML="<span style='color:#2d3f55;font-style:italic;'>No history yet</span>";return;}
-    container.innerHTML=logs.map(function(log){
-      let parsed={};
-      try{parsed=JSON.parse(log.data||"{}");}catch(e){}
-      let date="—";
-      if(log.created_at){let d;if(typeof log.created_at==="string"&&log.created_at.includes("-")){d=new Date(log.created_at);}else{const ts=parseInt(log.created_at);d=new Date(ts>1e12?ts:ts*1000);}if(d&&!isNaN(d.getTime())){date=d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}}
-      function extractVal(v){if(!v||v===null) return "";if(typeof v==="string") return v;if(typeof v==="object"){if(v.label&&v.label.text) return v.label.text;if(v.name) return v.name;if(v.text) return v.text;if(v.value) return String(v.value);}return String(v);}
-      let newVal=extractVal(parsed.value)||extractVal(parsed.to)||"—";
-      let prevVal=extractVal(parsed.previous_value)||extractVal(parsed.from)||"";
-      const colName=(log.data||"").includes("color_mm2gyjyr")?"Status":"Reason";
-      return "<div style='padding:6px 0;border-bottom:1px solid #1a2535;display:flex;gap:10px;align-items:flex-start;'><span style='color:#4a6a8a;white-space:nowrap;font-size:10px;margin-top:2px;min-width:130px;'>"+date+"</span><span style='flex:1;font-size:12px;color:#c0d4e8;'>"+colName+": <strong style='color:#e0eaf5;'>"+newVal+"</strong>"+(prevVal?" <span style='color:#4a6a8a;font-size:11px;'>(was: "+prevVal+")</span>":"")+
-      "</span></div>";
+    const q = "{boards(ids:"+IR_BOARD+"){activity_logs(item_ids:["+itemId+"],column_ids:[\"color_mm2gyjyr\",\"text_mm2g2kmt\"],limit:10){id event data created_at}}}";
+    const data = await gql(q);
+    const logs = data?.data?.boards?.[0]?.activity_logs || [];
+    if (!logs.length) {
+      container.innerHTML = "<span style='color:#2d3f55;font-style:italic;'>No history yet</span>";
+      return;
+    }
+    container.innerHTML = logs.map(function(log) {
+      let parsed = {};
+      try { parsed = JSON.parse(log.data||"{}"); } catch(e){}
+
+      // Date only - no time
+      let date = "—";
+      if (log.created_at) {
+        let d;
+        if (typeof log.created_at === "string" && log.created_at.includes("-")) {
+          d = new Date(log.created_at);
+        } else {
+          const ts = parseInt(log.created_at);
+          d = new Date(ts > 1e12 ? ts : ts * 1000);
+        }
+        if (d && !isNaN(d.getTime())) {
+          date = d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+        }
+      }
+
+      // Extract value safely - handles status labels and plain text
+      function extractVal(v) {
+        if (!v || v === null) return "";
+        if (typeof v === "string") return v;
+        if (typeof v === "object") {
+          if (v.label && v.label.text) return v.label.text;
+          if (v.name) return v.name;
+          if (v.text) return v.text;
+          if (v.value) return String(v.value);
+        }
+        return String(v);
+      }
+
+      // For text columns, value may be nested under changed_at or just be the string
+      let newVal = extractVal(parsed.value) || extractVal(parsed.to);
+      let prevVal = extractVal(parsed.previous_value) || extractVal(parsed.from);
+      
+      // If still empty, try column_title based approach
+      if (!newVal && parsed.column_title) newVal = extractVal(parsed.value);
+      
+      newVal = newVal || "—";
+      
+      const colName = (log.data||"").includes("color_mm2gyjyr") ? "Status" : "Reason";
+
+      return "<div style='padding:6px 0;border-bottom:1px solid #1a2535;display:flex;gap:10px;align-items:flex-start;'>"+
+        "<span style='color:#4a6a8a;white-space:nowrap;font-size:10px;margin-top:2px;min-width:130px;'>"+date+"</span>"+
+        "<span style='flex:1;font-size:12px;color:#c0d4e8;'>"+colName+": <strong style='color:#e0eaf5;'>"+newVal+"</strong>"+
+          (prevVal?" <span style='color:#4a6a8a;font-size:11px;'>(was: "+prevVal+")</span>":"")+
+        "</span>"+
+      "</div>";
     }).join("");
-  } catch(e){container.innerHTML="<span style='color:#4a6a8a;'>Could not load history</span>";}
+  } catch(e) {
+    container.innerHTML = "<span style='color:#4a6a8a;'>Could not load history</span>";
+  }
 }
 
 async function saveInterviewFields(itemId) {
-  const reason=document.getElementById("edit-interviewReason").value;
-  const date=document.getElementById("edit-interviewDate").value;
-  const reasonVal=reason.replace(/\n\s*\n/g,"\n.\n");
-  const ok1=await updateColumn(itemId,getActiveBoardId(),"text_mm2g2kmt",reasonVal,"text");
-  let ok2=true;
-  if(date){const colVal=JSON.stringify({date:date});const mut="mutation{change_column_value(board_id:"+getActiveBoardId()+",item_id:"+itemId+",column_id:\"date_mm2gkwpy\",value:"+JSON.stringify(colVal)+"){id}}";try{const res=await gql(mut);ok2=!!(res&&res.data&&res.data.change_column_value);}catch(e){ok2=false;}}
-  showMsg("msg-interviewReason",ok1&&ok2);
+  const reason = document.getElementById("edit-interviewReason").value;
+  const date = document.getElementById("edit-interviewDate").value;
+  const reasonVal = reason.replace(/\n\s*\n/g, "\n.\n");
+  const ok1 = await updateColumn(itemId, IR_BOARD, "text_mm2g2kmt", reasonVal, "text");
+  let ok2 = true;
+  if (date) {
+    const colVal = JSON.stringify({date: date});
+    const mut = "mutation{change_column_value(board_id:"+IR_BOARD+",item_id:"+itemId+",column_id:\"date_mm2gkwpy\",value:"+JSON.stringify(colVal)+"){id}}";
+    try { const res=await gql(mut); ok2=!!(res&&res.data&&res.data.change_column_value); } catch(e){ok2=false;}
+  }
+  const ok = ok1 && ok2;
+  showMsg("msg-interviewReason", ok);
+  if (ok) {
+    const item=irItems.find(function(x){return x.id===itemId;});
+    if(item){ item.interviewReason=reasonVal; item.interviewDate=date; }
+  }
+}
+
+async function saveInterviewReason(itemId) {
+  const raw = document.getElementById("edit-interviewReason").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const ok = await updateColumn(itemId, IR_BOARD, "text_mm2g2kmt", val, "text");
+  showMsg("msg-interviewReason", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.interviewReason=val; }
+}
+
+async function saveInterviewDate(itemId) {
+  const val = document.getElementById("edit-interviewDate").value;
+  const colVal = JSON.stringify({date: val});
+  const mut = "mutation{change_column_value(board_id:"+IR_BOARD+",item_id:"+itemId+",column_id:\"date_mm2gkwpy\",value:"+JSON.stringify(colVal)+"){id}}";
+  try {
+    const res = await gql(mut);
+    const ok = !!(res&&res.data&&res.data.change_column_value);
+    showMsg("msg-interviewDate", ok);
+    if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.interviewDate=val; }
+  } catch(e) { showMsg("msg-interviewDate", false); }
 }
 
 async function saveIncidentTime(itemId) {
-  const val=document.getElementById("edit-incidentTime").value;
-  const ok=await updateColumn(itemId,getActiveBoardId(),"text19",val,"text");
-  showMsg("msg-incidentTime",ok);
+  const val = document.getElementById("edit-incidentTime").value;
+  const ok = await updateColumn(itemId, IR_BOARD, "text19", val, "text");
+  showMsg("msg-incidentTime", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.incidentTime=val; }
 }
 
 async function saveApFindings(itemId) {
-  const raw=document.getElementById("edit-apFindings").value;
-  const val=raw.replace(/\n\s*\n/g,"\n.\n");
-  const ok=await updateColumn(itemId,getActiveBoardId(),"text95",val,"text");
-  showMsg("msg-apFindings",ok);
-  if(ok){const items=selectedBoard==="hr"?hrItems:irItems;const item=items.find(function(x){return x.id===itemId;});if(item) item.apFindings=val;}
-}
-
-async function saveHrFindings(itemId) {
-  const raw=document.getElementById("edit-hrFindings").value;
-  const val=raw.replace(/\n\s*\n/g,"\n.\n");
-  const ok=await updateColumn(itemId,getActiveBoardId(),"long_text_mm0f4cbg",val,"longtext");
-  showMsg("msg-hrFindings",ok);
-}
-
-async function saveInterviewNarrative(itemId) {
-  const raw=document.getElementById("edit-interviewNarrative").value;
-  const val=raw.replace(/\n\s*\n/g,"\n.\n");
-  const LIMIT=2000; let part1=val,part2="";
-  if(val.length>LIMIT){let splitAt=val.lastIndexOf("\n.\n",LIMIT);if(splitAt<500) splitAt=val.lastIndexOf("\n",LIMIT);if(splitAt<0) splitAt=LIMIT;part1=val.substring(0,splitAt).trim();part2=val.substring(splitAt).trim();if(!part1.endsWith(".")) part1=part1+"\n.";}
-  const ok1=await updateColumn(itemId,getActiveBoardId(),"long_text__1",part1,"longtext");
-  const ok2=await updateColumn(itemId,getActiveBoardId(),"long_text3__1",part2,"longtext");
-  showMsg("msg-interviewNarrative",ok1&&ok2);
-  if(ok1&&ok2){const items=selectedBoard==="hr"?hrItems:irItems;const item=items.find(function(x){return x.id===itemId;});if(item){item.interviewNarrative1=part1;item.interviewNarrative2=part2;}}
-}
-
-async function saveOneDriveLink(itemId) {
-  const val=document.getElementById("edit-oneDriveLink").value;
-  const ok=await updateColumn(itemId,getActiveBoardId(),"one_drive_link",val,"text");
-  showMsg("msg-oneDriveLink",ok);
-}
-
-async function saveVrNotes(itemId) {
-  const raw=document.getElementById("edit-vrNotes").value;
-  const val=raw.replace(/\n\s*\n/g,"\n.\n");
-  const ok=await updateColumn(itemId,getActiveBoardId(),"text_mm2fvpmd",val,"text");
-  showMsg("msg-vrNotes",ok);
+  const raw = document.getElementById("edit-apFindings").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const ok = await updateColumn(itemId, IR_BOARD, "text95", val, "text");
+  showMsg("msg-apFindings", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.apFindings=val; }
 }
 
 async function saveAndSubmitVR(itemId) {
-  const btn=document.querySelector("#sec-vr .btn-primary");
-  if(btn){btn.textContent="Submitting...";btn.disabled=true;}
-  const msgEl=document.getElementById("msg-vrNotes");
+  const btn = document.querySelector("#sec-vr .btn-primary");
+  if (btn) { btn.textContent = "Submitting..."; btn.disabled = true; }
+  const msgEl = document.getElementById("msg-vrNotes");
+
   try {
-    const items=selectedBoard==="hr"?hrItems:irItems;
-    const r=((selectedBoard==="hr"?hrDetailCache:irDetailCache)[itemId])||items.find(function(x){return x.id===itemId;});
-    if(!r) throw new Error("Case not found");
-    const raw=document.getElementById("edit-vrNotes").value;
-    const notesVal=raw.replace(/\n\s*\n/g,"\n.\n");
-    await updateColumn(itemId,getActiveBoardId(),"text_mm2fvpmd",notesVal,"text");
-    if(r) r.vrNotes=notesVal;
-    const narrative=getIRValue(r,"narrative");
-    const fullNarrative=(raw.trim()?"VIDEO REQUEST : "+raw.trim()+" - ":"")+narrative;
-    const today=new Date().toISOString().split("T")[0];
-    const cid=r.caseId||r.pushableCaseId||r.id;
-    const colVals=JSON.stringify({"status6":{"label":r.branch||"Incident Review"},"dropdown0":r.branch?{"label":r.branch}:undefined,"date4":today?{"date":today}:undefined,"long_text":{"text":fullNarrative},"text_mkwz2hhp":String(itemId),"text_mm0q7wkt":cid}).replace(/:undefined/g,":null");
-    const mut="mutation{create_item(board_id:"+VR_BOARD+",item_name:\""+cid.replace(/"/g,'\\"')+"\",column_values:"+JSON.stringify(colVals)+"){id}}";
-    const res=await gql(mut);
-    const newId=res?.data?.create_item?.id;
-    if(newId){
-      if(msgEl){msgEl.textContent="Video Request created!";msgEl.className="save-msg ok";}
-      setTimeout(async function(){const dateFilter=new Date();dateFilter.setDate(dateFilter.getDate()-90);vrItems=await fetchBoard(VR_BOARD,VR_COLS,dateFilter.toISOString().split("T")[0]);const detail=(selectedBoard==="hr"?hrDetailCache:irDetailCache)[itemId];if(detail) renderDetail(detail);},1500);
-    } else throw new Error("No item ID returned");
-  } catch(e){if(msgEl){msgEl.textContent="Failed: "+e.message;msgEl.className="save-msg err";}}
-  if(btn){btn.textContent=btn.textContent.includes("additional")?"💾 Save Notes & Submit New Request":"💾 Save Notes & Submit Video Request";btn.disabled=false;}
-  if(msgEl) setTimeout(function(){msgEl.textContent="";},4000);
+    const r = irDetailCache[itemId] || irItems.find(function(x){return x.id===itemId;});
+    if (!r) throw new Error("Case not found");
+
+    // 1. Save notes to IR board
+    const raw = document.getElementById("edit-vrNotes").value;
+    const notesVal = raw.replace(/\n\s*\n/g, "\n.\n");
+    await updateColumn(itemId, IR_BOARD, "text_mm2fvpmd", notesVal, "text");
+    if (r) r.vrNotes = notesVal;
+
+    // 2. Build narrative: notes + " - " + original narrative
+    const narrative = getIRValue(r, "narrative");
+    const fullNarrative = (raw.trim() ? "VIDEO REQUEST : "+raw.trim()+" - " : "") + narrative;
+
+    // 3. Get today's date
+    const today = new Date().toISOString().split("T")[0];
+
+    // 4. Create VR item on VR board
+    const cid = r.caseId||r.pushableCaseId||r.id;
+    const itemName = cid;
+    const colVals = JSON.stringify({
+      "status6": {"label": r.branch||"Incident Review"},
+      "dropdown0": r.branch ? {"label": r.branch} : undefined,
+      "date4": today ? {"date": today} : undefined,
+      "long_text": {"text": fullNarrative},
+      "text_mkwz2hhp": String(itemId),
+      "text_mm0q7wkt": cid
+    }).replace(/:undefined/g, ":null");
+
+    const mut = "mutation{create_item(board_id:"+VR_BOARD+",item_name:\""+itemName.replace(/"/g,'\\"')+"\",column_values:"+JSON.stringify(colVals)+"){id}}";
+    const res = await gql(mut);
+    const newId = res?.data?.create_item?.id;
+
+    if (newId) {
+      if (msgEl) { msgEl.textContent = "Video Request created!"; msgEl.className = "save-msg ok"; }
+      // Refresh VR items in background
+      setTimeout(async function(){
+        const dateFilter = new Date(); dateFilter.setDate(dateFilter.getDate()-90);
+        vrItems = await fetchBoard(VR_BOARD, VR_COLS, dateFilter.toISOString().split("T")[0]);
+        const detail = irDetailCache[itemId];
+        if (detail) renderDetail(detail);
+      }, 1500);
+    } else {
+      throw new Error("No item ID returned");
+    }
+  } catch(e) {
+    if (msgEl) { msgEl.textContent = "Failed: "+e.message; msgEl.className = "save-msg err"; }
+  }
+
+  if (btn) { btn.textContent = btn.textContent.includes("additional") ? "💾 Save Notes & Submit New Request" : "💾 Save Notes & Submit Video Request"; btn.disabled = false; }
+  if (msgEl) setTimeout(function(){ msgEl.textContent = ""; }, 4000);
 }
 
 async function saveAll(itemId) {
-  const btn=document.querySelector(".btn-primary.btn-small");
-  if(btn){btn.textContent="Saving...";btn.disabled=true;}
-  const results=[];
-  const bId=getActiveBoardId();
-  async function tryField(elId,colId,type){
-    const el=document.getElementById(elId);
-    if(!el) return;
-    const ok=await updateColumn(itemId,bId,colId,el.value,type);
-    results.push({field:elId,ok});
+  const btn = document.querySelector(".btn-primary.btn-small");
+  if (btn) { btn.textContent = "Saving..."; btn.disabled = true; }
+  const results = [];
+
+  // Save all editable fields that exist on the page
+  async function tryField(elId, colId, type) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    const val = el.value;
+    const ok = await updateColumn(itemId, IR_BOARD, colId, val, type);
+    results.push({field: elId, ok});
+    // Update cache
+    const item = irItems.find(function(x){return x.id===itemId;});
+    if (item && ok) {
+      if (elId==="edit-apFindings") item.apFindings = val;
+      if (elId==="edit-hrFindings") item.hrFindings = val;
+      if (elId==="edit-interviewNarrative") { item.interviewNarrative1 = val; }
+      if (elId==="edit-oneDriveLink") item.oneDriveLink = val;
+      if (elId==="edit-vrNotes") item.vrNotes = val;
+    }
   }
-  await tryField("edit-apFindings","text95","text");
-  await tryField("edit-hrFindings","long_text_mm0f4cbg","longtext");
-  await tryField("edit-interviewNarrative","long_text__1","longtext");
-  await tryField("edit-oneDriveLink","one_drive_link","text");
-  await tryField("edit-vrNotes","text_mm2fvpmd","text");
-  await tryField("edit-bbNotes","text_mm2k49q8","text");
-  await tryField("edit-interviewReason","text_mm2g2kmt","text");
-  const failed=results.filter(function(r){return !r.ok;}).length;
-  const saved=results.filter(function(r){return r.ok;}).length;
-  if(btn){btn.textContent=saved+" saved"+(failed?" · "+failed+" failed":"");btn.disabled=false;setTimeout(function(){btn.textContent="💾 Update All";},3000);}
+
+  await tryField("edit-apFindings",        "text95",              "text");
+  await tryField("edit-hrFindings",        "long_text_mm0f4cbg",  "longtext");
+  await tryField("edit-interviewNarrative","long_text__1",        "longtext");
+  await tryField("edit-oneDriveLink",      "one_drive_link",      "text");
+  await tryField("edit-vrNotes",           "text_mm2fvpmd",       "text");
+  await tryField("edit-bbNotes",           "text_mm2k49q8",       "text");
+  await tryField("edit-interviewReason",   "text_mm2g2kmt",       "text");
+
+  const failed = results.filter(function(r){return !r.ok;}).length;
+  const saved  = results.filter(function(r){return r.ok;}).length;
+
+  if (btn) {
+    btn.textContent = saved+" saved"+(failed?" · "+failed+" failed":"");
+    btn.disabled = false;
+    setTimeout(function(){ btn.textContent = "💾 Update All"; }, 3000);
+  }
 }
+
+async function saveVrNotes(itemId) {
+  const raw = document.getElementById("edit-vrNotes").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const ok = await updateColumn(itemId, IR_BOARD, "text_mm2fvpmd", val, "text");
+  showMsg("msg-vrNotes", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.vrNotes=val; }
+}
+
+async function saveOneDriveLink(itemId) {
+  const val = document.getElementById("edit-oneDriveLink").value;
+  const ok = await updateColumn(itemId, IR_BOARD, "one_drive_link", val, "text");
+  showMsg("msg-oneDriveLink", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.oneDriveLink=val; }
+}
+
+async function saveRetainVideo(itemId, val) {
+  const ok = await updateColumn(itemId, IR_BOARD, "deny_service__", val, "status");
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item){item.retainVideo=val;renderList();} }
+  const msg=document.createElement("span");
+  msg.textContent=ok?"Saved":"Failed";
+  msg.style.cssText="font-size:11px;margin-left:8px;color:"+(ok?"#1a7a3f":"#c0392b");
+  const sel=document.getElementById("edit-retainVideo");
+  if(sel){sel.parentNode.appendChild(msg);setTimeout(function(){msg.remove();},2500);}
+}
+
 function openVRModal(idx, irId) {
-  const items=selectedBoard==="hr"?hrItems:irItems;
-  const ir=items.find(function(x){return x.id===irId;});
-  const vrs=getLinkedVR(ir); const v=vrs[idx]; if(!v) return;
-  const fields=[{k:"agency",l:"Agency"},{k:"status",l:"Status"},{k:"assigned",l:"Assigned to"},{k:"branch",l:"Branch"},{k:"incidentDate",l:"Incident date"},{k:"submittedDate",l:"Submitted date"},{k:"submittedBy",l:"Submitted by"},{k:"requestNarrative",l:"Request narrative",long:true},{k:"sscSupplement",l:"AP Findings on Video Request",long:true},{k:"leContact",l:"LE contact"},{k:"leEmail",l:"LE email"},{k:"lePhone",l:"LE phone"},{k:"reviewDecision",l:"Review decision"},{k:"dateCompleted",l:"Date completed"},{k:"incidentCategory",l:"Incident category"},{k:"location",l:"Location"}];
+  const ir=irItems.find(function(x){return x.id===irId;});
+  const vrs=getLinkedVR(ir);
+  const v=vrs[idx];
+  if (!v) return;
+  const fields=[
+    {k:"agency",l:"Agency"},{k:"status",l:"Status"},{k:"assigned",l:"Assigned to"},
+    {k:"branch",l:"Branch"},{k:"incidentDate",l:"Incident date"},{k:"submittedDate",l:"Submitted date"},
+    {k:"submittedBy",l:"Submitted by"},
+    {k:"requestNarrative",l:"Request narrative",long:true},
+    {k:"sscSupplement",l:"AP Findings on Video Request",long:true},
+    {k:"leContact",l:"LE contact"},{k:"leEmail",l:"LE email"},{k:"lePhone",l:"LE phone"},
+    {k:"reviewDecision",l:"Review decision"},{k:"dateCompleted",l:"Date completed"},
+    {k:"incidentCategory",l:"Incident category"},{k:"location",l:"Location"}
+  ];
   document.getElementById("vr-modal-content").innerHTML=
-    "<div class=\"modal-hdr\"><div><div class=\"modal-title\">"+(v.agency||"Video Request")+"</div><div class=\"modal-sub\">"+(v.branch||"")+" · "+(v.incidentDate||"")+"</div></div>"+
-    "<button onclick=\"document.getElementById('vr-modal').style.display='none';\" style=\"font-size:16px;background:none;border:none;cursor:pointer;\">X</button></div>"+
+    "<div class=\"modal-hdr\">"+
+      "<div><div class=\"modal-title\">"+(v.agency||"Video Request")+"</div>"+
+      "<div class=\"modal-sub\">"+(v.branch||"")+" · "+(v.incidentDate||"")+"</div></div>"+
+      "<button onclick=\"document.getElementById(\'vr-modal\').style.display=\'none\';\" style=\"font-size:16px;background:none;border:none;cursor:pointer;\">X</button>"+
+    "</div>"+
     "<div class=\"badges\" style=\"margin-bottom:12px;\"><span class=\"badge "+badgeCls(v.status)+"\">"+(v.status||"")+"</span></div>"+
-    "<div class=\"mfields\">"+fields.map(function(f){return "<div class=\"mf "+(f.long?"full":"")+"\"><div class=\"mf-label\">"+f.l+"</div><div class=\"mf-val\">"+(v[f.k]||"—")+"</div></div>";}).join("")+"</div>"+
+    "<div class=\"mfields\">"+
+      fields.map(function(f){
+        return "<div class=\"mf "+(f.long?"full":"")+"\"><div class=\"mf-label\">"+f.l+"</div><div class=\"mf-val\">"+(v[f.k]||"—")+"</div></div>";
+      }).join("")+
+    "</div>"+
     (v.oneDriveLink&&v.oneDriveLink!=="—"?"<div style=\"margin-top:12px;\"><a href=\""+v.oneDriveLink+"\" target=\"_blank\" style=\"color:#3a7bd5;\">Open video</a></div>":"");
   document.getElementById("vr-modal").style.display="flex";
 }
-function closeModal(e) { if(e.target.id==="vr-modal") document.getElementById("vr-modal").style.display="none"; }
+
+function closeModal(e) {
+  if (e.target.id==="vr-modal") document.getElementById("vr-modal").style.display="none";
+}
 
 async function printCase(id) {
-  const items=selectedBoard==="hr"?hrItems:irItems;
-  const r=(selectedBoard==="hr"?hrDetailCache:irDetailCache)[id]||items.find(function(x){return x.id===id;});
-  if(!r) return;
-  const vrs=getLinkedVR(r); const ds=getLinkedDS(r); const cid=r.caseId||r.pushableCaseId||r.id;
-  let imageHtml=""; const files=[];
-  function parseFiles(raw){if(!raw||raw==="—"||raw==="") return;try{const parsed=JSON.parse(raw);const arr=parsed.files||(Array.isArray(parsed)?parsed:[]);arr.forEach(function(f){if(f.assetId&&(f.isImage==="true"||f.isImage===true)) files.push(f);});}catch(e){}}
-  parseFiles(r.documents); parseFiles(r.pictures);
-  if(files.length){try{const q="{assets(ids:["+files.map(function(f){return f.assetId;}).join(",")+"]){id public_url name}}";const data=await gql(q);const assets=data?.data?.assets||[];const imgUrls=assets.map(function(a){return{url:"https://images.weserv.nl/?url="+encodeURIComponent(a.public_url.replace(/^https:\/\//,""))+"&w=300&output=jpg",name:a.name};});if(imgUrls.length){imageHtml="<div class='section'><div class='sec-title'>Documents &amp; Media</div><div class='img-grid'>"+imgUrls.map(function(img){return "<div class='img-box'><img src='"+img.url+"' alt='"+img.name+"'/><div class='img-label'>"+img.name+"</div></div>";}).join("")+"</div></div>";}}catch(e){}}
-  const logoB64="";
-  const apBadge=r.apFollowUp?(r.apFollowUp.includes("Completed")?"badge-green":r.apFollowUp.includes("NEEDED")?"badge-red":"badge-gray"):"";
-  const isHR=r._board==="hr"||selectedBoard==="hr";
-  const win=window.open("","_blank");
+  const r = irDetailCache[id] || irItems.find(function(x){return x.id===id;});
+  if (!r) return;
+  const vrs = getLinkedVR(r);
+  const ds = getLinkedDS(r);
+  const cid = r.caseId||r.pushableCaseId||r.id;
+
+  // Fetch image URLs for print
+  let imageHtml = "";
+  const files = [];
+  function parseFiles(raw) {
+    if (!raw || raw==="—" || raw==="") return;
+    try {
+      const parsed = JSON.parse(raw);
+      const arr = parsed.files || (Array.isArray(parsed) ? parsed : []);
+      arr.forEach(function(f){ if (f.assetId && (f.isImage==="true"||f.isImage===true)) files.push(f); });
+    } catch(e) {}
+  }
+  parseFiles(r.documents);
+  parseFiles(r.pictures);
+
+  if (files.length) {
+    try {
+      const q = "{assets(ids:["+files.map(function(f){return f.assetId;}).join(",")+"]){id public_url name}}";
+      const data = await gql(q);
+      const assets = data?.data?.assets || [];
+      const imgUrls = assets.map(function(a){
+        return {url:"https://images.weserv.nl/?url="+encodeURIComponent(a.public_url.replace(/^https:\/\//,""))+"&w=300&output=jpg", name:a.name};
+      });
+      if (imgUrls.length) {
+        imageHtml = "<div class='section'><div class='sec-title'>Documents &amp; Media</div>"+
+          "<div class='img-grid'>"+
+          imgUrls.map(function(img){
+            return "<div class='img-box'><img src='"+img.url+"' alt='"+img.name+"'/><div class='img-label'>"+img.name+"</div></div>";
+          }).join("")+
+          "</div></div>";
+      }
+    } catch(e) {}
+  }
+
+  const logoB64 = document.querySelector('img[alt="Range USA"]')?.src || "";
+  const apBadge = r.apFollowUp ? (r.apFollowUp.includes("Completed") ? "badge-green" : r.apFollowUp.includes("NEEDED") ? "badge-red" : "badge-gray") : "";
+
+  const win = window.open("","_blank");
   win.document.write(`<!DOCTYPE html><html><head><title>${cid}</title>
-  <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#1a1a1a;font-size:12px;line-height:1.6;}.page{max-width:900px;margin:0 auto;padding:30px 40px;}.header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:3px solid #2d3a4a;margin-bottom:20px;}.logo{height:50px;object-fit:contain;}.case-id{font-size:18px;font-weight:700;color:#2d3a4a;}.case-meta{font-size:11px;color:#666;margin-top:3px;}.badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}.badge{font-size:10px;padding:3px 10px;border-radius:12px;font-weight:600;}.badge-red{background:#fdecea;color:#c0392b;border:1px solid #f5c6c6;}.badge-green{background:#e6f4ec;color:#1a7a3f;border:1px solid #b7dfc8;}.badge-blue{background:#e6f0fb;color:#1a5fa8;border:1px solid #b3d0f5;}.badge-purple{background:#f0e6fb;color:#6a0dad;border:1px solid #d0a8f5;}.badge-gray{background:#f0f0f0;color:#555;border:1px solid #ddd;}.section{margin-bottom:20px;}.sec-title{font-size:9px;font-weight:700;color:#2d3a4a;text-transform:uppercase;letter-spacing:1.5px;padding-bottom:4px;border-bottom:2px solid #2d3a4a;margin-bottom:10px;}.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 20px;}.field label{font-size:9px;color:#999;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:1px;}.field p{font-size:12px;color:#1a1a1a;}.full{grid-column:1/-1;}.narr{background:#f9f9f9;padding:10px 14px;border-radius:6px;white-space:pre-wrap;font-size:12px;border:1px solid #eee;line-height:1.7;}.vr-box{border:1px solid #2d3a4a;border-radius:6px;padding:10px 14px;margin-bottom:8px;}.ds-box{border:1px solid #f5c6c6;background:#fef9f9;border-radius:6px;padding:10px 14px;margin-bottom:8px;}.img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}.img-box{border:1px solid #eee;border-radius:6px;overflow:hidden;}.img-box img{width:100%;height:200px;object-fit:contain;background:#f5f5f5;display:block;}.img-label{font-size:9px;color:#888;padding:3px 6px;text-align:center;}.footer{margin-top:24px;padding-top:12px;border-top:1px solid #eee;font-size:9px;color:#aaa;display:flex;justify-content:space-between;}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{margin:.5cm;size:letter;}}</style></head><body>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#1a1a1a;font-size:12px;line-height:1.6;}
+    .page{max-width:900px;margin:0 auto;padding:30px 40px;}
+    .header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:3px solid #2d3a4a;margin-bottom:20px;}
+    .header-left{display:flex;flex-direction:column;gap:2px;}
+    .logo{height:50px;object-fit:contain;}
+    .ap-sub{font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#ffffff;font-weight:800;font-family:"Barlow",sans-serif;margin-top:4px;}
+    .header-right{text-align:right;}
+    .case-id{font-size:18px;font-weight:700;color:#2d3a4a;}
+    .case-meta{font-size:11px;color:#666;margin-top:3px;}
+    .badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .badge{font-size:10px;padding:3px 10px;border-radius:12px;font-weight:600;}
+    .badge-red{background:#fdecea;color:#c0392b;border:1px solid #f5c6c6;}
+    .badge-green{background:#e6f4ec;color:#1a7a3f;border:1px solid #b7dfc8;}
+    .badge-blue{background:#e6f0fb;color:#1a5fa8;border:1px solid #b3d0f5;}
+    .badge-gray{background:#f0f0f0;color:#555;border:1px solid #ddd;}
+    .section{margin-bottom:20px;}
+    .sec-title{font-size:9px;font-weight:700;color:#2d3a4a;text-transform:uppercase;letter-spacing:1.5px;padding-bottom:4px;border-bottom:2px solid #2d3a4a;margin-bottom:10px;}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 20px;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;}
+    .field label{font-size:9px;color:#999;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:1px;}
+    .field p{font-size:12px;color:#1a1a1a;}
+    .full{grid-column:1/-1;}
+    .narr{background:#f9f9f9;padding:10px 14px;border-radius:6px;white-space:pre-wrap;font-size:12px;border:1px solid #eee;line-height:1.7;}
+    .vr-box{border:1px solid #2d3a4a;border-radius:6px;padding:10px 14px;margin-bottom:8px;}
+    .vr-title{font-size:12px;font-weight:600;color:#2d3a4a;margin-bottom:6px;}
+    .ds-box{border:1px solid #f5c6c6;background:#fef9f9;border-radius:6px;padding:10px 14px;margin-bottom:8px;}
+    .img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+    .img-box{border:1px solid #eee;border-radius:6px;overflow:hidden;break-inside:avoid;}
+    .img-box img{width:100%;height:200px;object-fit:contain;background:#f5f5f5;display:block;}
+    .img-label{font-size:9px;color:#888;padding:3px 6px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .divider{border:none;border-top:1px solid #eee;margin:16px 0;}
+    .footer{margin-top:24px;padding-top:12px;border-top:1px solid #eee;font-size:9px;color:#aaa;display:flex;justify-content:space-between;}
+    @media print{
+      body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+      .page{padding:15px 20px;}
+      @page{margin:.5cm;size:letter;}
+    }
+  </style></head><body>
   <div class="page">
-    <div class="header"><div>${logoB64?`<img src="${logoB64}" class="logo" alt="Range USA"/>`:`<div style="font-size:22px;font-weight:800;color:#2d3a4a;letter-spacing:2px;">RANGE USA</div>`}<div style="font-size:11px;color:#666;margin-top:4px;">${isHR?"HR Investigation":"Asset Protection"}</div></div>
-    <div style="text-align:right;"><div class="case-id">${cid}</div><div class="case-meta">${r.date||""} · ${r.branch||""} · ${r.submittedBy||"—"}</div></div></div>
-    <div class="badges">${isHR?`<span class="badge badge-purple">HR Investigation</span>`:""} ${r.apFollowUp?`<span class="badge ${apBadge}">${r.apFollowUp}</span>`:""} ${r.hrRec&&r.hrRec!=="—"?`<span class="badge badge-red">HR: ${r.hrRec}</span>`:""} ${(r.retainVideo||"").includes("Yes")?`<span class="badge badge-blue">Video Retained</span>`:""} ${ds.length?`<span class="badge badge-red">DNS on File</span>`:""} ${r.category?`<span class="badge badge-gray">${r.category}</span>`:""}</div>
-    <div class="section"><div class="sec-title">Overview</div><div class="grid-3"><div class="field"><label>Case ID</label><p>${cid}</p></div><div class="field"><label>Incident Date</label><p>${r.date||"—"}</p></div><div class="field"><label>Branch</label><p>${r.branch||"—"}</p></div><div class="field"><label>Submitted By</label><p>${r.submittedBy||"—"}</p></div><div class="field"><label>Incident Type</label><p>${getIncidentTypes(r)}</p></div><div class="field"><label>Category</label><p>${r.category||"—"}</p></div></div></div>
-    <div class="section"><div class="sec-title">Subject</div><div class="grid-3"><div class="field"><label>Subject Name</label><p>${r.subjectName||"—"}</p></div><div class="field"><label>Injuries</label><p>${r.injuries||"—"}</p></div><div class="field"><label>Police Report #</label><p>${r.policeReport||"—"}</p></div></div></div>
-    <div class="section"><div class="sec-title">Original Narrative</div><div class="narr">${getIRValue(r,"narrative").replace(/\n/g,"<br/>")}</div></div>
-    <div class="section"><div class="sec-title">Findings</div><div class="field full" style="margin-bottom:10px;"><label>AP Findings</label><div class="narr">${(r.apFindings||"—").replace(/\n/g,"<br/>")}</div></div><div class="field full" style="margin-bottom:10px;"><label>HR Recommendation &amp; Findings</label><div class="narr">${getIRValue(r,"hrRec").replace(/\n/g,"<br/>")}</div></div><div class="field full"><label>Interview Narrative</label><div class="narr">${getIRValue(r,"interviewNarrative").replace(/\n/g,"<br/>")}</div></div></div>
-    ${ds.length?`<div class="section"><div class="sec-title">Deny Service Records (${ds.length})</div>${ds.map(function(d){const sn=[d.subjectFirstName,d.subjectLastName].filter(Boolean).join(" ")||"Unknown";return`<div class="ds-box"><div style="font-weight:600;color:#c0392b;margin-bottom:4px;">${sn} — ${d.status||""} — ${d.date||""}</div><div>${d.narrative||""}</div></div>`;}).join("")}</div>`:""}
-    ${vrs.length?`<div class="section"><div class="sec-title">Video Requests (${vrs.length})</div>${vrs.map(function(v){return`<div class="vr-box"><div style="font-weight:600;color:#2d3a4a;margin-bottom:4px;">${v.agency||"Video Request"} · ${v.status||""} · ${v.branch||""}</div><div>${v.requestNarrative||""}</div>${v.sscSupplement?`<div style="margin-top:4px;color:#555;">AP Findings on VR: ${v.sscSupplement}</div>`:""}</div>`;}).join("")}</div>`:""}
+    <div class="header">
+      <div class="header-left">
+        ${logoB64 ? `<img src="${logoB64}" class="logo" alt="Range USA"/>` : `<div style="font-size:22px;font-weight:800;color:#2d3a4a;letter-spacing:2px;">RANGE USA</div>`}
+        <div class="ap-sub">Asset Protection</div>
+      </div>
+      <div class="header-right">
+        <div class="case-id">${cid}</div>
+        <div class="case-meta">${r.date||""} &nbsp;·&nbsp; ${r.branch||""} &nbsp;·&nbsp; Submitted by ${r.submittedBy||"—"}</div>
+      </div>
+    </div>
+
+    <div class="badges">
+      ${r.apFollowUp ? `<span class="badge ${apBadge}">${r.apFollowUp}</span>` : ""}
+      ${r.hrRec&&r.hrRec!=="—" ? `<span class="badge badge-red">HR: ${r.hrRec}</span>` : ""}
+      ${r.hrRecommendation&&r.hrRecommendation!=="—" ? `<span class="badge badge-red">${r.hrRecommendation}</span>` : ""}
+      ${(r.retainVideo||"").includes("Yes") ? `<span class="badge badge-blue">Video Retained</span>` : ""}
+      ${ds.length ? `<span class="badge badge-red">DNS on File</span>` : ""}
+      ${r.category ? `<span class="badge badge-gray">${r.category}</span>` : ""}
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Overview</div>
+      <div class="grid-3">
+        <div class="field"><label>Case ID</label><p>${cid}</p></div>
+        <div class="field"><label>Incident Date</label><p>${r.date||"—"}</p></div>
+        <div class="field"><label>Incident Time</label><p>${r.incidentTime||"—"}</p></div>
+        <div class="field"><label>Branch</label><p>${r.branch||"—"}</p></div>
+        <div class="field"><label>District Leader</label><p>${r.district||"—"}</p></div>
+        <div class="field"><label>Submitted By</label><p>${r.submittedBy||"—"}</p></div>
+        <div class="field"><label>Location</label><p>${r.location||"—"}</p></div>
+        <div class="field"><label>Specific Location</label><p>${r.specificLocation||"—"}</p></div>
+        <div class="field"><label>Incident Type</label><p>${getIncidentTypes(r)}</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Subject</div>
+      <div class="grid-3">
+        <div class="field"><label>Subject Name</label><p>${r.subjectName||"—"}</p></div>
+        <div class="field"><label>Subject Type</label><p>${r.subjectType||"—"}</p></div>
+        <div class="field"><label>Injuries</label><p>${r.injuries||"—"}</p></div>
+        <div class="field"><label>Property Damage</label><p>${r.propertyDamage||"—"}</p></div>
+        <div class="field"><label>Police Report #</label><p>${r.policeReport||"—"}</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Original Narrative</div>
+      <div class="narr">${getIRValue(r,"narrative").replace(/\n/g,"<br/>")}</div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Findings</div>
+      <div class="field full" style="margin-bottom:10px;"><label>AP Findings</label>
+        <div class="narr">${(r.apFindings||"—").replace(/\n/g,"<br/>")}</div></div>
+      <div class="field full" style="margin-bottom:10px;"><label>HR Recommendation &amp; Findings</label>
+        <div class="narr">${getIRValue(r,"hrRec").replace(/\n/g,"<br/>")}</div></div>
+      <div class="field full"><label>Interview Narrative</label>
+        <div class="narr">${getIRValue(r,"interviewNarrative").replace(/\n/g,"<br/>")}</div></div>
+    </div>
+
+    ${ds.length ? `<div class="section"><div class="sec-title">Deny Service Records (${ds.length})</div>${ds.map(function(d){
+      const sn=[d.subjectFirstName,d.subjectLastName].filter(Boolean).join(" ")||"Unknown";
+      return `<div class="ds-box"><div style="font-weight:600;color:#c0392b;margin-bottom:4px;">${sn} — ${d.status||""} — ${d.date||""}</div><div>${d.narrative||""}</div></div>`;
+    }).join("")}</div>` : ""}
+
+    ${vrs.length ? `<div class="section"><div class="sec-title">Video Requests (${vrs.length})</div>${vrs.map(function(v){
+      return `<div class="vr-box"><div class="vr-title">${v.agency||"Video Request"} · ${v.status||""} · ${v.branch||""}</div><div>${v.requestNarrative||""}</div>${v.sscSupplement?`<div style="margin-top:4px;color:#555;">AP Findings on VR: ${v.sscSupplement}</div>`:""}</div>`;
+    }).join("")}</div>` : ""}
+
     ${imageHtml}
-    <div class="footer"><span>Range USA — ${isHR?"HR Investigation":"Asset Protection"} Case File</span><span>Printed ${new Date().toLocaleDateString()} · ${cid}</span></div>
+
+    <div class="footer">
+      <span>Range USA — Asset Protection Case File</span>
+      <span>Printed ${new Date().toLocaleDateString()} · ${cid}</span>
+    </div>
   </div>
-  <script>setTimeout(function(){window.print();},800);<\/script></body></html>`);
+  <script>setTimeout(function(){window.print();},800);<\/script>
+  </body></html>`);
   win.document.close();
 }
 
-// ── Settings panel ─────────────────────────────────────────
-const FIELD_DEFS=[{id:"apFindings",label:"AP Findings"},{id:"hrRec",label:"HR Rec & Findings"},{id:"interviewNarrative",label:"Interview Narrative"},{id:"narrative",label:"Original Narrative"},{id:"subject",label:"Subject Info"},{id:"overview",label:"Overview"},{id:"details",label:"Details"},{id:"documents",label:"Documents & Media"},{id:"denialRecords",label:"Deny Service Records"},{id:"videoRequests",label:"Video Requests"}];
-const SECTION_DEFS=[{id:"sec-findings",label:"Findings"},{id:"sec-overview",label:"Overview"},{id:"sec-details",label:"Details"},{id:"sec-narrative",label:"Original Narrative"},{id:"sec-subject",label:"Subject"},{id:"sec-bb",label:"AP Investigation File"},{id:"sec-interview",label:"Schedule Interview"},{id:"sec-witness",label:"Witness"},{id:"sec-rental",label:"Rental Firearm / Ammo Details"},{id:"sec-documents",label:"Documents & Media"},{id:"sec-dns",label:"Deny Service Records"},{id:"sec-vr",label:"Video Requests"}];
-const DEFAULT_SECTION_ORDER=SECTION_DEFS.map(function(s){return s.id;});
-let sectionOrder=JSON.parse(localStorage.getItem("sectionOrder")||JSON.stringify(DEFAULT_SECTION_ORDER));
-SECTION_DEFS.forEach(function(s){if(sectionOrder.indexOf(s.id)<0) sectionOrder.push(s.id);});
-let hiddenFields=JSON.parse(localStorage.getItem("hiddenFields")||"[]");
-let hiddenSections=JSON.parse(localStorage.getItem("hiddenSections")||"[]");
+// Settings panel
+const FIELD_DEFS = [
+  {id:"apFindings",label:"AP Findings"},
+  {id:"hrRec",label:"HR Rec & Findings"},
+  {id:"interviewNarrative",label:"Interview Narrative"},
+  {id:"narrative",label:"Original Narrative"},
+  {id:"subject",label:"Subject Info"},
+  {id:"overview",label:"Overview"},
+  {id:"details",label:"Details"},
+  {id:"documents",label:"Documents & Media"},
+  {id:"denialRecords",label:"Deny Service Records"},
+  {id:"videoRequests",label:"Video Requests"}
+];
+const SECTION_DEFS = [
+  {id:"sec-findings",label:"Findings"},
+  {id:"sec-overview",label:"Overview"},
+  {id:"sec-details",label:"Details"},
+  {id:"sec-narrative",label:"Original Narrative"},
+  {id:"sec-subject",label:"Subject"},
+  {id:"sec-bb",label:"AP Investigation File"},
+  {id:"sec-interview",label:"Schedule Interview"},
+  {id:"sec-witness",label:"Witness"},
+  {id:"sec-rental",label:"Rental Firearm / Ammo Details"},
+  {id:"sec-documents",label:"Documents & Media"},
+  {id:"sec-dns",label:"Deny Service Records"},
+  {id:"sec-vr",label:"Video Requests"}
+];
+const DEFAULT_SECTION_ORDER = SECTION_DEFS.map(function(s){return s.id;});
+let sectionOrder = JSON.parse(localStorage.getItem("sectionOrder")||JSON.stringify(DEFAULT_SECTION_ORDER));
+// Make sure any new sections not in saved order get appended
+SECTION_DEFS.forEach(function(s){ if(sectionOrder.indexOf(s.id)<0) sectionOrder.push(s.id); });
+let hiddenFields = JSON.parse(localStorage.getItem("hiddenFields")||"[]");
+let hiddenSections = JSON.parse(localStorage.getItem("hiddenSections")||"[]");
 
-function toggleSettings(){const panel=document.getElementById("settings-panel");panel.classList.toggle("open");if(panel.classList.contains("open")) buildSettingsUI();}
-function switchTab(tabId){document.querySelectorAll(".stab-content").forEach(function(el){el.classList.remove("active");});document.querySelectorAll(".stab").forEach(function(el){el.classList.remove("active");});document.getElementById(tabId).classList.add("active");event.target.classList.add("active");}
-function buildSettingsUI(){const ft=document.getElementById("field-toggles");ft.innerHTML=FIELD_DEFS.map(function(f){const checked=hiddenFields.indexOf(f.id)<0;return "<label class='settings-check'><input type='checkbox' "+(checked?"checked":"")+" onchange=\"toggleField('"+f.id+"',this.checked)\"/> "+f.label+"</label>";}).join("");buildSectionDragList();}
-function buildSectionDragList(){const list=document.getElementById("section-drag-list");list.innerHTML=sectionOrder.map(function(sid){const def=SECTION_DEFS.find(function(s){return s.id===sid;});if(!def) return "";const visible=hiddenSections.indexOf(sid)<0;return "<div class='drag-item' draggable='true' data-id='"+sid+"' ondragstart='dragStart(event)' ondragover='dragOver(event)' ondrop='dropSection(event)' ondragleave='dragLeave(event)'><span class='drag-handle'>⠿</span><input type='checkbox' "+(visible?"checked":"")+" onchange=\"toggleSection('"+sid+"',this.checked)\"/><span>"+def.label+"</span></div>";}).join("");}
-let dragSrcId=null;
-function dragStart(e){dragSrcId=e.currentTarget.dataset.id;e.currentTarget.classList.add("dragging");e.dataTransfer.effectAllowed="move";}
-function dragOver(e){e.preventDefault();e.dataTransfer.dropEffect="move";e.currentTarget.classList.add("drag-over");}
-function dragLeave(e){e.currentTarget.classList.remove("drag-over");}
-function dropSection(e){e.preventDefault();e.currentTarget.classList.remove("drag-over");const targetId=e.currentTarget.dataset.id;if(!dragSrcId||dragSrcId===targetId) return;const srcIdx=sectionOrder.indexOf(dragSrcId);const tgtIdx=sectionOrder.indexOf(targetId);sectionOrder.splice(srcIdx,1);sectionOrder.splice(tgtIdx,0,dragSrcId);dragSrcId=null;localStorage.setItem("sectionOrder",JSON.stringify(sectionOrder));buildSectionDragList();if(selectedId){const items=selectedBoard==="hr"?hrItems:irItems;const r=items.find(function(x){return x.id===selectedId;});if(r) renderDetail(r);}}
-function toggleField(id,visible){if(visible) hiddenFields=hiddenFields.filter(function(x){return x!==id;});else if(hiddenFields.indexOf(id)<0) hiddenFields.push(id);localStorage.setItem("hiddenFields",JSON.stringify(hiddenFields));if(selectedId){const items=selectedBoard==="hr"?hrItems:irItems;const r=items.find(function(x){return x.id===selectedId;});if(r) renderDetail(r);}}
-function toggleSection(id,visible){if(visible) hiddenSections=hiddenSections.filter(function(x){return x!==id;});else if(hiddenSections.indexOf(id)<0) hiddenSections.push(id);localStorage.setItem("hiddenSections",JSON.stringify(hiddenSections));if(selectedId){const items=selectedBoard==="hr"?hrItems:irItems;const r=items.find(function(x){return x.id===selectedId;});if(r) renderDetail(r);}}
-function isSectionVisible(id){return hiddenSections.indexOf(id)<0;}
-// ── Status bar ─────────────────────────────────────────────
-let columnOptionsCache={};
-async function fetchColumnOptions(colId,boardId){
-  const key=boardId+"_"+colId;
-  if(columnOptionsCache[key]) return columnOptionsCache[key];
-  try{const q="{boards(ids:"+boardId+"){columns(ids:[\""+colId+"\"]){settings_str}}}";const data=await gql(q);const settings=JSON.parse(data?.data?.boards?.[0]?.columns?.[0]?.settings_str||"{}");const labels=settings.labels||{};const options=Object.values(labels).filter(Boolean);columnOptionsCache[key]=options;return options;}catch(e){return [];}
+// ── Settings panel ──────────────────────────────────────────
+function toggleSettings() {
+  const panel = document.getElementById("settings-panel");
+  panel.classList.toggle("open");
+  if (panel.classList.contains("open")) buildSettingsUI();
 }
-function updateStatusBar(r){
-  const bar=document.getElementById("status-bar");
-  if(!r){bar.style.display="none";return;}
+
+function switchTab(tabId) {
+  document.querySelectorAll(".stab-content").forEach(function(el){el.classList.remove("active");});
+  document.querySelectorAll(".stab").forEach(function(el){el.classList.remove("active");});
+  document.getElementById(tabId).classList.add("active");
+  event.target.classList.add("active");
+}
+
+function buildSettingsUI() {
+  // Field toggles
+  const ft = document.getElementById("field-toggles");
+  ft.innerHTML = FIELD_DEFS.map(function(f){
+    const checked = hiddenFields.indexOf(f.id)<0;
+    return "<label class='settings-check'><input type='checkbox' "+(checked?"checked":"")+" onchange=\"toggleField('"+f.id+"',this.checked)\"/> "+f.label+"</label>";
+  }).join("");
+  // Section drag list
+  buildSectionDragList();
+}
+
+function buildSectionDragList() {
+  const list = document.getElementById("section-drag-list");
+  list.innerHTML = sectionOrder.map(function(sid){
+    const def = SECTION_DEFS.find(function(s){return s.id===sid;});
+    if (!def) return "";
+    const visible = hiddenSections.indexOf(sid)<0;
+    return "<div class='drag-item' draggable='true' data-id='"+sid+"' ondragstart='dragStart(event)' ondragover='dragOver(event)' ondrop='dropSection(event)' ondragleave='dragLeave(event)'>"+
+      "<span class='drag-handle'>⠿</span>"+
+      "<input type='checkbox' "+(visible?"checked":"")+" onchange=\"toggleSection('"+sid+"',this.checked)\"/>"+
+      "<span>"+def.label+"</span>"+
+    "</div>";
+  }).join("");
+}
+
+let dragSrcId = null;
+function dragStart(e) {
+  dragSrcId = e.currentTarget.dataset.id;
+  e.currentTarget.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+}
+function dragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  e.currentTarget.classList.add("drag-over");
+}
+function dragLeave(e) { e.currentTarget.classList.remove("drag-over"); }
+function dropSection(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove("drag-over");
+  const targetId = e.currentTarget.dataset.id;
+  if (!dragSrcId || dragSrcId === targetId) return;
+  const srcIdx = sectionOrder.indexOf(dragSrcId);
+  const tgtIdx = sectionOrder.indexOf(targetId);
+  sectionOrder.splice(srcIdx, 1);
+  sectionOrder.splice(tgtIdx, 0, dragSrcId);
+  dragSrcId = null;
+  localStorage.setItem("sectionOrder", JSON.stringify(sectionOrder));
+  buildSectionDragList();
+  if (selectedId) { const r=irItems.find(function(x){return x.id===selectedId;}); if(r) renderDetail(r); }
+}
+
+function toggleField(id, visible) {
+  if (visible) hiddenFields = hiddenFields.filter(function(x){return x!==id;});
+  else if (hiddenFields.indexOf(id)<0) hiddenFields.push(id);
+  localStorage.setItem("hiddenFields", JSON.stringify(hiddenFields));
+  if (selectedId) { const r=irItems.find(function(x){return x.id===selectedId;}); if(r) renderDetail(r); }
+}
+
+function toggleSection(id, visible) {
+  if (visible) hiddenSections = hiddenSections.filter(function(x){return x!==id;});
+  else if (hiddenSections.indexOf(id)<0) hiddenSections.push(id);
+  localStorage.setItem("hiddenSections", JSON.stringify(hiddenSections));
+  if (selectedId) { const r=irItems.find(function(x){return x.id===selectedId;}); if(r) renderDetail(r); }
+}
+
+function isSectionVisible(id) { return hiddenSections.indexOf(id)<0; }
+
+// ── Status bar with live dropdowns ───────────────────────────
+let columnOptionsCache = {};
+
+async function fetchColumnOptions(colId) {
+  if (columnOptionsCache[colId]) return columnOptionsCache[colId];
+  try {
+    const q = "{boards(ids:"+IR_BOARD+"){columns(ids:[\""+colId+"\"]){settings_str}}}";
+    const data = await gql(q);
+    const settings = JSON.parse(data?.data?.boards?.[0]?.columns?.[0]?.settings_str||"{}");
+    const labels = settings.labels || {};
+    const options = Object.values(labels).filter(Boolean);
+    columnOptionsCache[colId] = options;
+    return options;
+  } catch(e) { return []; }
+}
+
+function updateStatusBar(r) {
+  const bar = document.getElementById("status-bar");
+  if (!r) { bar.style.display="none"; return; }
   bar.style.display="flex";
-  function setBtn(id,label,val,activeClass){const btn=document.getElementById(id);if(!btn) return;btn.textContent=label+": "+(val&&val!=="—"?val:"—");btn.className="sbutton"+(val&&val!=="—"?" "+(activeClass||"active-blue"):"");}
-  setBtn("sb-ap","AP Follow-up",r.apFollowUp,r.apFollowUp&&r.apFollowUp.includes("Completed")?"active-green":"active-red");
-  setBtn("sb-category","Category",r.category,"active-gray");
-  setBtn("sb-video","Video",r.retainVideo,(r.retainVideo||"").includes("Yes")?"active-blue":"");
-  setBtn("sb-deny","Deny Service",r.denyService,"active-red");
-  setBtn("sb-hr","HR Review",r.hrRec,"active-red");
-  setBtn("sb-hrrec","HR Rec",r.hrRecommendation,"active-orange");
-  setBtn("sb-handshake","Rich Handshake",r.richHandshake,"active-green");
-  setBtn("sb-ownership","Ownership",r.currentOwnership,"active-blue");
+
+  function setBtn(id, label, val, activeClass) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.textContent = label+": "+(val&&val!=="—"?val:"—");
+    btn.className = "sbutton"+(val&&val!=="—"?" "+(activeClass||"active-blue"):"");
+  }
+
+  setBtn("sb-ap",       "AP Follow-up",   r.apFollowUp,        r.apFollowUp&&r.apFollowUp.includes("Completed")?"active-green":"active-red");
+  setBtn("sb-category", "Category",       r.category,          "active-gray");
+  setBtn("sb-video",    "Video",          r.retainVideo,       (r.retainVideo||"").includes("Yes")?"active-blue":"");
+  setBtn("sb-deny",     "Deny Service",   r.denyService,       "active-red");
+  setBtn("sb-hr",       "HR Review",      r.hrRec,             "active-red");
+  setBtn("sb-hrrec",    "HR Rec",         r.hrRecommendation,  "active-orange");
+  setBtn("sb-handshake","Rich Handshake", r.richHandshake,     "active-green");
+  setBtn("sb-ownership","Ownership",      r.currentOwnership,  "active-blue");
 }
 
-function toggleStatusDropdown(ddId,e){
+function toggleStatusDropdown(ddId, e) {
   e.stopPropagation();
-  const dd=document.getElementById(ddId);
-  const isOpen=dd.classList.contains("open");
+  const dd = document.getElementById(ddId);
+  const isOpen = dd.classList.contains("open");
+  // Close all dropdowns first
   document.querySelectorAll(".status-dropdown-menu").forEach(function(el){el.classList.remove("open");});
-  if(!isOpen){dd.classList.add("open");populateDropdown(ddId);}
+  if (!isOpen) {
+    dd.classList.add("open");
+    populateDropdown(ddId);
+  }
 }
-document.addEventListener("click",function(){document.querySelectorAll(".status-dropdown-menu").forEach(function(el){el.classList.remove("open");});});
 
-async function populateDropdown(ddId){
-  if(!selectedId) return;
-  const items=selectedBoard==="hr"?hrItems:irItems;
-  const r=items.find(function(x){return x.id===selectedId;});
-  if(!r) return;
-  const dd=document.getElementById(ddId);
-  dd.innerHTML="<div class='status-saving'>Loading options...</div>";
-  const activeBoardId=getActiveBoardId();
-  const MAP={
-    "dd-ap":{colId:"dup__of_hr_decision____1",prop:"apFollowUp"},
-    "dd-category":{colId:"color_mknf4hd3",prop:"category"},
-    "dd-video":{colId:"deny_service__",prop:"retainVideo"},
-    "dd-video-local":{colId:"deny_service__",prop:"retainVideo"},
-    "dd-deny":{colId:"district_leader",prop:"denyService"},
-    "dd-hr":{colId:"status_1__1",prop:"hrRec"},
-    "dd-hrrec":{colId:"color_mm0fehr4",prop:"hrRecommendation"},
-    "dd-hrrec-local":{colId:"color_mm0fehr4",prop:"hrRecommendation"},
-    "dd-interview":{colId:"color_mm2gyjyr",prop:"interviewStatus"},
-    "dd-handshake":{colId:"color_mm0rs4kc",prop:"richHandshake"},
-    "dd-ownership":{colId:"color_mm0q8n2x",prop:"currentOwnership"}
+document.addEventListener("click", function(){
+  document.querySelectorAll(".status-dropdown-menu").forEach(function(el){el.classList.remove("open");});
+});
+
+async function populateDropdown(ddId) {
+  if (!selectedId) return;
+  const r = irItems.find(function(x){return x.id===selectedId;});
+  if (!r) return;
+  const dd = document.getElementById(ddId);
+  dd.innerHTML = "<div class='status-saving'>Loading options...</div>";
+
+  const MAP = {
+    "dd-ap":          {colId:"dup__of_hr_decision____1", prop:"apFollowUp"},
+    "dd-category":    {colId:"color_mknf4hd3",           prop:"category"},
+    "dd-video":       {colId:"deny_service__",            prop:"retainVideo"},
+    "dd-video-local": {colId:"deny_service__",            prop:"retainVideo"},
+    "dd-deny":        {colId:"district_leader",           prop:"denyService"},
+    "dd-hr":          {colId:"status_1__1",               prop:"hrRec"},
+    "dd-hrrec":       {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
+    "dd-hrrec-local": {colId:"color_mm0fehr4",            prop:"hrRecommendation"},
+    "dd-interview":   {colId:"color_mm2gyjyr",            prop:"interviewStatus"},
+    "dd-handshake":   {colId:"color_mm0rs4kc",            prop:"richHandshake"},
+    "dd-ownership":   {colId:"color_mm0q8n2x",            prop:"currentOwnership"}
   };
-  const entry=MAP[ddId];
-  if(!entry){dd.innerHTML="<div class='status-saving'>Not configurable here</div>";return;}
-  const options=await fetchColumnOptions(entry.colId,activeBoardId);
-  if(!options.length){dd.innerHTML="<div class='status-saving'>No options found</div>";return;}
-  const current=r[entry.prop];
-  function optionColor(opt){const l=opt.toLowerCase();if(l.includes("terminat")||l.includes("action needed")||l.includes("deny")||l.includes("no")) return "#3a1a1a";if(l.includes("complet")||l.includes("approved")||l.includes("done")||l.includes("yes")) return "#1a3a2a";if(l.includes("progress")||l.includes("pending")||l.includes("review")) return "#2a2010";if(l.includes("written")||l.includes("warning")||l.includes("final")) return "#2a1a3a";return "";}
-  function optionTextColor(opt){const l=opt.toLowerCase();if(l.includes("terminat")||l.includes("action needed")||l.includes("deny")||l.includes("no")) return "#e05050";if(l.includes("complet")||l.includes("approved")||l.includes("done")||l.includes("yes")) return "#4caf80";if(l.includes("progress")||l.includes("pending")||l.includes("review")) return "#e0a030";if(l.includes("written")||l.includes("warning")||l.includes("final")) return "#a07ad5";return "#c0d4e8";}
-  dd.innerHTML=options.map(function(opt){const isCurrent=opt===current;const bg=optionColor(opt);const fg=optionTextColor(opt);return "<div class='status-option"+(isCurrent?" current":"")+"' style='"+(bg?"background:"+bg+";":"")+"color:"+fg+";' onclick='selectStatus(\""+ddId+"\",\""+entry.colId+"\",\""+entry.prop+"\",\""+opt.replace(/"/g,"&quot;")+"\")'>"+( isCurrent?"✓ ":"")+opt+"</div>";}).join("");
+
+  const entry = MAP[ddId];
+  if (!entry) { dd.innerHTML = "<div class='status-saving'>Not configurable here</div>"; return; }
+
+  const options = await fetchColumnOptions(entry.colId);
+  if (!options.length) { dd.innerHTML = "<div class='status-saving'>No options found</div>"; return; }
+
+  const current = r[entry.prop];
+
+  // Color coding by keyword
+  function optionColor(opt) {
+    const l = opt.toLowerCase();
+    if (l.includes("terminat") || l.includes("action needed") || l.includes("deny") || l.includes("no")) return "#3a1a1a";
+    if (l.includes("complet") || l.includes("approved") || l.includes("done") || l.includes("yes")) return "#1a3a2a";
+    if (l.includes("progress") || l.includes("pending") || l.includes("review")) return "#2a2010";
+    if (l.includes("written") || l.includes("warning") || l.includes("final")) return "#2a1a3a";
+    return "";
+  }
+  function optionTextColor(opt) {
+    const l = opt.toLowerCase();
+    if (l.includes("terminat") || l.includes("action needed") || l.includes("deny") || l.includes("no")) return "#e05050";
+    if (l.includes("complet") || l.includes("approved") || l.includes("done") || l.includes("yes")) return "#4caf80";
+    if (l.includes("progress") || l.includes("pending") || l.includes("review")) return "#e0a030";
+    if (l.includes("written") || l.includes("warning") || l.includes("final")) return "#a07ad5";
+    return "#c0d4e8";
+  }
+
+  dd.innerHTML = options.map(function(opt){
+    const isCurrent = opt === current;
+    const bg = optionColor(opt);
+    const fg = optionTextColor(opt);
+    return "<div class='status-option"+(isCurrent?" current":"")+"' style='"+(bg?"background:"+bg+";":"")+"color:"+fg+";' onclick='selectStatus(\""+ddId+"\",\""+entry.colId+"\",\""+entry.prop+"\",\""+opt.replace(/"/g,"&quot;")+"\")'>"+
+      (isCurrent?"✓ ":"")+opt+
+    "</div>";
+  }).join("");
 }
 
-async function selectStatus(ddId,colId,prop,value){
-  if(!selectedId) return;
-  const items=selectedBoard==="hr"?hrItems:irItems;
-  const r=items.find(function(x){return x.id===selectedId;});
-  if(!r) return;
-  const dd=document.getElementById(ddId);
-  dd.innerHTML="<div class='status-saving'>Saving...</div>";
-  const ok=await updateColumn(selectedId,getActiveBoardId(),colId,value,"status");
+async function saveHrFindings(itemId) {
+  const raw = document.getElementById("edit-hrFindings").value;
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const ok = await updateColumn(itemId, IR_BOARD, "long_text_mm0f4cbg", val, "longtext");
+  showMsg("msg-hrFindings", ok);
+  if (ok) { const item=irItems.find(function(x){return x.id===itemId;}); if(item) item.hrFindings=val; }
+}
+
+async function saveInterviewNarrative(itemId) {
+  const raw = document.getElementById("edit-interviewNarrative").value;
+  // Insert "." between paragraphs (replace blank lines with a line containing just ".")
+  const val = raw.replace(/\n\s*\n/g, "\n.\n");
+  const LIMIT = 2000;
+  let part1 = val, part2 = "";
+  if (val.length > LIMIT) {
+    let splitAt = val.lastIndexOf("\n.\n", LIMIT);
+    if (splitAt < 500) splitAt = val.lastIndexOf("\n", LIMIT);
+    if (splitAt < 0) splitAt = LIMIT;
+    part1 = val.substring(0, splitAt).trim();
+    part2 = val.substring(splitAt).trim();
+    if (!part1.endsWith(".")) part1 = part1 + "\n.";
+  }
+  const ok1 = await updateColumn(itemId, IR_BOARD, "long_text__1", part1, "longtext");
+  let ok2 = true;
+  if (part2) {
+    ok2 = await updateColumn(itemId, IR_BOARD, "long_text3__1", part2, "longtext");
+  } else {
+    ok2 = await updateColumn(itemId, IR_BOARD, "long_text3__1", "", "longtext");
+  }
+  const ok = ok1 && ok2;
+  showMsg("msg-interviewNarrative", ok);
+  if (ok) {
+    const item = irItems.find(function(x){return x.id===itemId;});
+    if (item) { item.interviewNarrative1=part1; item.interviewNarrative2=part2; }
+  }
+}
+
+async function selectStatus(ddId, colId, prop, value) {
+  if (!selectedId) return;
+  const r = irItems.find(function(x){return x.id===selectedId;});
+  if (!r) return;
+  const dd = document.getElementById(ddId);
+  dd.innerHTML = "<div class='status-saving'>Saving...</div>";
+  const ok = await updateColumn(selectedId, IR_BOARD, colId, value, "status");
   dd.classList.remove("open");
-  if(ok){r[prop]=value;updateStatusBar(r);renderList();if(selectedId) renderDetail(r);}
-  else{alert("Save failed — please try again.");}
-}
-
-// ── Cache helpers ─────────────────────────────────────────
-const CACHE_KEY="rusa_cv_cache";
-const CACHE_TS_KEY="rusa_cv_cache_ts";
-const CACHE_MAX_AGE=30*60*1000;
-function saveCache(ir,vr,ds,hr){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ir,vr,ds,hr}));localStorage.setItem(CACHE_TS_KEY,Date.now().toString());}catch(e){}}
-function loadCache(){try{const ts=parseInt(localStorage.getItem(CACHE_TS_KEY)||"0");const age=Date.now()-ts;const raw=localStorage.getItem(CACHE_KEY);if(!raw) return null;const data=JSON.parse(raw);return{data,age,isStale:age>CACHE_MAX_AGE};}catch(e){return null;}}
-function clearCache(){localStorage.removeItem(CACHE_KEY);localStorage.removeItem(CACHE_TS_KEY);}
-function getDateFilter(daysBack){const d=new Date();d.setDate(d.getDate()-daysBack);return d.toISOString().split("T")[0];}
-function showCacheBadge(age){const el=document.getElementById("cache-badge");if(!el) return;const mins=Math.round(age/60000);el.textContent=mins<1?"● just synced":"● cached "+mins+"m ago";}
-
-async function loadOlderCases(){
-  const btn=document.getElementById("btn-load-older");
-  const selectedBranch=document.getElementById("f-branch").value;
-  if(!selectedBranch){alert("Please select a branch first.");return;}
-  if(btn){btn.textContent="Loading "+selectedBranch+"...";btn.disabled=true;}
-  try{
-    const dateFilter=getDateFilter(365);
-    const q="{boards(ids:"+IR_BOARD+"){items_page(limit:100,query_params:{rules:[{column_id:\"date4\",compare_value:[\""+dateFilter+"\"],operator:greater_than_or_equals},{column_id:\"dropdown0\",compare_value:[\""+selectedBranch+"\"],operator:any_of}]}){cursor items{id name column_values{id text value}}}}}";
-    let all=[],cursor=null;
-    for(let p=0;p<20;p++){const pageQ=cursor?"{next_items_page(limit:100,cursor:\""+cursor+"\"){cursor items{id name column_values{id text value}}}}":q;const data=await gql(pageQ);const pd=cursor?data?.data?.next_items_page:data?.data?.boards?.[0]?.items_page;if(!pd||!pd.items||!pd.items.length) break;all=all.concat(pd.items.map(function(item){const r={id:item.id,name:item.name};Object.entries(IR_LIST_COLS).forEach(function(e){r[e[0]]=getVal(item.column_values,e[1]);});return r;}));if(!pd.cursor) break;cursor=pd.cursor;}
-    const existing=new Set(irItems.map(function(x){return x.id;}));
-    const newItems=all.filter(function(x){return !existing.has(x.id);});
-    irItems=irItems.concat(newItems);
+  if (ok) {
+    r[prop] = value;
+    updateStatusBar(r);
     renderList();
-    if(btn){btn.textContent=newItems.length?"+"+newItems.length+" older cases loaded":"No older cases found";btn.disabled=false;btn.style.color="#aaa";btn.style.borderColor="#aaa";}
-  }catch(e){if(btn){btn.textContent="Load older cases";btn.disabled=false;}}
+    if (selectedId) renderDetail(r);
+  } else {
+    alert("Save failed — please try again.");
+  }
 }
 
-async function refreshAll(){
+// ── Cache helpers ─────────────────────────────────────────────
+const CACHE_KEY = "rusa_cv_cache";
+const CACHE_TS_KEY = "rusa_cv_cache_ts";
+const CACHE_MAX_AGE = 30 * 60 * 1000; // 30 minutes
+
+function saveCache(ir, vr, ds) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ir, vr, ds}));
+    localStorage.setItem(CACHE_TS_KEY, Date.now().toString());
+  } catch(e) {}
+}
+
+function loadCache() {
+  try {
+    const ts = parseInt(localStorage.getItem(CACHE_TS_KEY)||"0");
+    const age = Date.now() - ts;
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return {data, age, isStale: age > CACHE_MAX_AGE};
+  } catch(e) { return null; }
+}
+
+function clearCache() {
+  localStorage.removeItem(CACHE_KEY);
+  localStorage.removeItem(CACHE_TS_KEY);
+}
+
+function getDateFilter(daysBack) {
+  const d = new Date();
+  d.setDate(d.getDate() - daysBack);
+  return d.toISOString().split("T")[0];
+}
+
+function showCacheBadge(age) {
+  const el = document.getElementById("cache-badge");
+  if (!el) return;
+  const mins = Math.round(age / 60000);
+  el.textContent = mins < 1 ? "● just synced" : "● cached "+mins+"m ago";
+}
+
+async function loadOlderCases() {
+  const btn = document.getElementById("btn-load-older");
+  const selectedBranch = document.getElementById("f-branch").value;
+
+  if (!selectedBranch) {
+    alert("Please select a branch first — loading older cases for all branches at once takes too long. Select a branch filter, then click Load older cases.");
+    return;
+  }
+
+  if (btn) { btn.textContent = "Loading "+selectedBranch+"..."; btn.disabled = true; }
+  try {
+    const dateFilter = getDateFilter(365);
+    // Fetch older cases with branch filter applied via Monday query
+    const q = "{boards(ids:"+IR_BOARD+"){items_page(limit:100,query_params:{rules:[{column_id:\"date4\",compare_value:[\""+dateFilter+"\"],operator:greater_than_or_equals},{column_id:\"dropdown0\",compare_value:[\""+selectedBranch+"\"],operator:any_of}]}){cursor items{id name column_values{id text value}}}}}";
+    let all=[], cursor=null;
+    for (let p=0; p<20; p++) {
+      const pageQ = cursor
+        ? "{next_items_page(limit:100,cursor:\""+cursor+"\"){cursor items{id name column_values{id text value}}}}"
+        : q;
+      const data = await gql(pageQ);
+      const pd = cursor ? data?.data?.next_items_page : data?.data?.boards?.[0]?.items_page;
+      if (!pd||!pd.items||!pd.items.length) break;
+      all = all.concat(pd.items.map(function(item){
+        const r={id:item.id, name:item.name};
+        Object.entries(IR_LIST_COLS).forEach(function(e){ r[e[0]]=getVal(item.column_values,e[1]); });
+        return r;
+      }));
+      if (!pd.cursor) break;
+      cursor = pd.cursor;
+    }
+    const existing = new Set(irItems.map(function(x){return x.id;}));
+    const newItems = all.filter(function(x){return !existing.has(x.id);});
+    irItems = irItems.concat(newItems);
+    renderList();
+    if (btn) {
+      btn.textContent = newItems.length ? "+"+newItems.length+" older cases loaded" : "No older cases found";
+      btn.disabled = false;
+      btn.style.color="#aaa"; btn.style.borderColor="#aaa";
+    }
+  } catch(e) {
+    if (btn) { btn.textContent = "Load older cases"; btn.disabled = false; }
+  }
+}
+
+async function refreshAll() {
   clearCache();
-  document.getElementById("live-badge").textContent="● Refreshing...";
-  irDetailCache={}; hrDetailCache={};
+  document.getElementById("live-badge").textContent = "● Refreshing...";
+  irDetailCache = {};
   await init();
 }
 
-async function init(){
-  const cached=loadCache();
-  if(cached&&!cached.isStale){
-    irItems=cached.data.ir; vrItems=cached.data.vr||[]; dsItems=cached.data.ds||[]; hrItems=cached.data.hr||[];
-    document.getElementById("live-badge").textContent="● "+(irItems.length+hrItems.length)+" cases (cached)";
+async function init() {
+  const cached = loadCache();
+
+  if (cached && !cached.isStale) {
+    // INSTANT LOAD from cache
+    irItems = cached.data.ir;
+    vrItems = cached.data.vr || [];
+    dsItems = cached.data.ds || [];
+    const mins = Math.round(cached.age / 60000);
+    document.getElementById("live-badge").textContent = "● "+irItems.length+" cases (cached)";
     showCacheBadge(cached.age);
-    populateFilters(); renderList();
+    populateFilters();
+    renderList();
+    // Refresh from Monday silently in background
     refreshInBackground();
     return;
   }
-  if(cached&&cached.isStale){
-    irItems=cached.data.ir; vrItems=cached.data.vr||[]; dsItems=cached.data.ds||[]; hrItems=cached.data.hr||[];
-    document.getElementById("live-badge").textContent="● "+(irItems.length+hrItems.length)+" cases (updating…)";
-    populateFilters(); renderList();
+
+  if (cached && cached.isStale) {
+    // Stale cache — show it immediately while we fetch fresh data
+    irItems = cached.data.ir;
+    vrItems = cached.data.vr || [];
+    dsItems = cached.data.ds || [];
+    document.getElementById("live-badge").textContent = "● "+irItems.length+" cases (updating…)";
+    populateFilters();
+    renderList();
+    // Fetch fresh in background
     refreshInBackground();
     return;
   }
-  try{
-    document.getElementById("live-badge").textContent="● Loading…";
-    const dateFilter=getDateFilter(90);
-    const [ir,hr]=await Promise.all([
-      fetchBoard(IR_BOARD,IR_LIST_COLS,dateFilter),
-      fetchBoard(HR_BOARD,HR_LIST_COLS,dateFilter)
+
+  // No cache — full load
+  try {
+    document.getElementById("live-badge").textContent = "● Loading…";
+    const dateFilter = getDateFilter(90);
+    irItems = await fetchBoard(IR_BOARD, IR_LIST_COLS, dateFilter);
+    document.getElementById("live-badge").textContent = "● "+irItems.length+" cases";
+    populateFilters();
+    renderList();
+    // Load VR and DS then save cache
+    const [vr, ds] = await Promise.all([
+      fetchBoard(VR_BOARD, VR_COLS, dateFilter),
+      fetchBoard(DS_BOARD, DS_COLS, dateFilter)
     ]);
-    irItems=ir; hrItems=hr;
-    document.getElementById("live-badge").textContent="● "+(irItems.length+hrItems.length)+" cases";
-    populateFilters(); renderList();
-    const [vr,ds]=await Promise.all([
-      fetchBoard(VR_BOARD,VR_COLS,dateFilter),
-      fetchBoard(DS_BOARD,DS_COLS,dateFilter)
-    ]);
-    vrItems=vr; dsItems=ds;
-    // Stamp VR status onto IR/HR items for sidebar display
-    irItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
-    hrItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
-    saveCache(irItems,vrItems,dsItems,hrItems);
+    vrItems = vr; dsItems = ds;
+    saveCache(irItems, vrItems, dsItems);
     showCacheBadge(0);
-  }catch(e){
-    document.getElementById("list-panel").innerHTML="<div class=\"err-msg\">Error: "+e.message+"</div>";
-    document.getElementById("live-badge").textContent="● Error";
+  } catch(e) {
+    document.getElementById("list-panel").innerHTML = "<div class=\"err-msg\">Error: "+e.message+"</div>";
+    document.getElementById("live-badge").textContent = "● Error";
   }
 }
 
-async function refreshInBackground(){
-  try{
-    const dateFilter=getDateFilter(90);
-    const [ir,vr,ds,hr]=await Promise.all([
-      fetchBoard(IR_BOARD,IR_LIST_COLS,dateFilter),
-      fetchBoard(VR_BOARD,VR_COLS,dateFilter),
-      fetchBoard(DS_BOARD,DS_COLS,dateFilter),
-      fetchBoard(HR_BOARD,HR_LIST_COLS,dateFilter)
+async function refreshInBackground() {
+  try {
+    const dateFilter = getDateFilter(90);
+    const [ir, vr, ds] = await Promise.all([
+      fetchBoard(IR_BOARD, IR_LIST_COLS, dateFilter),
+      fetchBoard(VR_BOARD, VR_COLS, dateFilter),
+      fetchBoard(DS_BOARD, DS_COLS, dateFilter)
     ]);
-    irItems=ir; vrItems=vr; dsItems=ds; hrItems=hr;
-    irItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
-    hrItems.forEach(function(r){ const linked=vrItems.filter(function(v){return (v.linkedIRId&&String(v.linkedIRId).trim()===String(r.id).trim())||(v.linkedCaseId&&r.caseId&&String(v.linkedCaseId).trim().toLowerCase()===String(r.caseId).trim().toLowerCase());}); r._vrStatus=linked.length?(linked[linked.length-1].status||"—"):""; });
-    irDetailCache={}; hrDetailCache={};
-    saveCache(irItems,vrItems,dsItems,hrItems);
-    document.getElementById("live-badge").textContent="● Live — "+(irItems.length+hrItems.length)+" cases";
+    irItems = ir; vrItems = vr; dsItems = ds;
+    irDetailCache = {}; // clear detail cache since data is fresh
+    saveCache(irItems, vrItems, dsItems);
+    document.getElementById("live-badge").textContent = "● Live — "+irItems.length+" cases";
     showCacheBadge(0);
     renderList();
-  }catch(e){document.getElementById("live-badge").textContent="● Live (bg refresh failed)";}
+  } catch(e) {
+    document.getElementById("live-badge").textContent = "● Live (bg refresh failed)";
+  }
 }
 
-// ── Panel resizing ─────────────────────────────────────────
-(function(){
-  const STORAGE_KEY_LEFT="rusa_panel_list_width", STORAGE_KEY_RIGHT="rusa_panel_preview_width";
-  const DEFAULT_LEFT=310, DEFAULT_RIGHT=500;
-  function initPanels(){const listW=parseInt(localStorage.getItem(STORAGE_KEY_LEFT))||DEFAULT_LEFT;const previewW=parseInt(localStorage.getItem(STORAGE_KEY_RIGHT))||DEFAULT_RIGHT;const list=document.getElementById("list-panel");const preview=document.getElementById("preview-panel");if(list){list.style.width=listW+"px";list.style.minWidth="150px";}if(preview){preview.style.width=previewW+"px";preview.style.minWidth="150px";}}
-  function makeResizer(resizerId,panelId,storageKey,side){const resizer=document.getElementById(resizerId);const panel=document.getElementById(panelId);if(!resizer||!panel) return;let startX,startW;resizer.addEventListener("mousedown",function(e){startX=e.clientX;startW=panel.offsetWidth;resizer.classList.add("dragging");document.body.style.cursor="col-resize";document.body.style.userSelect="none";function onMove(e){const dx=side==="left"?e.clientX-startX:startX-e.clientX;const newW=Math.max(150,Math.min(700,startW+dx));panel.style.width=newW+"px";}function onUp(){resizer.classList.remove("dragging");document.body.style.cursor="";document.body.style.userSelect="";localStorage.setItem(storageKey,panel.offsetWidth);document.removeEventListener("mousemove",onMove);document.removeEventListener("mouseup",onUp);}document.addEventListener("mousemove",onMove);document.addEventListener("mouseup",onUp);e.preventDefault();});resizer.addEventListener("dblclick",function(){const def=side==="left"?DEFAULT_LEFT:DEFAULT_RIGHT;panel.style.width=def+"px";localStorage.setItem(storageKey,def);});}
+// ── PANEL RESIZING ─────────────────────────────────────────
+(function() {
+  const STORAGE_KEY_LEFT = "rusa_panel_list_width";
+  const STORAGE_KEY_RIGHT = "rusa_panel_preview_width";
+  const DEFAULT_LEFT = 310;
+  const DEFAULT_RIGHT = 500;
+
+  function initPanels() {
+    const listW = parseInt(localStorage.getItem(STORAGE_KEY_LEFT)) || DEFAULT_LEFT;
+    const previewW = parseInt(localStorage.getItem(STORAGE_KEY_RIGHT)) || DEFAULT_RIGHT;
+    const list = document.getElementById("list-panel");
+    const preview = document.getElementById("preview-panel");
+    if (list) { list.style.width = listW+"px"; list.style.minWidth = "150px"; }
+    if (preview) { preview.style.width = previewW+"px"; preview.style.minWidth = "150px"; }
+  }
+
+  function makeResizer(resizerId, panelId, storageKey, side) {
+    const resizer = document.getElementById(resizerId);
+    const panel = document.getElementById(panelId);
+    if (!resizer || !panel) return;
+    let startX, startW;
+    resizer.addEventListener("mousedown", function(e) {
+      startX = e.clientX;
+      startW = panel.offsetWidth;
+      resizer.classList.add("dragging");
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      function onMove(e) {
+        const dx = side === "left" ? e.clientX - startX : startX - e.clientX;
+        const newW = Math.max(150, Math.min(700, startW + dx));
+        panel.style.width = newW+"px";
+      }
+      function onUp() {
+        resizer.classList.remove("dragging");
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        localStorage.setItem(storageKey, panel.offsetWidth);
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+      }
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+      e.preventDefault();
+    });
+    resizer.addEventListener("dblclick", function() {
+      const def = side === "left" ? DEFAULT_LEFT : DEFAULT_RIGHT;
+      panel.style.width = def+"px";
+      localStorage.setItem(storageKey, def);
+    });
+  }
+
   initPanels();
-  makeResizer("resizer-left","list-panel",STORAGE_KEY_LEFT,"left");
-  makeResizer("resizer-right","preview-panel",STORAGE_KEY_RIGHT,"right");
+  makeResizer("resizer-left", "list-panel", STORAGE_KEY_LEFT, "left");
+  makeResizer("resizer-right", "preview-panel", STORAGE_KEY_RIGHT, "right");
 })();
 
 init();
@@ -1584,5 +2250,6 @@ init();
     </div>
   </div>
 </div>
+
 </body>
 </html>
