@@ -285,10 +285,12 @@ async function loadGCData() {
   const wrap = document.getElementById('gc-table-wrap');
   wrap.innerHTML = '<div class="empty-state"><div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div><div class="empty-title">Loading Gift Card Data...</div></div>';
   try {
-    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/Weekly%20GC%20Report.csv');
+    const r = await fetch('https://dream-drivers-wool-discover.trycloudflare.com/api/gift-cards', {
+      headers: {'X-API-Key': 'rusa-ap-2026'}
+    });
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    const text = await r.text();
-    gcData = parseCSV(text);
+    const data = await r.json();
+    gcData = Array.isArray(data) ? data : data.data || [];
     populateGCFilters();
     applyGCFilters();
     document.getElementById('gc-summary').style.display = 'flex';
@@ -415,9 +417,12 @@ async function loadRetData() {
   const wrap = document.getElementById('ret-table-wrap');
   wrap.innerHTML = '<div class="empty-state"><div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div><div class="empty-title">Loading Returns Data...</div></div>';
   try {
-    const r = await fetch('https://raw.githubusercontent.com/sweirRUSA/ap-case-viewer/main/Returns%20Report.csv');
-    const text = await r.text();
-    retData = parseCSV(text);
+    const r = await fetch('https://dream-drivers-wool-discover.trycloudflare.com/api/returns', {
+      headers: {'X-API-Key': 'rusa-ap-2026'}
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    retData = Array.isArray(data) ? data : data.data || [];
     populateRetFilters();
     applyRetFilters();
     document.getElementById('ret-summary').style.display = 'flex';
