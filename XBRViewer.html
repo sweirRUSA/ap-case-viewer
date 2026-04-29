@@ -356,12 +356,13 @@ function renderGCTable() {
     const av=a[gcSortCol]||'', bv=b[gcSortCol]||'';
     return gcSortDir * (av<bv?-1:av>bv?1:0);
   });
-  const thead = '<thead><tr>' + GC_COLS.map(c => {
+  const thead = '<thead><tr><th>🚩</th>' + GC_COLS.map(c => {
     const cls = gcSortCol===c.key ? (gcSortDir===1?'sort-asc':'sort-desc') : '';
     return '<th onclick="sortGC(\'' + c.key.replace(/'/g,"\\'") + '\')" class="' + cls + '">' + c.label + '</th>';
   }).join('') + '</tr></thead>';
   const tbody = '<tbody>' + sorted.map(r => {
-    return '<tr>' + GC_COLS.map(c => {
+    const flagBtn = '<td><button onclick="flagRow(\'gc\',' + JSON.stringify(r).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') + ')" style="font-size:10px;padding:2px 6px;background:#2a1a1a;border:1px solid #5a2020;color:#e05050;border-radius:4px;cursor:pointer;">🚩</button></td>';
+    return '<tr>' + flagBtn + GC_COLS.map(c => {
       let val = r[c.key];
       if (val === null || val === undefined || val === '') val = '—';
       if (c.money && val !== '—') val = '$' + parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -488,12 +489,13 @@ function renderRetTable() {
     const av=a[retSortCol]||'', bv=b[retSortCol]||'';
     return retSortDir * (av<bv?-1:av>bv?1:0);
   });
-  const thead = '<thead><tr>' + RET_COLS.map(c => {
+  const thead = '<thead><tr><th>🚩</th>' + RET_COLS.map(c => {
     const cls = retSortCol===c.key ? (retSortDir===1?'sort-asc':'sort-desc') : '';
     return '<th onclick="sortRet(\'' + c.key.replace(/'/g,"\\'") + '\')" class="' + cls + '">' + c.label + '</th>';
   }).join('') + '</tr></thead>';
   const tbody = '<tbody>' + sorted.map(r => {
-    return '<tr>' + RET_COLS.map(c => {
+    const flagBtn = '<td><button onclick="flagRow(\'ret\',' + JSON.stringify(r).replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') + ')" style="font-size:10px;padding:2px 6px;background:#2a1a1a;border:1px solid #5a2020;color:#e05050;border-radius:4px;cursor:pointer;">🚩</button></td>';
+    return '<tr>' + flagBtn + RET_COLS.map(c => {
       let val = r[c.key];
       if (val === null || val === undefined || val === '') val = '—';
       if (c.money && val !== '—') val = '$' + parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -532,6 +534,190 @@ function exportToExcel(tableId, filename) {
 
 // Auto-load GC data from GitHub CSV
 loadGCData();
+
+// ── XBR INVESTIGATION TRACKING ────────────────────────────
+const XBR_BOARD = "18410682291";
+const XBR_COLS = {
+  reportType: "color_mm2vdtee",
+  saleId: "text_mm2vpjv7",
+  gcNumber: "text_mm2v38xk",
+  branch: "dropdown_mm2vbqvj",
+  tranDate: "date_mm2vbrph",
+  amount: "numeric_mm2vp6ba",
+  notes: "text_mm2vrczc",
+  storeBranch: "text_mm2v20m7",
+  status: "color_mm2vka66",
+  transactionType: "dropdown_mm2v6ww2",
+  investigator: "multiple_person_mm2vqmjh",
+  customerName: "text_mm2v2p99",
+  associateName: "text_mm2vxz4k"
+};
+
+let currentFlagRow = null;
+
+function flagRow(type, row) {
+  currentFlagRow = {type, row};
+  const modal = document.getElementById('flag-modal');
+  const title = document.getElementById('flag-modal-title');
+  const info = document.getElementById('flag-modal-info');
+
+  if (type === 'gc') {
+    title.textContent = 'Flag Gift Card Exception';
+    info.innerHTML =
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;">' +
+      '<div><span style="color:#4a6a8a;">GC #</span><br><span style="color:#e0eaf5;">' + (row['GC #']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Branch</span><br><span style="color:#e0eaf5;">' + (row['Event Branch #']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Transaction Type</span><br><span style="color:#e0eaf5;">' + (row['Transaction Type']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Amount</span><br><span style="color:#e0eaf5;">' + (row['Transaction Amount']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Associate</span><br><span style="color:#e0eaf5;">' + (row['Activating RA']||row['Redeeming RA']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">GC Notes</span><br><span style="color:#e0a030;">' + (row['GC Notes']||'—') + '</span></div>' +
+      '</div>';
+    document.getElementById('flag-gc-number').value = row['GC #']||'';
+    document.getElementById('flag-sale-id').value = row['Activation Sale ID']||row['Redemption Sale ID']||'';
+    document.getElementById('flag-amount').value = row['Transaction Amount']||'';
+    document.getElementById('flag-store').value = (row['Event Branch #']||'') + ' - ' + (row['Store Responsibility']||'');
+    document.getElementById('flag-type-row').style.display = '';
+    document.getElementById('flag-gcnum-row').style.display = '';
+    document.getElementById('flag-report-type').value = 'Gift Card';
+  } else {
+    title.textContent = 'Flag Returns Exception';
+    info.innerHTML =
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;">' +
+      '<div><span style="color:#4a6a8a;">Store</span><br><span style="color:#e0eaf5;">' + (row['STORE NUMBER']||'') + ' - ' + (row['STORE DESCRIPTION']||'') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Refund Date</span><br><span style="color:#e0eaf5;">' + (row['REFUND DATE']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Product</span><br><span style="color:#e0eaf5;">' + (row['PRODUCT DESCRIPTION']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Amount</span><br><span style="color:#e0eaf5;">' + (row['REFUNDED AMOUNT']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Customer</span><br><span style="color:#e0eaf5;">' + (row['CUSTOMER NAME']||'—') + '</span></div>' +
+      '<div><span style="color:#4a6a8a;">Sold By</span><br><span style="color:#e0eaf5;">' + (row['SOLD BY EMPLOYEE']||'—') + '</span></div>' +
+      '</div>';
+    document.getElementById('flag-gc-number').value = '';
+    document.getElementById('flag-sale-id').value = row['REFUND SALE ID']||'';
+    document.getElementById('flag-amount').value = row['REFUNDED AMOUNT']||'';
+    document.getElementById('flag-store').value = (row['STORE NUMBER']||'') + ' - ' + (row['STORE DESCRIPTION']||'');
+    document.getElementById('flag-gcnum-row').style.display = 'none';
+    document.getElementById('flag-report-type').value = 'Return';
+  }
+
+  document.getElementById('flag-notes').value = '';
+  document.getElementById('flag-msg').textContent = '';
+  modal.style.display = 'flex';
+}
+
+function hideFlagModal() {
+  document.getElementById('flag-modal').style.display = 'none';
+  currentFlagRow = null;
+}
+
+async function submitFlag() {
+  const btn = document.getElementById('flag-submit-btn');
+  const msg = document.getElementById('flag-msg');
+  const notes = document.getElementById('flag-notes').value.trim();
+  const reportType = document.getElementById('flag-report-type').value;
+  const r = currentFlagRow ? currentFlagRow.row : {};
+
+  btn.disabled = true;
+  btn.textContent = 'Flagging...';
+  msg.textContent = '';
+
+  // Build item name
+  const itemName = reportType === 'Gift Card'
+    ? 'GC: ' + (r['GC #']||'') + ' — ' + (r['Event Branch #']||'')
+    : 'Return: ' + (r['REFUND SALE ID']||'') + ' — ' + (r['STORE NUMBER']||'');
+
+  // Create Monday item
+  const mutation = `mutation {
+    create_item(
+      board_id: ${XBR_BOARD},
+      item_name: "${itemName.replace(/"/g, '\\"')}",
+      column_values: "${JSON.stringify({
+        [XBR_COLS.reportType]: reportType === 'Gift Card' ? {label: 'Gift Card'} : {label: 'Return'},
+        [XBR_COLS.status]: {label: 'Not Reviewed'},
+        [XBR_COLS.saleId]: document.getElementById('flag-sale-id').value,
+        [XBR_COLS.gcNumber]: document.getElementById('flag-gc-number').value,
+        [XBR_COLS.storeBranch]: document.getElementById('flag-store').value,
+        [XBR_COLS.amount]: document.getElementById('flag-amount').value,
+        [XBR_COLS.notes]: notes,
+        [XBR_COLS.customerName]: reportType === 'Gift Card' ? (r['Activating Cust']||'') : (r['CUSTOMER NAME']||''),
+        [XBR_COLS.associateName]: reportType === 'Gift Card' ? (r['Activating RA']||r['Redeeming RA']||'') : (r['SOLD BY EMPLOYEE']||'')
+      }).replace(/\\/g,'\\\\').replace(/"/g,'\\"')}"
+    ) { id name }
+  }`;
+
+  try {
+    const resp = await fetch(PROXY + encodeURIComponent('https://api.monday.com/v2'), {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Authorization':TOKEN},
+      body: JSON.stringify({query: mutation})
+    });
+    const data = await resp.json();
+    if (data?.data?.create_item?.id) {
+      msg.style.color = '#4caf80';
+      msg.textContent = '✓ Flagged successfully! Item #' + data.data.create_item.id;
+      setTimeout(hideFlagModal, 2000);
+    } else {
+      const err = data?.errors?.[0]?.message || JSON.stringify(data);
+      msg.style.color = '#e05050';
+      msg.textContent = 'Error: ' + err;
+    }
+  } catch(e) {
+    msg.style.color = '#e05050';
+    msg.textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Flag for Investigation';
+}
+
+document.addEventListener('click', function(e) {
+  const m = document.getElementById('flag-modal');
+  if (m && e.target === m) hideFlagModal();
+});
 </script>
+
+<!-- Flag for Investigation Modal -->
+<div id="flag-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#131f2e;border:1px solid #2d3f55;border-radius:12px;width:90%;max-width:560px;overflow:hidden;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #1e2e40;background:#0d1520;">
+      <div style="font-size:14px;font-weight:600;color:#e0eaf5;" id="flag-modal-title">Flag Exception</div>
+      <button onclick="hideFlagModal()" style="background:transparent;border:none;color:#8fa8c0;font-size:18px;cursor:pointer;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:16px 20px;">
+      <div id="flag-modal-info" style="background:#0d1520;border-radius:8px;padding:12px;margin-bottom:16px;border:1px solid #1e2e40;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div>
+          <div style="font-size:11px;color:#4a6a8a;margin-bottom:4px;">Report Type</div>
+          <input id="flag-report-type" type="text" readonly style="width:100%;font-size:12px;background:#0d1520;border:1px solid #2d3f55;border-radius:6px;padding:6px 8px;color:#e0eaf5;"/>
+        </div>
+        <div id="flag-gcnum-row">
+          <div style="font-size:11px;color:#4a6a8a;margin-bottom:4px;">GC #</div>
+          <input id="flag-gc-number" type="text" readonly style="width:100%;font-size:12px;background:#0d1520;border:1px solid #2d3f55;border-radius:6px;padding:6px 8px;color:#e0eaf5;"/>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#4a6a8a;margin-bottom:4px;">Sale ID</div>
+          <input id="flag-sale-id" type="text" readonly style="width:100%;font-size:12px;background:#0d1520;border:1px solid #2d3f55;border-radius:6px;padding:6px 8px;color:#e0eaf5;"/>
+        </div>
+        <div>
+          <div style="font-size:11px;color:#4a6a8a;margin-bottom:4px;">Store / Branch</div>
+          <input id="flag-store" type="text" readonly style="width:100%;font-size:12px;background:#0d1520;border:1px solid #2d3f55;border-radius:6px;padding:6px 8px;color:#e0eaf5;"/>
+        </div>
+        <div id="flag-type-row">
+          <div style="font-size:11px;color:#4a6a8a;margin-bottom:4px;">Amount</div>
+          <input id="flag-amount" type="text" readonly style="width:100%;font-size:12px;background:#0d1520;border:1px solid #2d3f55;border-radius:6px;padding:6px 8px;color:#e0eaf5;"/>
+        </div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:11px;color:#4a6a8a;margin-bottom:4px;">Investigation Notes</div>
+        <textarea id="flag-notes" placeholder="Add notes about this exception..." style="width:100%;font-size:12px;background:#0d1520;border:1px solid #2d3f55;border-radius:6px;padding:8px;color:#e0eaf5;resize:vertical;min-height:80px;font-family:inherit;"></textarea>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span id="flag-msg" style="font-size:12px;"></span>
+        <div style="display:flex;gap:8px;">
+          <button onclick="hideFlagModal()" style="font-size:12px;padding:7px 16px;background:transparent;border:1px solid #2d3f55;color:#8fa8c0;border-radius:6px;cursor:pointer;">Cancel</button>
+          <button id="flag-submit-btn" onclick="submitFlag()" style="font-size:12px;padding:7px 16px;background:#e05050;border:none;color:#fff;border-radius:6px;cursor:pointer;font-weight:600;">🚩 Flag for Investigation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
