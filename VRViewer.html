@@ -120,8 +120,8 @@ button:hover{background:#243447;}
 </div>
 
 <script>
-const TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjY1MTIzNjEwMCwiYWFpIjoxMSwidWlkIjo1OTA4NDY1LCJpYWQiOiIyMDI2LTA0LTI4VDE0OjM2OjEyLjAwMFoiLCJwZXIiOiJtZTp3cml0ZSIsImFjdGlkIjoyNjYzMjIyLCJyZ24iOiJ1c2UxIn0.e6YlO1yUrBMNXR7e3pF9Vl0kGVnAIjJvVdtp0lAHxoQ";
-const PROXY = "https://corsproxy.io/?";
+const TOKEN = "unused";
+const PROXY = "https://radius-revelation-ward-chicago.trycloudflare.com/api/monday?query=";
 const VR_BOARD = "992178387";
 let vrItems = [], selectedId = null;
 
@@ -140,8 +140,8 @@ const VR_COLS = {
 };
 
 async function gql(q) {
-  const r = await fetch(PROXY+encodeURIComponent("https://api.monday.com/v2"),{
-    method:"POST",headers:{"Content-Type":"application/json","Authorization":TOKEN},
+  const r = await fetch("https://radius-revelation-ward-chicago.trycloudflare.com/api/monday",{
+    method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},
     body:JSON.stringify({query:q})
   });
   return r.json();
@@ -377,7 +377,7 @@ async function showActivityLog(itemId, boardId, name) {
   body.innerHTML = "<div style='color:#4a6a8a;font-size:12px;'>Loading activity log...</div>";
   try {
     const q = "{boards(ids:"+boardId+"){activity_logs(item_ids:["+itemId+"],limit:50){id event data created_at}}}";
-    const r = await fetch(PROXY+encodeURIComponent("https://api.monday.com/v2"),{method:"POST",headers:{"Content-Type":"application/json","Authorization":TOKEN},body:JSON.stringify({query:q})});
+    const r = await fetch("https://radius-revelation-ward-chicago.trycloudflare.com/api/monday",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},body:JSON.stringify({query:q})});
     const data = await r.json();
     const logs = data?.data?.boards?.[0]?.activity_logs || [];
     if (!logs.length) { body.innerHTML = "<div style='color:#4a6a8a;font-size:12px;font-style:italic;'>No activity found.</div>"; return; }
