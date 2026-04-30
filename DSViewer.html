@@ -90,12 +90,12 @@ let AP_TOKEN = null;
 
 (async function checkSession() {
   AP_TOKEN = localStorage.getItem('ap_token');
-  if (!AP_TOKEN) { if (!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; return; }
+  if (!AP_TOKEN) { window.location.href = 'login.html'; return; }
   try {
     const r = await fetch(BACKEND + '/api/session', {
       headers: { 'x-session-token': AP_TOKEN }
     });
-    if (!r.ok) { window.location.href = 'login.html'; return; }
+    if (!r.ok) { localStorage.removeItem('ap_token'); localStorage.removeItem('ap_user'); window.location.href = 'login.html'; return; }
     const data = await r.json();
     AP_USER = data.user;
     // Check module access
