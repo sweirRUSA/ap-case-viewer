@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Range USA — User Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&family=Barlow:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Roboto',Arial,sans-serif;background:#0a1628;color:#e0eaf5;min-height:100vh;}
+.header{background:#0d1520;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #f56200;}
+.header-left{display:flex;align-items:center;gap:16px;}
+.header-left img{height:120px;object-fit:contain;}
+.header-right{display:flex;align-items:center;gap:12px;}
+.user-badge{font-size:12px;color:#8fa8c0;background:#131f2e;padding:4px 12px;border-radius:6px;}
+.btn-small{font-size:11px;padding:4px 12px;background:transparent;border:1px solid #2d3f55;color:#8fa8c0;border-radius:6px;cursor:pointer;font-family:'Roboto',Arial,sans-serif;}
+.btn-small:hover{border-color:#f56200;color:#f56200;}
+.btn-orange{background:#f56200;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Roboto',Arial,sans-serif;}
+.btn-orange:hover{background:#d45500;}
+.main{padding:24px;max-width:1200px;margin:0 auto;}
+.page-title{font-size:20px;font-weight:900;color:#e0eaf5;margin-bottom:4px;}
+.page-sub{font-size:12px;color:#4a6a8a;margin-bottom:24px;}
+.section{background:#131f2e;border:1px solid #1e2e40;border-radius:10px;margin-bottom:24px;overflow:hidden;}
+.section-title{font-size:13px;font-weight:700;color:#f56200;padding:14px 20px;border-bottom:1px solid #1e2e40;display:flex;justify-content:space-between;align-items:center;}
+.user-table{width:100%;border-collapse:collapse;}
+.user-table th{font-size:10px;font-weight:700;color:#4a6a8a;text-transform:uppercase;padding:10px 16px;text-align:left;border-bottom:1px solid #1e2e40;}
+.user-table td{padding:12px 16px;border-bottom:1px solid #1a2535;font-size:13px;vertical-align:middle;}
+.user-table tr:last-child td{border-bottom:none;}
+.user-table tr:hover td{background:#1a2d42;}
+.access-grid{display:flex;gap:4px;flex-wrap:wrap;}
+.access-badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;}
+.access-w{background:#1a3a1a;color:#4caf80;border:1px solid #2a5a2a;}
+.access-r{background:#1a2a3a;color:#5a9fd4;border:1px solid #2a4a6a;}
+.access-none{background:#1a1a1a;color:#4a4a4a;border:1px solid #2a2a2a;}
+.status-active{color:#4caf80;font-size:11px;font-weight:700;}
+.status-inactive{color:#e05050;font-size:11px;font-weight:700;}
+.level-admin{color:#f56200;font-size:11px;font-weight:700;}
+.level-user{color:#8fa8c0;font-size:11px;}
+.btn-edit{font-size:11px;padding:3px 10px;background:transparent;border:1px solid #2d3f55;color:#8fa8c0;border-radius:4px;cursor:pointer;}
+.btn-edit:hover{border-color:#5a9fd4;color:#5a9fd4;}
+.btn-disable{font-size:11px;padding:3px 10px;background:transparent;border:1px solid #2d3f55;color:#e05050;border-radius:4px;cursor:pointer;margin-left:4px;}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;}
+.modal.open{display:flex;}
+.modal-box{background:#131f2e;border:1px solid #2d3f55;border-radius:12px;width:90%;max-width:620px;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #1e2e40;}
+.modal-title{font-size:15px;font-weight:700;color:#e0eaf5;}
+.modal-close{background:transparent;border:none;color:#8fa8c0;font-size:18px;cursor:pointer;padding:4px 8px;}
+.modal-body{padding:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-row.single{grid-template-columns:1fr;}
+.form-group label{display:block;font-size:11px;color:#4a6a8a;margin-bottom:4px;text-transform:uppercase;font-weight:700;}
+.form-group input{width:100%;padding:8px 10px;background:#0d1520;border:1px solid #2d3f55;border-radius:6px;color:#e0eaf5;font-size:13px;font-family:'Roboto',Arial,sans-serif;}
+.form-group input:focus{outline:none;border-color:#f56200;}
+.access-section{margin-top:16px;}
+.access-section h3{font-size:12px;color:#4a6a8a;text-transform:uppercase;font-weight:700;margin-bottom:12px;}
+.access-table{width:100%;border-collapse:collapse;}
+.access-table th{font-size:10px;color:#4a6a8a;padding:6px 10px;text-align:center;border-bottom:1px solid #1e2e40;}
+.access-table th:first-child{text-align:left;}
+.access-table td{padding:8px 10px;border-bottom:1px solid #1a2535;font-size:12px;text-align:center;}
+.access-table td:first-child{text-align:left;color:#c0d4e8;}
+.access-table select{background:#0d1520;border:1px solid #2d3f55;color:#e0eaf5;padding:3px 6px;border-radius:4px;font-size:12px;}
+.modal-footer{padding:16px 20px;border-top:1px solid #1e2e40;display:flex;justify-content:space-between;align-items:center;}
+.save-msg{font-size:12px;color:#4caf80;}
+.err-msg{font-size:12px;color:#e05050;}
+.loading{text-align:center;padding:40px;color:#4a6a8a;}
+.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:#4a6a8a;font-size:13px;font-weight:700;padding:8px 16px;cursor:pointer;font-family:'Roboto',Arial,sans-serif;margin-bottom:-1px;}
+.tab-btn.active{color:#f56200;border-bottom-color:#f56200;}
+.tab-btn:hover{color:#e0eaf5;}
+.log-filters{display:flex;gap:10px;padding:14px 20px;border-bottom:1px solid #1e2e40;flex-wrap:wrap;align-items:center;}
+.log-filters select,.log-filters input{background:#0d1520;border:1px solid #2d3f55;color:#e0eaf5;padding:5px 8px;border-radius:5px;font-size:12px;}
+.log-table{width:100%;border-collapse:collapse;}
+.log-table th{font-size:10px;color:#4a6a8a;text-transform:uppercase;padding:8px 14px;text-align:left;border-bottom:1px solid #1e2e40;}
+.log-table td{padding:8px 14px;border-bottom:1px solid #1a2535;font-size:12px;color:#c0d4e8;}
+.log-table tr:hover td{background:#1a2d42;}
+.log-action-login{color:#4caf80;}
+.log-action-login_fail{color:#e05050;}
+.log-action-logout{color:#8fa8c0;}
+.log-action-edit{color:#5a9fd4;}
+.log-action-view{color:#7a8a9a;}
+.log-action-user_create,.log-action-user_update,.log-action-user_unlock{color:#e0a030;}
+</style>
+<script>
+// ── SESSION CHECK ──────────────────────────────────────────
+const BACKEND = (function() {
+  // Use localhost when running locally, tunnel URL when on GitHub Pages
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3000';
+  }
+  return 'https://liz-enabling-sparc-four.trycloudflare.com';
+})();
+let AP_USER = null;
+let AP_TOKEN = null;
+
+(async function checkSession() {
+  AP_TOKEN = localStorage.getItem('ap_token');
+  if (!AP_TOKEN) { if (!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; return; }
+  try {
+    const r = await fetch(BACKEND + '/api/session', {
+      headers: { 'x-session-token': AP_TOKEN }
+    });
+    if (!r.ok) { window.location.href = 'login.html'; return; }
+    const data = await r.json();
+    AP_USER = data.user;
+    // Check module access
+    const module = document.body.getAttribute('data-module');
+    if (module && !AP_USER.access[module]) {
+      window.location.href = 'index.html';
+      return;
+    }
+    // Show user name in header
+    const badge = document.getElementById('user-badge');
+    if (badge) badge.textContent = AP_USER.name;
+    // Hide write controls if read-only
+    if (module && AP_USER.access[module] === 'R') {
+      document.querySelectorAll('.write-only').forEach(el => el.style.display = 'none');
+    }
+  } catch(e) {
+    window.location.href = 'login.html';
+  }
+})();
+
+async function doLogout() {
+  await fetch(BACKEND + '/api/logout', {
+    method: 'POST',
+    headers: { 'x-session-token': AP_TOKEN }
+  });
+  localStorage.removeItem('ap_token');
+  localStorage.removeItem('ap_user');
+  window.location.href = 'login.html';
+}
+
+</script>
+</head>
+<body data-module="settings">
+
+<div class="header">
+  <div class="header-left">
+    <img src="RUSALogo.png" alt="Range USA" onerror="this.style.display='none'"/>
+  </div>
+  <div class="header-right">
+    <span class="user-badge" id="user-badge">Loading...</span>
+    <a href="index.html" class="btn-small">🏠 Home</a>
+    <button class="btn-small" onclick="doLogout()">Sign out</button>
+  </div>
+</div>
+
+<div class="main">
+  <div style="display:flex;gap:12px;margin-bottom:20px;border-bottom:1px solid #1e2e40;padding-bottom:0;">
+    <button class="tab-btn active" id="tab-users" onclick="switchTab('users')">👥 Users</button>
+    <button class="tab-btn" id="tab-logs" onclick="switchTab('logs')">📋 Activity log</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span>Portal users</span>
+      <button class="btn-orange" onclick="openCreateModal()">+ Add user</button>
+    </div>
+    <div id="users-wrap">
+      <div class="loading">Loading users...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Log Section (hidden by default) -->
+<div id="log-section" style="display:none;max-width:1200px;margin:0 auto;padding:0 24px 24px;">
+  <div class="section">
+    <div class="section-title">
+      <span>Activity log</span>
+      <button class="btn-orange" onclick="exportLogs()">⬇ Export CSV</button>
+    </div>
+    <div class="log-filters">
+      <select id="log-user-filter" onchange="loadLogs()">
+        <option value="">All users</option>
+      </select>
+      <select id="log-action-filter" onchange="loadLogs()">
+        <option value="">All actions</option>
+        <option value="LOGIN">Login</option>
+        <option value="LOGIN_FAIL">Failed login</option>
+        <option value="LOGOUT">Logout</option>
+        <option value="VIEW">View</option>
+        <option value="EDIT">Edit</option>
+        <option value="USER_CREATE">User created</option>
+        <option value="USER_UPDATE">User updated</option>
+        <option value="USER_UNLOCK">User unlocked</option>
+      </select>
+      <input type="date" id="log-from" onchange="loadLogs()" placeholder="From date"/>
+      <input type="date" id="log-to" onchange="loadLogs()" placeholder="To date"/>
+      <span id="log-count" style="font-size:12px;color:#4a6a8a;margin-left:8px;"></span>
+    </div>
+    <div id="log-wrap"><div class="loading">Select the Activity log tab to load entries.</div></div>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal" id="user-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Add user</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Username (ID)</label>
+          <input type="text" id="modal-id" placeholder="e.g. jsmith"/>
+        </div>
+        <div class="form-group">
+          <label>Full name</label>
+          <input type="text" id="modal-name" placeholder="e.g. John Smith"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label id="pwd-label">Password</label>
+          <input type="password" id="modal-password" placeholder="Min 8 characters"/>
+        </div>
+        <div class="form-group">
+          <label>Level</label>
+          <input type="text" id="modal-level" placeholder="USER or ADMIN" value="USER"/>
+        </div>
+      </div>
+      <div class="access-section">
+        <h3>Module access</h3>
+        <table class="access-table">
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Access</th>
+            </tr>
+          </thead>
+          <tbody id="access-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span id="modal-msg" class="save-msg"></span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-small" onclick="closeModal()">Cancel</button>
+        <button class="btn-orange" id="modal-save-btn" onclick="saveUser()">Save user</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BACKEND = (function() {
+  // Use localhost when running locally, tunnel URL when on GitHub Pages
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3000';
+  }
+  return 'https://liz-enabling-sparc-four.trycloudflare.com';
+})();
+const MODULES = [
+  { key:'dashboard', label:'Dashboard' },
+  { key:'ir',        label:'Incident Reporting' },
+  { key:'dns',       label:'Deny Service' },
+  { key:'vr',        label:'Video Requests' },
+  { key:'hr',        label:'HR Investigations' },
+  { key:'xbr',       label:'XBR Viewer' },
+  { key:'blackbook', label:'Black Book' },
+  { key:'cashvar',   label:'Cash Variances' },
+  { key:'settings',  label:'Settings' }
+];
+
+let currentEditId = null;
+let token = localStorage.getItem('ap_token');
+let currentUser = JSON.parse(localStorage.getItem('ap_user') || 'null');
+
+// ── AUTH CHECK ─────────────────────────────────────────────
+(async function() {
+  if (!token) { window.location.href = 'login.html'; return; }
+  try {
+    const r = await fetch(BACKEND + '/api/session', { headers: {'x-session-token': token} });
+    if (!r.ok) { window.location.href = 'login.html'; return; }
+    const data = await r.json();
+    if (data.user.level !== 'ADMIN') { alert('Admin access required.'); window.location.href = 'index.html'; return; }
+    currentUser = data.user;
+    document.getElementById('user-badge').textContent = data.user.name;
+    loadUsers();
+  } catch(e) { window.location.href = 'login.html'; }
+})();
+
+async function doLogout() {
+  await fetch(BACKEND + '/api/logout', { method:'POST', headers:{'x-session-token':token} });
+  localStorage.removeItem('ap_token');
+  localStorage.removeItem('ap_user');
+  window.location.href = 'login.html';
+}
+
+async function loadUsers() {
+  const wrap = document.getElementById('users-wrap');
+  try {
+    const r = await fetch(BACKEND + '/api/users', { headers:{'x-session-token':token} });
+    const users = await r.json();
+    renderUsers(users);
+  } catch(e) {
+    wrap.innerHTML = '<div class="loading">Error loading users: ' + e.message + '</div>';
+  }
+}
+
+function renderUsers(users) {
+  const wrap = document.getElementById('users-wrap');
+  if (!users.length) { wrap.innerHTML = '<div class="loading">No users found.</div>'; return; }
+  
+  wrap.innerHTML = '<table class="user-table"><thead><tr>' +
+    '<th>User</th><th>ID</th><th>Level</th><th>Status</th><th>Access</th><th>Actions</th>' +
+    '</tr></thead><tbody>' +
+    users.map(u => {
+      const accessBadges = MODULES.map(m => {
+        const a = u.access[m.key] || '';
+        if (!a) return `<span class="access-badge access-none">${m.label.substring(0,3)}</span>`;
+        if (a === 'W') return `<span class="access-badge access-w">${m.label.substring(0,3)} W</span>`;
+        return `<span class="access-badge access-r">${m.label.substring(0,3)} R</span>`;
+      }).join('');
+      return `<tr>
+        <td><strong>${u.name}</strong></td>
+        <td style="color:#5a9fd4;">${u.id}</td>
+        <td><span class="${u.level==='ADMIN'?'level-admin':'level-user'}">${u.level}</span></td>
+        <td><span class="${u.active?'status-active':'status-inactive'}">${u.active?'Active':'Inactive'}</span></td>
+        <td><div class="access-grid">${accessBadges}</div></td>
+        <td>
+          <button class="btn-edit" onclick="openEditModal('${u.id}')">Edit</button>
+          <button class="btn-disable" onclick="toggleUser('${u.id}',${u.active})">${u.active?'Disable':'Enable'}</button>
+          <button class="btn-edit" style="color:#e0a030;border-color:#5a4000;" onclick="unlockUser('${u.id}')">Unlock</button>
+        </td>
+      </tr>`;
+    }).join('') +
+    '</tbody></table>';
+}
+
+function buildAccessTable(access) {
+  return MODULES.map(m => `
+    <tr>
+      <td>${m.label}</td>
+      <td>
+        <select id="access-${m.key}">
+          <option value="" ${!access[m.key]?'selected':''}>No access</option>
+          <option value="R" ${access[m.key]==='R'?'selected':''}>Read</option>
+          <option value="W" ${access[m.key]==='W'?'selected':''}>Read + Write</option>
+        </select>
+      </td>
+    </tr>`).join('');
+}
+
+function getAccessFromForm() {
+  const access = {};
+  MODULES.forEach(m => { access[m.key] = document.getElementById('access-'+m.key).value; });
+  return access;
+}
+
+function openCreateModal() {
+  currentEditId = null;
+  document.getElementById('modal-title').textContent = 'Add user';
+  document.getElementById('modal-id').value = '';
+  document.getElementById('modal-id').disabled = false;
+  document.getElementById('modal-name').value = '';
+  document.getElementById('modal-password').value = '';
+  document.getElementById('modal-level').value = 'USER';
+  document.getElementById('pwd-label').textContent = 'Password';
+  document.getElementById('modal-save-btn').textContent = 'Save user';
+  document.getElementById('modal-msg').textContent = '';
+  document.getElementById('access-tbody').innerHTML = buildAccessTable({});
+  document.getElementById('user-modal').classList.add('open');
+}
+
+function openEditModal(userId) {
+  currentEditId = userId;
+  const users = document.querySelectorAll('.user-table tbody tr');
+  // Fetch fresh data
+  fetch(BACKEND + '/api/users', { headers:{'x-session-token':token} })
+    .then(r => r.json())
+    .then(users => {
+      const u = users.find(x => x.id === userId);
+      if (!u) return;
+      document.getElementById('modal-title').textContent = 'Edit user — ' + u.name;
+      document.getElementById('modal-id').value = u.id;
+      document.getElementById('modal-id').disabled = true;
+      document.getElementById('modal-name').value = u.name;
+      document.getElementById('modal-password').value = '';
+      document.getElementById('modal-level').value = u.level;
+      document.getElementById('pwd-label').textContent = 'New password (leave blank to keep current)';
+      document.getElementById('modal-save-btn').textContent = 'Save changes';
+      document.getElementById('modal-msg').textContent = '';
+      document.getElementById('access-tbody').innerHTML = buildAccessTable(u.access);
+      document.getElementById('user-modal').classList.add('open');
+    });
+}
+
+function closeModal() {
+  document.getElementById('user-modal').classList.remove('open');
+  currentEditId = null;
+}
+
+async function saveUser() {
+  const btn = document.getElementById('modal-save-btn');
+  const msg = document.getElementById('modal-msg');
+  btn.disabled = true;
+  msg.textContent = '';
+  msg.className = 'save-msg';
+
+  const id = document.getElementById('modal-id').value.trim().toLowerCase();
+  const name = document.getElementById('modal-name').value.trim();
+  const password = document.getElementById('modal-password').value;
+  const level = document.getElementById('modal-level').value.trim().toUpperCase();
+  const access = getAccessFromForm();
+
+  try {
+    let r;
+    if (currentEditId) {
+      const body = { name, level, access };
+      if (password) body.newPassword = password;
+      r = await fetch(BACKEND + '/api/users/' + currentEditId, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json','x-session-token':token},
+        body: JSON.stringify(body)
+      });
+    } else {
+      if (!id || !name || !password) { msg.textContent = 'ID, name and password are required.'; msg.className='err-msg'; btn.disabled=false; return; }
+      r = await fetch(BACKEND + '/api/users', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','x-session-token':token},
+        body: JSON.stringify({ id, name, password, level, access })
+      });
+    }
+    const data = await r.json();
+    if (r.ok) {
+      msg.textContent = '✓ Saved successfully';
+      msg.className = 'save-msg';
+      loadUsers();
+      setTimeout(closeModal, 1200);
+    } else {
+      msg.textContent = data.error || 'Save failed';
+      msg.className = 'err-msg';
+    }
+  } catch(e) {
+    msg.textContent = 'Error: ' + e.message;
+    msg.className = 'err-msg';
+  }
+  btn.disabled = false;
+}
+
+async function toggleUser(userId, currentlyActive) {
+  if (!confirm(`${currentlyActive?'Disable':'Enable'} user ${userId}?`)) return;
+  try {
+    const r = await fetch(BACKEND + '/api/users/' + userId, {
+      method: 'PUT',
+      headers: {'Content-Type':'application/json','x-session-token':token},
+      body: JSON.stringify({ active: !currentlyActive })
+    });
+    if (r.ok) loadUsers();
+    else alert('Failed to update user.');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function unlockUser(userId) {
+  if (!confirm('Unlock account for ' + userId + '?')) return;
+  try {
+    const r = await fetch(BACKEND + '/api/users/' + userId + '/unlock', {
+      method: 'POST',
+      headers: {'x-session-token': token}
+    });
+    if (r.ok) { alert('Account unlocked successfully.'); loadUsers(); }
+    else alert('Failed to unlock account.');
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target === document.getElementById('user-modal')) closeModal();
+});
+
+function switchTab(tab) {
+  document.getElementById('tab-users').classList.toggle('active', tab === 'users');
+  document.getElementById('tab-logs').classList.toggle('active', tab === 'logs');
+  document.querySelector('.main').style.display = tab === 'users' ? '' : 'none';
+  document.getElementById('log-section').style.display = tab === 'logs' ? '' : 'none';
+  if (tab === 'logs') loadActivityLogs();
+}
+
+async function loadActivityLogs() {
+  const wrap = document.getElementById('log-wrap');
+  wrap.innerHTML = '<div class="loading">Loading...</div>';
+
+  const userId = document.getElementById('log-user-filter').value;
+  const action = document.getElementById('log-action-filter').value;
+  const from = document.getElementById('log-from').value;
+  const to = document.getElementById('log-to').value;
+
+  let url = BACKEND + '/api/logs?limit=500';
+  if (userId) url += '&userId=' + userId;
+  if (action) url += '&action=' + action;
+  if (from) url += '&from=' + from;
+  if (to) url += '&to=' + to + 'T23:59:59';
+
+  try {
+    const r = await fetch(url, { headers: {'x-session-token': token} });
+    const logs = await r.json();
+    document.getElementById('log-count').textContent = logs.length + ' entries';
+
+    // Populate user filter if empty
+    const userFilter = document.getElementById('log-user-filter');
+    if (userFilter.options.length <= 1) {
+      const users = [...new Set(logs.map(l => l.userId))].sort();
+      users.forEach(u => {
+        const opt = document.createElement('option');
+        opt.value = u; opt.textContent = u;
+        userFilter.appendChild(opt);
+      });
+    }
+
+    if (!logs.length) { wrap.innerHTML = '<div class="loading">No log entries found.</div>'; return; }
+
+    wrap.innerHTML = '<table class="log-table"><thead><tr>' +
+      '<th>Timestamp</th><th>User</th><th>Action</th><th>Target</th><th>Detail</th><th>IP</th>' +
+      '</tr></thead><tbody>' +
+      logs.map(l => {
+        const dt = new Date(l.ts).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+        const actionClass = 'log-action-' + (l.action||'').toLowerCase();
+        return `<tr>
+          <td style="color:#4a6a8a;white-space:nowrap;">${dt}</td>
+          <td><strong>${l.userName||l.userId}</strong><br><span style="color:#4a6a8a;font-size:10px;">${l.userId}</span></td>
+          <td><span class="${actionClass}">${l.action}</span></td>
+          <td>${l.target||'—'}</td>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${(l.detail||'').replace(/"/g,'&quot;')}">${l.detail||'—'}</td>
+          <td style="color:#4a6a8a;">${l.ip||'—'}</td>
+        </tr>`;
+      }).join('') +
+      '</tbody></table>';
+  } catch(e) {
+    wrap.innerHTML = '<div class="loading">Error: ' + e.message + '</div>';
+  }
+}
+
+// Alias for filter change handlers
+function loadLogs() { loadActivityLogs(); }
+
+async function exportLogs() {
+  const url = BACKEND + '/api/logs/export';
+  const r = await fetch(url, { headers: {'x-session-token': token} });
+  const blob = await r.blob();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ap-activity-log.csv';
+  a.click();
+}
+</script>
+</body>
+</html>

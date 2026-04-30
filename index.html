@@ -1,6 +1,6 @@
 <!-- v20260423204100 -->
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;800&display=swap" rel="stylesheet">
@@ -62,8 +62,64 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 /* FOOTER */
 .footer{text-align:center;padding:24px;color:#2d3f55;font-size:11px;border-top:1px solid #1e2e40;margin-top:40px;}
 </style>
+<script>
+// ── SESSION CHECK ──────────────────────────────────────────
+const BACKEND = (function() {
+  // Use localhost when running locally, tunnel URL when on GitHub Pages
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3000';
+  }
+  return 'https://liz-enabling-sparc-four.trycloudflare.com';
+})();
+let AP_USER = null;
+let AP_TOKEN = null;
+
+(async function checkSession() {
+  AP_TOKEN = localStorage.getItem('ap_token');
+  if (!AP_TOKEN) { if (!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; return; }
+  try {
+    const r = await fetch(BACKEND + '/api/session', {
+      headers: { 'x-session-token': AP_TOKEN }
+    });
+    if (!r.ok) { window.location.href = 'login.html'; return; }
+    const data = await r.json();
+    AP_USER = data.user;
+    // Check module access
+    const module = document.body.getAttribute('data-module');
+    if (module && !AP_USER.access[module]) {
+      window.location.href = 'index.html';
+      return;
+    }
+    // Show user name in header
+    const badge = document.getElementById('user-badge');
+    if (badge) badge.textContent = AP_USER.name;
+    // Hide write controls if read-only
+    if (module && AP_USER.access[module] === 'R') {
+      document.querySelectorAll('.write-only').forEach(el => el.style.display = 'none');
+    }
+    // Hide modules user cant access (index.html only)
+    document.querySelectorAll('[data-requires]').forEach(el => {
+      const mod = el.getAttribute('data-requires');
+      if (!AP_USER.access[mod]) el.style.display = 'none';
+    });
+  } catch(e) {
+    window.location.href = 'login.html';
+  }
+})();
+
+async function doLogout() {
+  await fetch(BACKEND + '/api/logout', {
+    method: 'POST',
+    headers: { 'x-session-token': AP_TOKEN }
+  });
+  localStorage.removeItem('ap_token');
+  localStorage.removeItem('ap_user');
+  window.location.href = 'login.html';
+}
+
+</script>
 </head>
-<body>
+<body data-module="dashboard">
 
 <div class="header">
   <div class="header-left">
@@ -86,7 +142,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <div class="section-title">Active Modules</div>
   <div class="module-grid">
 
-    <div class="module-card live" onclick="window.location='APViewer.html'">
+    <div class="module-card live" onclick="window.location='APViewer.html'" data-requires="ir">
       <div class="module-stripe stripe-live"></div>
       <div class="module-icon">🛡️</div>
       <div class="module-name">Incident Reporting</div>
@@ -97,7 +153,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       </div>
     </div>
 
-    <div class="module-card live" onclick="window.location='VRViewer.html'">
+    <div class="module-card live" onclick="window.location='VRViewer.html'" data-requires="vr">
       <div class="module-stripe stripe-live"></div>
       <div class="module-icon">🎬</div>
       <div class="module-name">Video Requests</div>
@@ -108,7 +164,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       </div>
     </div>
 
-    <div class="module-card live" onclick="window.location='DSViewer.html'">
+    <div class="module-card live" onclick="window.location='DSViewer.html'" data-requires="dns">
       <div class="module-stripe stripe-live"></div>
       <div class="module-icon">🚫</div>
       <div class="module-name">Deny Service</div>
@@ -119,7 +175,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       </div>
     </div>
 
-    <div class="module-card live" onclick="window.location='HRViewer.html'">
+    <div class="module-card live" onclick="window.location='HRViewer.html'" data-requires="hr">
       <div class="module-stripe stripe-live"></div>
       <div class="module-icon">👥</div>
       <div class="module-name">HR Investigations</div>
@@ -160,7 +216,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       </div>
     </div>
 
-    <div class="module-card live" onclick="window.location='XBRViewer.html'">
+    <div class="module-card live" onclick="window.location='XBRViewer.html'" data-requires="xbr">
       <div class="module-stripe stripe-live"></div>
       <div class="module-icon">📊</div>
       <div class="module-name">XBR Investigations</div>
@@ -171,19 +227,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
       </div>
     </div>
 
+    <div class="module-card live" onclick="window.location='UserManager.html'" data-requires="settings">
+      <div class="module-stripe" style="background:#f56200;"></div>
+      <div class="module-icon">⚙️</div>
+      <div class="module-name">User management</div>
+      <div class="module-desc">Manage portal users, access levels, passwords, and view activity logs. Admin and authorized users only.</div>
+      <div class="module-footer">
+        <span class="module-badge badge-live">● Live</span>
+        <span class="module-arrow">→</span>
+      </div>
+    </div>
+
   </div>
   <div class="footer">Range USA Asset Protection Platform &nbsp;·&nbsp; Internal Use Only</div>
 </div>
 
 <script>
 const TOKEN = "unused";
-const PROXY = "https://radius-revelation-ward-chicago.trycloudflare.com/api/monday?query=";
+const PROXY = "https://liz-enabling-sparc-four.trycloudflare.com/api/monday?query=";
 const IR_BOARD = "309348813";
 const VR_BOARD = "992178387";
 const DS_BOARD = "1053253179";
 
 async function gql(query) {
-  const r = await fetch("https://radius-revelation-ward-chicago.trycloudflare.com/api/monday", {method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},body:JSON.stringify({query:q}),
+  const r = await fetch("https://liz-enabling-sparc-four.trycloudflare.com/api/monday", {method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},body:JSON.stringify({query:q}),
     body:JSON.stringify({query})
   });
   return r.json();

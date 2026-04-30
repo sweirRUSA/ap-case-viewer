@@ -1,7 +1,7 @@
 <!-- v20260423204100 -->
 <!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
 <meta charset="UTF-8"/>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@700;800&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -70,8 +70,59 @@ tbody td.neg{color:#e05050;}
 .summary-val{font-size:18px;font-weight:700;color:#e0eaf5;}
 .summary-lbl{font-size:10px;color:#4a6a8a;text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
 </style>
+<script>
+// ── SESSION CHECK ──────────────────────────────────────────
+const BACKEND = (function() {
+  // Use localhost when running locally, tunnel URL when on GitHub Pages
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3000';
+  }
+  return 'https://liz-enabling-sparc-four.trycloudflare.com';
+})();
+let AP_USER = null;
+let AP_TOKEN = null;
+
+(async function checkSession() {
+  AP_TOKEN = localStorage.getItem('ap_token');
+  if (!AP_TOKEN) { if (!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; return; }
+  try {
+    const r = await fetch(BACKEND + '/api/session', {
+      headers: { 'x-session-token': AP_TOKEN }
+    });
+    if (!r.ok) { window.location.href = 'login.html'; return; }
+    const data = await r.json();
+    AP_USER = data.user;
+    // Check module access
+    const module = document.body.getAttribute('data-module');
+    if (module && !AP_USER.access[module]) {
+      window.location.href = 'index.html';
+      return;
+    }
+    // Show user name in header
+    const badge = document.getElementById('user-badge');
+    if (badge) badge.textContent = AP_USER.name;
+    // Hide write controls if read-only
+    if (module && AP_USER.access[module] === 'R') {
+      document.querySelectorAll('.write-only').forEach(el => el.style.display = 'none');
+    }
+  } catch(e) {
+    window.location.href = 'login.html';
+  }
+})();
+
+async function doLogout() {
+  await fetch(BACKEND + '/api/logout', {
+    method: 'POST',
+    headers: { 'x-session-token': AP_TOKEN }
+  });
+  localStorage.removeItem('ap_token');
+  localStorage.removeItem('ap_user');
+  window.location.href = 'login.html';
+}
+
+</script>
 </head>
-<body>
+<body data-module="xbr">
 
 <div class="header">
   <div class="header-left">
@@ -144,7 +195,7 @@ tbody td.neg{color:#e05050;}
       <div class="empty-title">Returns Report</div>
       <div class="empty-sub">Connect to your SQL Server backend to load live returns data. This report shows original sales, refunds, payment types, product details, and employee information.</div>
       <div style="margin-top:16px;">
-        <button class="btn-primary" onclick="showConnectModal('returns')">⚡ Connect to SQL Server</button>
+        <button class="btn-primary write-only" onclick="showConnectModal('returns')">⚡ Connect to SQL Server</button>
       </div>
     </div>
   </div>
@@ -164,21 +215,85 @@ tbody td.neg{color:#e05050;}
       <input type="password" id="api-key" placeholder="Optional API key"/>
     </div>
     <div style="display:flex;gap:8px;margin-top:16px;">
-      <button class="btn-primary" onclick="testConnection()">Test Connection</button>
-      <button class="btn-primary" onclick="saveAndLoad()" id="btn-load" style="display:none;">Load Data</button>
+      <button class="btn-primary write-only" onclick="testConnection()">Test Connection</button>
+      <button class="btn-primary write-only" onclick="saveAndLoad()" id="btn-load" style="display:none;">Load Data</button>
       <button onclick="hideConnectModal()">Cancel</button>
     </div>
     <div id="connect-status" style="margin-top:10px;font-size:12px;color:#4a6a8a;"></div>
   </div>
 </div>
 
-<script>
-let gcData = [], retData = [], gcFiltered = [], retFiltered = [];
-let gcSortCol = null, gcSortDir = 1;
-let retSortCol = null, retSortDir = 1;
-let currentModal = '';
-let apiUrl = localStorage.getItem('xbr_api_url') || '';
-let apiKey = localStorage.getItem('xbr_api_key') || '';
+<script>─// ── SESSION CHECK ──────────────────────────────────────────
+const BACKEND_URL = "https://liz-enabling-sparc-four.trycloudflare.com";
+let apUser = null;
+
+async function checkSession(moduleKey) {
+  const token = localStorage.getItem("ap_token");
+  if (!token) { window.location.href = "login.html"; return false; }
+  try {
+    const r = await fetch(BACKEND_URL + "/api/session", { headers: {"x-session-token": token} });
+    if (!r.ok) { window.location.href = "login.html"; return false; }
+    const data = await r.json();
+    apUser = data.user;
+    const access = apUser.access[moduleKey] || "";
+    if (!access) { window.location.href = "index.html"; return false; }
+    const badge = document.getElementById("user-badge");
+    if (badge) badge.textContent = apUser.name;
+    if (access === "R") { setTimeout(applyReadOnly, 1500); }
+    return true;
+  } catch(e) { window.location.href = "login.html"; return false; }
+}
+
+function applyReadOnly() {
+  document.querySelectorAll(".btn-primary,.sbutton,.fedit-actions").forEach(function(el) {
+    el.style.display = "none";
+  });
+}
+
+async function doLogout() {
+  const token = localStorage.getItem("ap_token");
+  try { await fetch(BACKEND_URL + "/api/logout", { method:"POST", headers:{"x-session-token":token} }); } catch(e) {}
+  localStorage.removeItem("ap_token");
+  localStorage.removeItem("ap_user");
+  window.location.href = "login.html";
+}
+// ── END SESSION CHECK ──────────────────────────────────────
+
+
+
+// ── SESSION CHECK ──────────────────────────────────────────
+const MODULE_KEY = 'xbr';
+
+async function checkSession() {{
+  const token = localStorage.getItem('ap_token');
+  if (!token) {{ window.location.href = 'login.html'; return false; }}
+  try {{
+    const r = await fetch(BACKEND_URL + '/api/session', {{ headers: {{"x-session-token": token}} }});
+    if (!r.ok) {{ window.location.href = 'login.html'; return false; }}
+    const data = await r.json();
+    apUser = data.user;
+    const access = apUser.access[MODULE_KEY] || '';
+    if (!access) {{ window.location.href = 'index.html'; return false; }}
+    const badge = document.getElementById('user-badge');
+    if (badge) badge.textContent = apUser.name;
+    if (access === 'R') {{ setTimeout(applyReadOnly, 1500); }}
+    return true;
+  }} catch(e) {{ window.location.href = 'login.html'; return false; }}
+}}
+
+function applyReadOnly() {{
+  document.querySelectorAll('.btn-primary,.sbutton,.fedit-actions,button[onclick*="save"],button[onclick*="Save"],button[onclick*="update"],button[onclick*="Update"]').forEach(el => {{
+    el.style.display = 'none';
+  }});
+}}
+
+async function doLogout() {{
+  const token = localStorage.getItem('ap_token');
+  try {{ await fetch(BACKEND_URL + '/api/logout', {{ method:'POST', headers:{{"x-session-token":token}} }}); }} catch(e) {{}}
+  localStorage.removeItem('ap_token');
+  localStorage.removeItem('ap_user');
+  window.location.href = 'login.html';
+}}
 
 // ── TAB SWITCHING ──────────────────────────────────────────
 function switchTab(tab) {
@@ -231,7 +346,8 @@ async function testConnection() {
 async function saveAndLoad() {
   hideConnectModal();
   if (currentModal === 'gift-card') await loadGCData();
-  else await loadRetData();
+  if (!await checkSession("xbr")) return;
+    else await loadRetData();
 }
 
 // ── GIFT CARD DATA ─────────────────────────────────────────
@@ -282,6 +398,7 @@ function parseCSVRow(line) {
 }
 
 async function loadGCData() {
+  if (apUser === null && !await checkSession()) return;
   const wrap = document.getElementById('gc-table-wrap');
   wrap.innerHTML = '<div class="empty-state"><div class="empty-icon" style="animation:pulse 1s infinite;">⏳</div><div class="empty-title">Loading Gift Card Data...</div></div>';
   try {
@@ -534,7 +651,6 @@ function exportToExcel(tableId, filename) {
 
 // Auto-load GC data from GitHub CSV
 loadGCData();
-
 // ── XBR INVESTIGATION TRACKING ────────────────────────────
 const XBR_BOARD = "18410682291";
 const XBR_COLS = {
