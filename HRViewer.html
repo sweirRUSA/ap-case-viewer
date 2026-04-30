@@ -131,7 +131,7 @@ const BACKEND = (function() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return 'http://localhost:3000';
   }
-  return 'https://liz-enabling-sparc-four.trycloudflare.com';
+  return 'https://jefferson-commons-routing-sky.trycloudflare.com';
 })();
 let AP_USER = null;
 let AP_TOKEN = null;
@@ -255,7 +255,7 @@ async function doLogout() {
     <button class="lightbox-btn" onclick="lbNav(1)">&#8250;</button>
   </div>
 </div>
-<script>─const BACKEND_URL = "https://liz-enabling-sparc-four.trycloudflare.com";
+<script>─const BACKEND_URL = "https://jefferson-commons-routing-sky.trycloudflare.com";
 let apUser = null;
 
 async function checkSession(moduleKey) {
@@ -293,7 +293,7 @@ const TOKEN = "unused";
 const HR_BOARD = "18409509776";
 const VR_BOARD = "992178387";
 const DS_BOARD = "1053253179";
-const PROXY = "https://liz-enabling-sparc-four.trycloudflare.com/api/monday?query=";
+const PROXY = "https://jefferson-commons-routing-sky.trycloudflare.com/api/monday?query=";
 let hrItems=[], vrItems=[], dsItems=[], selectedId=null;
 let detailCache={};
 
@@ -354,7 +354,7 @@ async function logActivity(action, target, detail) {
   const token = localStorage.getItem('ap_token');
   if (!token) return;
   try {
-    await fetch('https://liz-enabling-sparc-four.trycloudflare.com/api/log', {
+    await fetch('https://jefferson-commons-routing-sky.trycloudflare.com/api/log', {
       method: 'POST',
       headers: {'Content-Type':'application/json','x-session-token':token},
       body: JSON.stringify({action, target, detail})

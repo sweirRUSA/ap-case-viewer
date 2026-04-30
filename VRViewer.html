@@ -85,7 +85,7 @@ const BACKEND = (function() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return 'http://localhost:3000';
   }
-  return 'https://liz-enabling-sparc-four.trycloudflare.com';
+  return 'https://jefferson-commons-routing-sky.trycloudflare.com';
 })();
 let AP_USER = null;
 let AP_TOKEN = null;
@@ -171,7 +171,7 @@ async function doLogout() {
   <div class="detail" id="detail-panel"><div class="empty">Select a request from the list</div></div>
 </div>
 
-<script>─const BACKEND_URL = "https://liz-enabling-sparc-four.trycloudflare.com";
+<script>─const BACKEND_URL = "https://jefferson-commons-routing-sky.trycloudflare.com";
 let apUser = null;
 
 async function checkSession(moduleKey) {
@@ -206,7 +206,7 @@ async function doLogout() {
 }
 
 const TOKEN = "unused";
-const PROXY = "https://liz-enabling-sparc-four.trycloudflare.com/api/monday?query=";
+const PROXY = "https://jefferson-commons-routing-sky.trycloudflare.com/api/monday?query=";
 const VR_BOARD = "992178387";
 let vrItems = [], selectedId = null;
 
@@ -230,7 +230,7 @@ async function logActivity(action, target, detail) {
   const token = localStorage.getItem('ap_token');
   if (!token) return;
   try {
-    await fetch('https://liz-enabling-sparc-four.trycloudflare.com/api/log', {
+    await fetch('https://jefferson-commons-routing-sky.trycloudflare.com/api/log', {
       method: 'POST',
       headers: {'Content-Type':'application/json','x-session-token':token},
       body: JSON.stringify({action, target, detail})
@@ -238,7 +238,7 @@ async function logActivity(action, target, detail) {
   } catch(e) {}
 }
 async function gql(q) {
-  const r = await fetch("https://liz-enabling-sparc-four.trycloudflare.com/api/monday",{
+  const r = await fetch("https://jefferson-commons-routing-sky.trycloudflare.com/api/monday",{
     method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},
     body:JSON.stringify({query:q})
   });
@@ -477,7 +477,7 @@ async function showActivityLog(itemId, boardId, name) {
   body.innerHTML = "<div style='color:#4a6a8a;font-size:12px;'>Loading activity log...</div>";
   try {
     const q = "{boards(ids:"+boardId+"){activity_logs(item_ids:["+itemId+"],limit:50){id event data created_at}}}";
-    const r = await fetch("https://liz-enabling-sparc-four.trycloudflare.com/api/monday",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},body:JSON.stringify({query:q})});
+    const r = await fetch("https://jefferson-commons-routing-sky.trycloudflare.com/api/monday",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},body:JSON.stringify({query:q})});
     const data = await r.json();
     const logs = data?.data?.boards?.[0]?.activity_logs || [];
     if (!logs.length) { body.innerHTML = "<div style='color:#4a6a8a;font-size:12px;font-style:italic;'>No activity found.</div>"; return; }
