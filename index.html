@@ -75,13 +75,17 @@ let AP_USER = null;
 let AP_TOKEN = null;
 
 (async function checkSession() {
+  var dbg = document.getElementById('debug-bar');
   AP_TOKEN = localStorage.getItem('ap_token');
-  if (!AP_TOKEN) { window.location.href = 'login.html'; return; }
+  dbg.textContent = 'Token: ' + (AP_TOKEN ? AP_TOKEN.substring(0,20)+'...' : 'NONE') + ' | BACKEND: ' + BACKEND;
+  if (!AP_TOKEN) { dbg.textContent += ' | NO TOKEN - redirecting'; setTimeout(()=>window.location.href='login.html',2000); return; }
   try {
+    dbg.textContent += ' | Calling /api/session...';
     const r = await fetch(BACKEND + '/api/session', {
       headers: { 'x-session-token': AP_TOKEN }
     });
-    if (!r.ok) { localStorage.removeItem('ap_token'); localStorage.removeItem('ap_user'); window.location.href = 'login.html'; return; }
+    dbg.textContent += ' | Status: ' + r.status;
+    if (!r.ok) { dbg.textContent += ' | FAILED - clearing token'; localStorage.removeItem('ap_token'); localStorage.removeItem('ap_user'); setTimeout(()=>window.location.href='login.html',3000); return; }
     const data = await r.json();
     AP_USER = data.user;
     // Check module access
@@ -121,7 +125,8 @@ async function doLogout() {
 </head>
 <body data-module="dashboard">
 
-<div class="header">
+<div id="debug-bar" style="background:#ff0;color:#000;padding:8px 16px;font-size:12px;font-family:monospace;position:fixed;top:0;left:0;right:0;z-index:9999;">Loading...</div>
+<div class="header" style="margin-top:32px;">
   <div class="header-left">
     <img src="RUSALogo.png" alt="Range USA" style="height:120px;object-fit:contain;"/>
   </div>
