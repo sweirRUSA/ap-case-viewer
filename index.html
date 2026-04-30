@@ -78,7 +78,7 @@ let AP_TOKEN = null;
   AP_TOKEN = localStorage.getItem('ap_token');
   if (!AP_TOKEN) { window.location.href = 'login.html'; return; }
   try {
-    dbg.textContent += " | Calling /api/session...";
+
     const r = await fetch(BACKEND + '/api/session', {
       headers: { 'x-session-token': AP_TOKEN }
     });
