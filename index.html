@@ -75,17 +75,14 @@ let AP_USER = null;
 let AP_TOKEN = null;
 
 (async function checkSession() {
-  var dbg = document.getElementById('debug-bar');
   AP_TOKEN = localStorage.getItem('ap_token');
-  dbg.textContent = 'Token: ' + (AP_TOKEN ? AP_TOKEN.substring(0,20)+'...' : 'NONE') + ' | BACKEND: ' + BACKEND;
-  if (!AP_TOKEN) { dbg.textContent += ' | NO TOKEN - redirecting'; setTimeout(()=>window.location.href='login.html',2000); return; }
+  if (!AP_TOKEN) { window.location.href = 'login.html'; return; }
   try {
-    dbg.textContent += ' | Calling /api/session...';
+    dbg.textContent += " | Calling /api/session...";
     const r = await fetch(BACKEND + '/api/session', {
       headers: { 'x-session-token': AP_TOKEN }
     });
-    dbg.textContent += ' | Status: ' + r.status;
-    if (!r.ok) { dbg.textContent += ' | FAILED - clearing token'; localStorage.removeItem('ap_token'); localStorage.removeItem('ap_user'); setTimeout(()=>window.location.href='login.html',3000); return; }
+    if (!r.ok) { localStorage.removeItem('ap_token'); localStorage.removeItem('ap_user'); window.location.href = 'login.html'; return; }
     const data = await r.json();
     AP_USER = data.user;
     // Check module access
@@ -125,8 +122,7 @@ async function doLogout() {
 </head>
 <body data-module="dashboard">
 
-<div id="debug-bar" style="background:#ff0;color:#000;padding:8px 16px;font-size:12px;font-family:monospace;position:fixed;top:0;left:0;right:0;z-index:9999;">Loading...</div>
-<div class="header" style="margin-top:32px;">
+<div class="header">
   <div class="header-left">
     <img src="RUSALogo.png" alt="Range USA" style="height:120px;object-fit:contain;"/>
   </div>
@@ -255,8 +251,15 @@ const VR_BOARD = "992178387";
 const DS_BOARD = "1053253179";
 
 async function gql(query) {
-  const r = await fetch("https://jefferson-commons-routing-sky.trycloudflare.com/api/monday", {method:"POST",headers:{"Content-Type":"application/json","x-api-key":"rusa-ap-2026"},body:JSON.stringify({query:q}),
-    body:JSON.stringify({query})
+  var token = localStorage.getItem('ap_token');
+  if (!token) return {};
+  var backend = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : 'https://jefferson-commons-routing-sky.trycloudflare.com';
+  const r = await fetch(backend + '/api/monday', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'x-session-token': token},
+    body: JSON.stringify({query: query})
   });
   return r.json();
 }

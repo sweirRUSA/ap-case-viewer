@@ -408,6 +408,20 @@ async function logActivity(action, target, detail) {
     });
   } catch(e) {}  // Silent fail — logging should never break the app
 }
+async function gql(q) {
+  var token = localStorage.getItem('ap_token');
+  if (!token) return {};
+  var backend = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : 'https://jefferson-commons-routing-sky.trycloudflare.com';
+  const r = await fetch(backend + '/api/monday', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'x-session-token': token},
+    body: JSON.stringify({query: q})
+  });
+  return r.json();
+}
+
 async function fetchBoard(boardId, colMap, dateFilter) {
   let all=[], cursor=null;
   for (let p=0; p<30; p++) {
